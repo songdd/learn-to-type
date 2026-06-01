@@ -22,3 +22,8 @@ npm-debug.log*
 dist/
 build/
 *.exe
+# Tencent Cloud EdgeOne
+.env
+.edgeone/*
+.tef_dist/*
+  

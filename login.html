@@ -152,7 +152,7 @@
     // 调用后端 API 验证邀请码
     async function verifyCode(code) {
         try {
-            const response = await fetch('/api/verify', {
+            const response = await fetch('/verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
