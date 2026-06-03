@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>打字练习 · 21关渐进盲打 | 精准解锁 + 战机模式入口 | 真实键盘音效</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a3a 0%, #0f1a24 100%);
+            font-family: 'Segoe UI', 'Roboto', 'JetBrains Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(22, 32, 45, 0.85);
+            backdrop-filter: blur(2px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
+            padding: 1rem 1.2rem 1.2rem 1.2rem;
+            border: 1px solid rgba(72, 120, 150, 0.4);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #0e1a24c9;
+            border-radius: 50px;
+            padding: 6px 16px;
+            margin-bottom: 8px;
+        }
+
+        .stat {
+            background: #07121b;
+            padding: 4px 14px;
+            border-radius: 30px;
+            color: #cfecf0;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .stat span {
+            color: #6bc6ff;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-right: 4px;
+        }
+
+        .rule-banner {
+            background: #0f2a2f;
+            border-radius: 28px;
+            padding: 6px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            font-size: 0.7rem;
+            color: #b8e2f2;
+            border: 1px solid #2c7da0;
+        }
+        .rule-banner span {
+            background: #1c4e5c;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .rule-banner .high { background: #ffb347; color: #1e2a2f; }
+        .rule-banner .auto-reset { background: #8b5a2b; color: #ffd966; }
+        .save-badge {
+            background: #2c7da0;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+        }
+        .game-mode-link {
+            background: #e67e22;
+            color: white;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            font-family: monospace;
+        }
+        .game-mode-link:hover {
+            background: #f39c12;
+            transform: scale(0.96);
+            box-shadow: 0 0 8px #ffb347;
+        }
+
+        .major-level-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            background: #0a1620b3;
+            padding: 6px 12px;
+            border-radius: 40px;
+            align-items: center;
+        }
+
+        .major-btn {
+            background: #1f3a48;
+            border: none;
+            padding: 5px 14px;
+            border-radius: 32px;
+            font-weight: bold;
+            color: #cbdce6;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        .major-btn.active-major {
+            background: #2c7da0 !important;
+            color: white !important;
+            box-shadow: 0 0 5px #2c7da0;
+        }
+
+        .major-btn.locked-flash {
+            animation: lockFlash 0.5s ease-in-out 3;
+            background: #e74c3c !important;
+            color: white !important;
+        }
+
+        .sub-level-panel {
+            background: #0b1620dd;
+            border-radius: 24px;
+            padding: 6px 12px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            border: 1px solid #2f5e7a;
+        }
+
+        .sub-level-btn {
+            background: #1f3a48;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 28px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #d1e5f0;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .sub-level-btn.active-sub {
+            background: #ffb347 !important;
+            color: #1e2a2f !important;
+            box-shadow: 0 0 6px #ffaa33;
+            transform: scale(1.01);
+        }
+
+        .sub-level-btn.locked-sub {
+            opacity: 0.6;
+            cursor: pointer;
+        }
+
+        .sub-level-btn.locked-flash {
+            animation: lockFlash 0.5s ease-in-out 3;
+            background: #e74c3c !important;
+            color: white !important;
+            opacity: 1;
+        }
+
+        @keyframes lockFlash {
+            0% { background: #e74c3c; transform: scale(1); }
+            50% { background: #ff6b6b; transform: scale(1.05); }
+            100% { background: #e74c3c; transform: scale(1); }
+        }
+
+        .message-area.flash-error {
+            animation: msgFlash 0.5s ease-in-out 3;
+            background: #e74c3c !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        @keyframes msgFlash {
+            0% { background: #e74c3c; transform: scale(1); }
+            50% { background: #ff6b6b; transform: scale(1.02); }
+            100% { background: #e74c3c; transform: scale(1); }
+        }
+
+        .debug-badge {
+            background: #ff9800;
+            color: #1e2a2a;
+            padding: 2px 10px;
+            border-radius: 24px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .practice-area {
+            background: #0b1620dd;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 12px;
+        }
+
+        .reference-text {
+            font-size: 1.4rem;
+            font-weight: 500;
+            word-break: break-word;
+            line-height: 1.3;
+            color: #eef4ff;
+            background: #05111c;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-family: 'Fira Code', monospace;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .current-char-highlight {
+            background: #ffb74d;
+            color: #1e2a2f;
+            padding: 0 3px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 0 0 2px #ffb347;
+        }
+
+        .typing-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1.3rem;
+            font-family: 'Fira Code', monospace;
+            background: #010a13;
+            border: 2px solid #2c7da0;
+            border-radius: 40px;
+            color: #b3f0ff;
+            outline: none;
+            text-align: left;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .typing-input:focus {
+            border-color: #ffb347;
+            box-shadow: 0 0 6px #ffb34780;
+        }
+
+        .virtual-keyboard {
+            background: #0d1c26;
+            border-radius: 1.2rem;
+            padding: 8px 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .key-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 4px;
+            flex-wrap: nowrap;
+            min-width: 540px;
+        }
+
+        .key {
+            background: #1f2f3a;
+            color: #d9e2e8;
+            padding: 5px 8px;
+            min-width: 38px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .key.highlight {
+            background: #ffb347;
+            color: #0a1c28;
+            transform: scale(0.97);
+            box-shadow: 0 0 6px #ffaa33;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #1f4b5e;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 32px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: #2c7da0;
+        }
+
+        .btn-primary:hover {
+            background: #3e95b8;
+        }
+
+        .btn-reset-progress {
+            background: #8b5a2b;
+        }
+        .btn-reset-progress:hover {
+            background: #a06b35;
+        }
+
+        .message-area {
+            background: #0a141f;
+            padding: 8px 12px;
+            border-radius: 28px;
+            color: #88c9f0;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 500;
+            line-height: 1.4;
+            transition: all 0.2s;
+        }
+
+        @media (max-width: 750px) {
+            .reference-text { font-size: 1rem; padding: 10px; }
+            .typing-input { font-size: 1rem; padding: 10px; }
+            .key { padding: 3px 5px; min-width: 30px; font-size: 0.65rem; }
+            .major-btn { padding: 4px 12px; font-size: 0.7rem; }
+            .sub-level-btn { padding: 3px 10px; font-size: 0.65rem; }
+            .stat { font-size: 0.75rem; padding: 3px 10px; }
+            .rule-banner { font-size: 0.6rem; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="stats-bar">
+        <div class="stat"><span>⌨️ WPM</span> <span id="wpmValue">0</span></div>
+        <div class="stat"><span>🎯 准确率</span> <span id="accuracyValue">100</span>%</div>
+        <div class="stat"><span>⏱️ 用时</span> <span id="timerValue">0</span> s</div>
+        <div class="stat"><span>✨ 进度</span> <span id="progressCount">0</span>/<span id="totalChars">0</span></div>
+    </div>
+    <div class="rule-banner">
+        📋 解锁条件：<span>准确率 ≥90% 且练习≥3次</span> 或 <span class="high">准确率 ≥98% 直接解锁</span>
+        <span class="auto-reset">🔄 未达标(＜90%)自动重置</span>
+        <span class="save-badge">💾 进度自动保存</span>
+        <button id="arcadeModeBtn" class="game-mode-link">🎮 战机打字母 · 街机模式</button>
+    </div>
+    <div class="major-level-nav" id="majorNav"></div>
+    <div id="subPanel" class="sub-level-panel"></div>
+    <div class="practice-area">
+        <div class="reference-text" id="refText"></div>
+        <input type="text" class="typing-input" id="userInput" autocomplete="off" placeholder="开始打字..." autofocus>
+        <div class="virtual-keyboard" id="virtualKeyboard"></div>
+        <div class="action-bar">
+            <button class="btn" id="resetBtn">🔄 重置当前关卡</button>
+            <button class="btn btn-primary" id="nextLevelBtn">⏩ 下一关</button>
+            <button class="btn btn-reset-progress" id="resetAllProgressBtn">🗑️ 重置全部进度</button>
+        </div>
+        <div class="message-area" id="msgArea">✨ 点击未解锁关卡会有红色闪烁提示 | 进度自动保存 | 真实机械键盘音效（预加载，无延迟）</div>
+    </div>
+</div>
+<script>
+// 在 index.html 的 <script> 最开头添加
+(function() {
+    // 检查是否已登录
+    const loggedIn = localStorage.getItem('logged_in');
+    const loginTime = localStorage.getItem('login_time');
+    
+    if (!loggedIn || !loginTime) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // 登录有效期 7 天
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    if (Date.now() - parseInt(loginTime) > sevenDays) {
+        localStorage.removeItem('logged_in');
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('login_time');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    console.log('欢迎回来，', localStorage.getItem('user_name'));
+})();
+    
+// ==================== 真实键盘音效系统（预加载，无延迟）====================
+(function() {
+    let audioCtx = null;
+    let isAudioAllowed = false;
+    let correctSoundBuffer = null;
+    let errorSoundBuffer = null;
+    let isGenerating = false;
+    let generatePromise = null;
+    
+    // 初始化 AudioContext（静默创建，不自动启动）
+    function initAudio() {
+        if (audioCtx) return audioCtx;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            console.log("AudioContext 创建成功，状态:", audioCtx.state);
+        } catch(e) { 
+            console.warn("Web Audio API 不支持:", e); 
+        }
+        return audioCtx;
+    }
+    
+    // 生成逼真的机械键盘敲击音效（青轴手感）- 立即执行，预加载
+    function generateSoundBuffers() {
+        if (correctSoundBuffer && errorSoundBuffer) return Promise.resolve(true);
+        if (isGenerating) return generatePromise;
+        
+        const ctx = initAudio();
+        if (!ctx) return Promise.resolve(false);
+        
+        isGenerating = true;
+        generatePromise = new Promise((resolve) => {
+            try {
+                const sampleRate = ctx.sampleRate;
+                const duration = 0.12;
+                
+                // 正确输入音效缓冲区
+                correctSoundBuffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
+                const correctData = correctSoundBuffer.getChannelData(0);
+                
+                // 错误输入音效缓冲区
+                errorSoundBuffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
+                const errorData = errorSoundBuffer.getChannelData(0);
+                
+                for (let i = 0; i < sampleRate * duration; i++) {
+                    const t = i / sampleRate;
+                    
+                    // === 正确音效：机械键盘青轴 ===
+                    let mainClick = Math.sin(2 * Math.PI * 1200 * t) * Math.exp(-t * 35);
+                    let harmonic = Math.sin(2 * Math.PI * 400 * t) * Math.exp(-t * 25) * 0.6;
+                    let thump = Math.sin(2 * Math.PI * 80 * t) * Math.exp(-t * 18) * 0.4;
+                    let spring = Math.sin(2 * Math.PI * 2500 * t) * Math.exp(-t * 50) * 0.25;
+                    
+                    let correctSample = (mainClick + harmonic + thump + spring) * 0.8;
+                    correctSample = Math.max(-0.8, Math.min(0.8, correctSample));
+                    correctData[i] = correctSample;
+                    
+                    // === 错误音效：低沉"啵"声 ===
+                    let freq = 400 - t * 2000;
+                    if (freq < 60) freq = 60;
+                    let mainSound = Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 22);
+                    let lowThump = Math.sin(2 * Math.PI * 60 * t) * Math.exp(-t * 15) * 0.5;
+                    
+                    let errorSample = (mainSound + lowThump) * 0.6;
+                    errorSample = Math.max(-0.6, Math.min(0.6, errorSample));
+                    errorData[i] = errorSample;
+                }
+                
+                console.log("✅ 音效缓冲区预生成完成");
+                isGenerating = false;
+                resolve(true);
+            } catch(e) {
+                console.warn("生成音效失败:", e);
+                isGenerating = false;
+                resolve(false);
+            }
+        });
+        
+        return generatePromise;
+    }
+    
+    // 立即开始预生成音效（不依赖用户交互）
+    generateSoundBuffers();
+    
+    // 播放音效
+    function playSound(buffer, volume = 0.5) {
+        if (!audioCtx || !isAudioAllowed || !buffer) return false;
+        
+        try {
+            if (audioCtx.state !== 'running') {
+                return false;
+            }
+            
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.value = volume;
+            
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            source.start();
+            return true;
+        } catch(e) {
+            console.warn("播放音效失败:", e);
+            return false;
+        }
+    }
+    
+    let lastPlayTime = 0;
+    function playKeySound(isError = false) {
+        // 限制播放频率
+        const now = Date.now();
+        if (now - lastPlayTime < 50) return;
+        lastPlayTime = now;
+        
+        if (!audioCtx) {
+            initAudio();
+        }
+        
+        if (!isAudioAllowed) {
+            console.log("音效未启用，等待用户交互后播放");
+            return;
+        }
+        
+        if (audioCtx && audioCtx.state !== 'running') {
+            audioCtx.resume().then(() => {
+                if (isError) {
+                    playSound(errorSoundBuffer, 0.4);
+                } else {
+                    playSound(correctSoundBuffer, 0.5);
+                }
+            }).catch(e => console.log("恢复 AudioContext 失败:", e));
+            return;
+        }
+        
+        if (isError) {
+            playSound(errorSoundBuffer, 0.4);
+        } else {
+            playSound(correctSoundBuffer, 0.5);
+        }
+    }
+    
+    // 用户交互时启用音效并播放测试音
+    let hasEnabled = false;
+    function enableAudio() {
+        if (hasEnabled) return;
+        hasEnabled = true;
+        
+        initAudio();
+        
+        if (audioCtx) {
+            // 确保音效已生成
+            generateSoundBuffers().then(() => {
+                audioCtx.resume().then(() => {
+                    isAudioAllowed = true;
+                    console.log("🎧 真实键盘音效已启用！");
+                    // 播放测试音，确认音效正常工作
+                    setTimeout(() => {
+                        if (correctSoundBuffer) {
+                            playSound(correctSoundBuffer, 0.25);
+                        }
+                    }, 50);
+                }).catch(e => {
+                    console.log("AudioContext 启动失败:", e);
+                    isAudioAllowed = true;
+                });
+            });
+        } else {
+            isAudioAllowed = true;
+            console.log("浏览器不支持 Web Audio API");
+        }
+        
+        document.removeEventListener('click', enableAudio);
+        document.removeEventListener('keydown', enableAudio);
+    }
+    
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('keydown', enableAudio);
+    
+    window._typingSound = { 
+        play: playKeySound, 
+        isAllowed: () => isAudioAllowed 
+    };
+})();
+
+// ==================== 主游戏逻辑 ====================
+(function(){
+    const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
+    const STORAGE_KEY = 'typing_practice_progress';
+    
+    function fullyShuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+        return arr;
+    }
+    function slightShuffle(baseStr, repeatTimes) {
+        let blocks = [];
+        for (let i = 0; i < baseStr.length; i++) {
+            let block = [];
+            for (let r = 0; r < repeatTimes; r++) block.push(baseStr[i]);
+            for (let k = block.length - 1; k > 0; k--) { const rand = Math.floor(Math.random() * (k + 1)); [block[k], block[rand]] = [block[rand], block[k]]; }
+            blocks.push(block);
+        }
+        for (let swap = 0; swap < baseStr.length * 2; swap++) {
+            let idxA = Math.floor(Math.random() * blocks.length), idxB = Math.floor(Math.random() * blocks.length);
+            if (idxA !== idxB) { [blocks[idxA], blocks[idxB]] = [blocks[idxB], blocks[idxA]]; }
+        }
+        let result = [];
+        for (let block of blocks) result.push(...block);
+        for (let i = 0; i < result.length * 0.3; i++) { let p = Math.floor(Math.random() * result.length), q = Math.floor(Math.random() * result.length); [result[p], result[q]] = [result[q], result[p]]; }
+        return result.join('');
+    }
+    function fullShuffle(baseStr, repeatTimes) {
+        let arr = [];
+        for (let i = 0; i < baseStr.length; i++) { for (let r = 0; r < repeatTimes; r++) arr.push(baseStr[i]); }
+        return fullyShuffleArray(arr).join('');
+    }
+    function orderText(baseStr, repeatTimes) {
+        let arr = [];
+        for (let i = 0; i < baseStr.length; i++) { for (let r = 0; r < repeatTimes; r++) arr.push(baseStr[i]); }
+        return arr.join('');
+    }
+    
+    const HOME = "asdfghjkl;", TOP = "qwertyuiop", BOTTOM = "zxcvbnm";
+    const SYMS = "`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
+    const ALL = "abcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
+    const DIGITS = "1234567890";
+    const UPPER_LOWER = (() => { let s = ''; for(let i=0;i<26;i++) s += String.fromCharCode(65+i) + String.fromCharCode(97+i); return s; })();
+    
+    const groups = [
+        { name:"L1 基准", base:HOME, repeat:5 }, { name:"L2 上排", base:TOP, repeat:5 },
+        { name:"L3 下排", base:BOTTOM, repeat:5 }, { name:"L4 大写", base:UPPER_LOWER, repeat:5 },
+        { name:"L5 数字", base:DIGITS, repeat:5 }, { name:"L6 符号", base:SYMS, repeat:5 },
+        { name:"L7 综合", base:ALL, repeat:3 }
+    ];
+    
+    let allLevels = [];
+    for(let g=0; g<groups.length; g++) {
+        for(let m=0; m<3; m++) {
+            let mode = m;
+            let modeName = ['顺序','微乱','全乱'][m];
+            let text = mode === 0 ? orderText(groups[g].base, groups[g].repeat) : (mode === 1 ? slightShuffle(groups[g].base, groups[g].repeat) : fullShuffle(groups[g].base, groups[g].repeat));
+            allLevels.push({ id: allLevels.length, name: `${groups[g].name} ${modeName}`, text: text, groupIdx: g, modeIdx: m });
+        }
+    }
+    const TOTAL = allLevels.length;
+    
+    let unlocked = Array(TOTAL).fill(false);
+    let attempts = Array(TOTAL).fill(0);
+    let bestAcc = Array(TOTAL).fill(0);
+    let savedCurrentLevelId = 0;
+    
+    function saveProgress() {
+        const progress = {
+            unlocked: unlocked,
+            attempts: attempts,
+            bestAcc: bestAcc,
+            currentLevelId: currentLevelId,
+            version: 1,
+            saveTime: Date.now()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+    
+    function loadProgress() {
+        if (DEBUG) return false;
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return false;
+        try {
+            const data = JSON.parse(saved);
+            if (data.unlocked && data.unlocked.length === TOTAL) {
+                unlocked = data.unlocked;
+                attempts = data.attempts || Array(TOTAL).fill(0);
+                bestAcc = data.bestAcc || Array(TOTAL).fill(0);
+                savedCurrentLevelId = data.currentLevelId || 0;
+                return true;
+            }
+        } catch(e) { console.warn("加载进度失败", e); }
+        return false;
+    }
+    
+    function resetAllProgress() {
+        if (confirm("⚠️ 确定要重置所有闯关进度吗？这将清除所有已解锁关卡和练习记录！")) {
+            unlocked = Array(TOTAL).fill(false);
+            attempts = Array(TOTAL).fill(0);
+            bestAcc = Array(TOTAL).fill(0);
+            if (!DEBUG) {
+                unlocked[0] = true;
+            } else {
+                for(let i=0;i<TOTAL;i++) unlocked[i] = true;
+            }
+            savedCurrentLevelId = 0;
+            saveProgress();
+            currentLevelId = 0;
+            currentGroupIdx = allLevels[0].groupIdx;
+            renderNav();
+            resetCurrentInternal(true, "✅ 全部进度已重置，从第一关开始！");
+            showMessage("✅ 全部进度已重置！", false);
+        }
+    }
+    
+    function showMessage(text, isError = true) {
+        const msgDiv = document.getElementById('msgArea');
+        msgDiv.innerHTML = text;
+        if (isError) {
+            msgDiv.classList.remove('flash-error');
+            void msgDiv.offsetWidth;
+            msgDiv.classList.add('flash-error');
+            setTimeout(() => {
+                msgDiv.classList.remove('flash-error');
+            }, 1500);
+        }
+    }
+    
+    let currentLevelId = 0, currentGroupIdx = 0;
+    let expected = [], idx = 0, total = 0, correct = 0, errors = 0, active = true;
+    let startTime = null, timer = null, seconds = 0;
+    let autoSwitchPending = false;
+    
+    const refDiv = document.getElementById('refText'), input = document.getElementById('userInput');
+    const wpmSpan = document.getElementById('wpmValue'), accSpan = document.getElementById('accuracyValue');
+    const timerSpan = document.getElementById('timerValue'), progSpan = document.getElementById('progressCount');
+    const totalSpan = document.getElementById('totalChars');
+    const majorNav = document.getElementById('majorNav'), subPanel = document.getElementById('subPanel');
+    const resetBtn = document.getElementById('resetBtn'), nextBtn = document.getElementById('nextLevelBtn');
+    const resetAllProgressBtn = document.getElementById('resetAllProgressBtn');
+    const arcadeBtn = document.getElementById('arcadeModeBtn');
+    const virtualKbd = document.getElementById('virtualKeyboard');
+    
+    const escapeHtml = s => s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+    
+    function renderVirtualKeyboard(expectedKey) {
+        if (!virtualKbd) return;
+        const rows = [
+            ['`','1','2','3','4','5','6','7','8','9','0','-','='],
+            ['q','w','e','r','t','y','u','i','o','p','[',']','\\'],
+            ['a','s','d','f','g','h','j','k','l',';','\''],
+            ['z','x','c','v','b','n','m',',','.','/']
+        ];
+        let highlightRaw = (expectedKey && expectedKey !== ' ') ? expectedKey.toLowerCase() : null;
+        let html = '';
+        for (let row of rows) {
+            let rowHtml = '<div class="key-row">';
+            for (let key of row) {
+                let isHighlight = (highlightRaw !== null && key.toLowerCase() === highlightRaw);
+                rowHtml += `<div class="key ${isHighlight ? 'highlight' : ''}">${key}</div>`;
+            }
+            rowHtml += '</div>';
+            html += rowHtml;
+        }
+        let spaceHighlight = (expectedKey === ' ') ? 'highlight' : '';
+        html += `<div class="key-row"><div class="key ${spaceHighlight}" style="flex:2; max-width:200px;">␣ Space</div></div>`;
+        virtualKbd.innerHTML = html;
+    }
+    
+    function updateRefHighlight() {
+        let full = expected.join('');
+        let prefix = full.slice(0, idx);
+        let currentChar = idx < full.length ? full[idx] : '';
+        let suffix = full.slice(idx + 1);
+        let html = `<span style="background:#2a4b6e;border-radius:6px;padding:0 3px;">${escapeHtml(prefix)}</span>`;
+        if (currentChar) html += `<span class="current-char-highlight">${escapeHtml(currentChar)}</span>`;
+        html += `<span style="opacity:0.8;">${escapeHtml(suffix)}</span>`;
+        refDiv.innerHTML = html;
+        renderVirtualKeyboard(currentChar);
+    }
+    
+    function updateStats() {
+        let minutes = seconds / 60;
+        let rawWpm = 0;
+        if (minutes > 0 && correct >= 5) {
+            rawWpm = Math.floor((correct / 5) / minutes);
+            if (rawWpm < 1 && correct >= 5) rawWpm = 1;
+        } else if (correct >= 5 && seconds >= 3) {
+            rawWpm = Math.max(1, Math.floor((correct / 5) / (seconds / 60)));
+        }
+        let totalTyped = correct + errors;
+        let accuracy = totalTyped === 0 ? 100 : Math.floor((correct / totalTyped) * 100);
+        wpmSpan.innerText = rawWpm;
+        accSpan.innerText = accuracy;
+        progSpan.innerText = idx;
+        totalSpan.innerText = total;
+        return accuracy;
+    }
+    
+    function stopTimer() { if(timer) clearInterval(timer); timer = null; }
+    function startTimerIfNeeded() { 
+        if(!startTime && active && idx > 0 && idx < total) { 
+            startTime = Date.now(); 
+            stopTimer(); 
+            timer = setInterval(() => { 
+                if(startTime && active) { 
+                    seconds = Math.floor((Date.now() - startTime) / 1000); 
+                    timerSpan.innerText = seconds; 
+                    updateStats(); 
+                } 
+            }, 500); 
+        } 
+    }
+    
+    function resetCurrentInternal(showMessageFlag = true, customMsg = null) {
+        stopTimer();
+        let lev = allLevels[currentLevelId];
+        expected = lev.text.split('');
+        total = expected.length;
+        idx = 0;
+        correct = 0;
+        errors = 0;
+        active = true;
+        startTime = null;
+        seconds = 0;
+        timerSpan.innerText = "0";
+        input.value = "";
+        input.disabled = false;
+        updateRefHighlight();
+        updateStats();
+        startTimerIfNeeded();
+        input.focus();
+        if (showMessageFlag) {
+            if (customMsg) showMessage(customMsg, false);
+            else showMessage(`🔄 重置 「${lev.name}」`, false);
+        }
+    }
+    
+    function resetCurrent() { resetCurrentInternal(true); }
+    
+    function finish(force = false) {
+        if(!force && idx < total) return;
+        if (autoSwitchPending) return;
+        active = false;
+        stopTimer();
+        let acc = (correct + errors) === 0 ? 100 : Math.floor((correct / (correct + errors)) * 100);
+        let currentLevelName = allLevels[currentLevelId].name;
+        attempts[currentLevelId]++;
+        if(acc > bestAcc[currentLevelId]) bestAcc[currentLevelId] = acc;
+        
+        saveProgress();
+        
+        let nxt = currentLevelId + 1;
+        const isQualified = acc >= 90;
+        const isExcellent = acc >= 98;
+        
+        if (DEBUG && nxt < TOTAL) {
+            if (!unlocked[nxt]) unlocked[nxt] = true;
+            let nextName = allLevels[nxt].name;
+            showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🐞 调试模式：即将进入下一关「${nextName}」`, false);
+            saveProgress();
+            autoSwitchPending = true;
+            setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1200);
+            return;
+        }
+        
+        if (nxt < TOTAL && !unlocked[nxt]) {
+            if (isExcellent) {
+                unlocked[nxt] = true;
+                let nextName = allLevels[nxt].name;
+                showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🎉 完美达标！恭喜进入下一关「${nextName}」`, false);
+                saveProgress();
+                autoSwitchPending = true;
+                setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1800);
+                return;
+            } else if (isQualified && attempts[currentLevelId] >= 3) {
+                unlocked[nxt] = true;
+                let nextName = allLevels[nxt].name;
+                showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🎉 恭喜！已完成 ${attempts[currentLevelId]} 次练习，达标解锁！即将进入「${nextName}」`, false);
+                saveProgress();
+                autoSwitchPending = true;
+                setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1800);
+                return;
+            } else if (isQualified && attempts[currentLevelId] < 3) {
+                let remain = 3 - attempts[currentLevelId];
+                showMessage(`📊 本次练习准确率：${acc}%<br>✅ 达标！还需练习 ${remain} 次才能解锁下一关。<br>💪 继续努力，即将自动重置当前关卡。`, false);
+                saveProgress();
+                setTimeout(() => { resetCurrentInternal(true, `📘 继续练习「${currentLevelName}」，还差 ${remain} 次达标解锁`); }, 2000);
+                return;
+            } else {
+                showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>⚠️ 未达标（需要 ≥90%），继续努力！即将自动重置。`, true);
+                saveProgress();
+                setTimeout(() => { resetCurrentInternal(true, `⚠️ 未达标，重新练习「${currentLevelName}」`); }, 2000);
+                return;
+            }
+        } else if (nxt < TOTAL && unlocked[nxt]) {
+            let nextName = allLevels[nxt].name;
+            showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🎉 恭喜完成！即将进入下一关「${nextName}」`, false);
+            saveProgress();
+            autoSwitchPending = true;
+            setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1500);
+            return;
+        } else if (nxt >= TOTAL) {
+            showMessage(`🏆 最终练习「${currentLevelName}」准确率：${acc}%<br>🎉🎉 恭喜你完成了全部21关！`, false);
+            updateStats();
+            input.disabled = true;
+            input.value = "";
+            saveProgress();
+            return;
+        } else {
+            if (!isQualified) {
+                showMessage(`📊 练习准确率：${acc}%<br>⚠️ 未达标，即将自动重置。`, true);
+                setTimeout(() => { resetCurrentInternal(true, `⚠️ 重新练习「${currentLevelName}」`); }, 2000);
+            } else {
+                updateStats();
+                input.disabled = true;
+                input.value = "";
+            }
+            saveProgress();
+            return;
+        }
+    }
+    
+    // 稳定的输入处理函数
+    let pendingUpdate = false;
+    let lastProcessedValue = "";
+    
+    function handleInput() {
+        if (!active) return;
+        
+        if (pendingUpdate) return;
+        pendingUpdate = true;
+        
+        requestAnimationFrame(() => {
+            pendingUpdate = false;
+            
+            let currentValue = input.value;
+            let expectedStr = expected.join('');
+            
+            if (currentValue === lastProcessedValue && idx > 0) {
+                return;
+            }
+            
+            if (currentValue.length > expectedStr.length) {
+                currentValue = currentValue.slice(0, expectedStr.length);
+                input.value = currentValue;
+            }
+            
+            if (currentValue.length === 0) {
+                if (idx !== 0) {
+                    idx = 0;
+                    correct = 0;
+                    errors = 0;
+                    updateStats();
+                    updateRefHighlight();
+                    stopTimer();
+                    startTime = null;
+                    seconds = 0;
+                    timerSpan.innerText = "0";
+                }
+                lastProcessedValue = "";
+                return;
+            }
+            
+            let isMatch = true;
+            for (let i = 0; i < currentValue.length; i++) {
+                if (i >= expectedStr.length || currentValue[i] !== expectedStr[i]) {
+                    isMatch = false;
+                    break;
+                }
+            }
+            
+            if (isMatch && currentValue.length > idx) {
+                let newChar = currentValue[currentValue.length - 1];
+                let expectedChar = expectedStr[idx];
+                
+                if (newChar === expectedChar) {
+                    if (window._typingSound && window._typingSound.isAllowed()) {
+                        window._typingSound.play(false);
+                    }
+                    
+                    correct = currentValue.length;
+                    errors = 0;
+                    idx = currentValue.length;
+                    
+                    updateStats();
+                    updateRefHighlight();
+                    startTimerIfNeeded();
+                    lastProcessedValue = currentValue;
+                    
+                    if (idx === total) {
+                        finish(true);
+                    }
+                }
+            } 
+            else if (isMatch && currentValue.length === idx) {
+                lastProcessedValue = currentValue;
+            }
+            else {
+                if (currentValue.length > 0) {
+                    let errorPos = -1;
+                    for (let i = 0; i < currentValue.length; i++) {
+                        if (i >= expectedStr.length || currentValue[i] !== expectedStr[i]) {
+                            errorPos = i;
+                            break;
+                        }
+                    }
+                    
+                    if (errorPos !== -1) {
+                        if (window._typingSound && window._typingSound.isAllowed()) {
+                            window._typingSound.play(true);
+                        }
+                        
+                        let expectedChar = expectedStr[errorPos];
+                        let wrongChar = currentValue[errorPos];
+                        showMessage(`❌ 第${errorPos+1}个字符错误！ 应输入 "${expectedChar}"，您输入了 "${wrongChar}"`, true);
+                        input.style.borderColor = "#e74c3c";
+                        setTimeout(() => input.style.borderColor = "#2c7da0", 700);
+                        
+                        let correctPrefix = expectedStr.substring(0, idx);
+                        input.value = correctPrefix;
+                        lastProcessedValue = correctPrefix;
+                        updateRefHighlight();
+                    }
+                }
+            }
+        });
+    }
+    
+    function getFirstSub(groupIdx) { 
+        let f = allLevels.find(l => l.groupIdx === groupIdx && l.modeIdx === 0); 
+        return f ? f.id : allLevels.filter(l => l.groupIdx === groupIdx)[0]?.id; 
+    }
+    
+    function getFirstUnlockedSubInGroup(groupIdx) {
+        const subs = allLevels.filter(l => l.groupIdx === groupIdx);
+        for (let sub of subs) {
+            if (unlocked[sub.id]) return sub.id;
+        }
+        return null;
+    }
+    
+    function flashElement(element) {
+        if (!element) return;
+        element.classList.add('locked-flash');
+        setTimeout(() => {
+            element.classList.remove('locked-flash');
+        }, 600);
+    }
+    
+    function switchTo(levelId, sourceElement = null) {
+        if(!DEBUG && !unlocked[levelId]) { 
+            const levelName = allLevels[levelId].name;
+            showMessage(`🔒 关卡「${levelName}」尚未解锁！请先完成前置关卡，达到准确率≥90%且练习≥3次（或≥98%一次）即可解锁。`, true);
+            if (sourceElement) flashElement(sourceElement);
+            return; 
+        }
+        if(currentLevelId === levelId && idx > 0 && idx < total && confirm("重置当前进度?")) { resetCurrent(); return; }
+        currentLevelId = levelId;
+        currentGroupIdx = allLevels[levelId].groupIdx;
+        stopTimer();
+        let lev = allLevels[currentLevelId];
+        expected = lev.text.split('');
+        total = expected.length;
+        idx = 0; correct = 0; errors = 0; active = true; startTime = null; seconds = 0;
+        timerSpan.innerText = "0";
+        input.value = ""; input.disabled = false;
+        lastProcessedValue = "";
+        updateRefHighlight(); updateStats(); startTimerIfNeeded(); input.focus();
+        showMessage(`🔓 进入「${lev.name}」共 ${total} 字符，加油！`, false);
+        renderNav();
+        saveProgress();
+    }
+    
+    function selectMajor(groupIdx, btnElement) {
+        if(!DEBUG && !allLevels.some(l => l.groupIdx === groupIdx && unlocked[l.id])) { 
+            const groupName = groups[groupIdx].name;
+            showMessage(`🔒 大关卡「${groupName}」尚未解锁！请先完成上一大关卡的全部小关卡并满足解锁条件。`, true);
+            if (btnElement) flashElement(btnElement);
+            return; 
+        }
+        currentGroupIdx = groupIdx;
+        renderNav();
+        const targetId = getFirstUnlockedSubInGroup(groupIdx);
+        if(targetId !== null) {
+            switchTo(targetId);
+        } else {
+            const firstSub = getFirstSub(groupIdx);
+            if(firstSub !== undefined) switchTo(firstSub);
+        }
+    }
+    
+    function renderNav() {
+        majorNav.innerHTML = '';
+        for(let i = 0; i < groups.length; i++) {
+            let btn = document.createElement('button');
+            btn.innerText = groups[i].name;
+            btn.className = 'major-btn';
+            if(currentGroupIdx === i) btn.classList.add('active-major');
+            btn.onclick = (idx => () => selectMajor(idx, btn))(i);
+            majorNav.appendChild(btn);
+        }
+        if(DEBUG) { let badge = document.createElement('span'); badge.innerText = '🐞 调试'; badge.className = 'debug-badge'; majorNav.appendChild(badge); }
+        let subs = allLevels.filter(l => l.groupIdx === currentGroupIdx);
+        subPanel.innerHTML = '';
+        subs.forEach(lvl => {
+            let btn = document.createElement('button');
+            btn.innerText = lvl.name;
+            btn.className = 'sub-level-btn';
+            if(lvl.id === currentLevelId) btn.classList.add('active-sub');
+            if(!DEBUG && !unlocked[lvl.id]) btn.classList.add('locked-sub');
+            btn.onclick = (id => () => switchTo(id, btn))(lvl.id);
+            subPanel.appendChild(btn);
+        });
+    }
+    
+    function nextLevel() { 
+        let nxt = currentLevelId + 1; 
+        if(nxt < TOTAL && (DEBUG || unlocked[nxt])) switchTo(nxt); 
+        else if(nxt < TOTAL) {
+            const nextName = allLevels[nxt].name;
+            showMessage(`🔒 下一关「${nextName}」尚未解锁！需要当前关卡准确率 ≥90% 且练习 ≥3 次，或准确率 ≥98% 一次解锁。`, true);
+        } else showMessage(`🏁 已完成全部关卡`, false); 
+    }
+    
+    arcadeBtn.addEventListener('click', () => {
+        window.location.href = 'play-to-type.html';
+    });
+    
+    let hasLoaded = false;
+    if (!DEBUG) {
+        hasLoaded = loadProgress();
+    }
+    
+    if (hasLoaded && savedCurrentLevelId >= 0 && savedCurrentLevelId < TOTAL) {
+        currentLevelId = savedCurrentLevelId;
+        currentGroupIdx = allLevels[currentLevelId].groupIdx;
+    } else if (!DEBUG) {
+        unlocked[0] = true;
+        currentLevelId = 0;
+        currentGroupIdx = allLevels[0].groupIdx;
+    } else {
+        for(let i=0;i<TOTAL;i++) unlocked[i] = true;
+        currentLevelId = 0;
+        currentGroupIdx = allLevels[0].groupIdx;
+    }
+    
+    renderNav();
+    resetCurrentInternal(true);
+    input.addEventListener('input', handleInput);
+    resetBtn.addEventListener('click', resetCurrent);
+    nextBtn.addEventListener('click', nextLevel);
+    resetAllProgressBtn.addEventListener('click', resetAllProgress);
+    
+    window.addEventListener('beforeunload', () => { saveProgress(); });
+})();
+</script>
+</body>
+</html>

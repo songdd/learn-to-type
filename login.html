@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 战机打字员</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 40px 32px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .logo {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #fff, #8cc9ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        .input-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 48px;
+            font-size: 16px;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #ff0050;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff0050, #ff6b35);
+            border: none;
+            border-radius: 48px;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 0, 80, 0.4);
+        }
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 24px;
+            font-size: 13px;
+            display: none;
+        }
+        .message.error {
+            background: rgba(255, 0, 80, 0.2);
+            color: #ff6b6b;
+        }
+        .message.success {
+            background: rgba(0, 255, 100, 0.15);
+            color: #7cff9e;
+        }
+        .footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <div class="logo">✈️🎮</div>
+    <h1>战机打字员</h1>
+    <div class="subtitle">邀请制 · 专属入口</div>
+
+    <div class="input-group">
+        <label>🔑 邀请码</label>
+        <input type="text" id="inviteCode" placeholder="请输入你的邀请码" autocomplete="off">
+    </div>
+
+    <button class="login-btn" id="loginBtn">验证并进入游戏 🚀</button>
+
+    <div id="message" class="message"></div>
+    <div class="footer">联系我获取邀请码</div>
+</div>
+
+<script>
+    const loginBtn = document.getElementById('loginBtn');
+    const inviteInput = document.getElementById('inviteCode');
+    const messageDiv = document.getElementById('message');
+
+    function showMessage(text, isError = true) {
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 3000);
+    }
+
+    // 调用后端 API 验证邀请码
+    async function verifyCode(code) {
+        try {
+            const response = await fetch('/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: code })
+            });
+            
+            if (!response.ok) {
+                throw new Error('网络请求失败');
+            }
+            
+            return await response.json();
+        } catch (e) {
+            console.error('验证请求失败:', e);
+            return { success: false, message: '网络错误，请稍后重试' };
+        }
+    }
+
+    async function handleLogin() {
+        const code = inviteInput.value.trim();
+        
+        if (!code) {
+            showMessage('请输入邀请码', true);
+            return;
+        }
+        
+        loginBtn.disabled = true;
+        loginBtn.textContent = '验证中...';
+        
+        const result = await verifyCode(code);
+        
+        if (result.success) {
+            showMessage(`✅ 欢迎 ${result.name}！正在进入游戏...`, false);
+            // 保存登录状态
+            localStorage.setItem('logged_in', 'true');
+            localStorage.setItem('user_name', result.name);
+            localStorage.setItem('login_time', Date.now());
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        } else {
+            showMessage(result.message || '验证失败，请重试', true);
+            loginBtn.disabled = false;
+            loginBtn.textContent = '验证并进入游戏 🚀';
+        }
+    }
+
+    loginBtn.addEventListener('click', handleLogin);
+    inviteInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    // 从 URL 参数自动填充邀请码（方便好友直接点击链接）
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('code');
+    if (codeFromUrl) {
+        inviteInput.value = codeFromUrl;
+        // 可选：自动登录
+        // handleLogin();
+    }
+</script>
+</body>
+</html>

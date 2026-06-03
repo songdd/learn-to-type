@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>✈️ 战机打字母 | 时间同步速度版 | 爆炸音效 + 错误提示音</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #030c1a, #01060c);
+            font-family: 'Segoe UI', 'JetBrains Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2% 5%;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #030f1a;
+            border-radius: 1rem;
+            box-shadow: 0 0 0 2px #2c7da055, 0 5px 15px -3px black;
+            image-rendering: crisp-edges;
+        }
+
+        canvas.hide-cursor {
+            cursor: none;
+        }
+
+        .game-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+            gap: 1.5vh;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1vw;
+            width: 100%;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: #1f3a48dd;
+            border: none;
+            border-radius: 40px;
+            padding: 0.6vh 1.5vw;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+            transition: 0.2s;
+            border: 1px solid #5f9fc0;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #2c7da0;
+            transform: scale(0.97);
+        }
+
+        .reset-level-btn {
+            background: #8b5a2bcc;
+        }
+        .reset-level-btn:hover {
+            background: #a06b35;
+        }
+
+        .reset-all-btn {
+            background: #8b2b2bcc;
+        }
+        .reset-all-btn:hover {
+            background: #a03535;
+        }
+
+        .skin-selector {
+            background: #0a1422aa;
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 0.4vh 1vw;
+            display: flex;
+            gap: 0.8vw;
+            align-items: center;
+        }
+
+        .skin-option {
+            background: #1f3a48cc;
+            border: 1px solid #5f9fc0;
+            border-radius: 30px;
+            padding: 0.3vh 1vw;
+            font-size: clamp(0.65rem, 1.6vw, 0.75rem);
+            cursor: pointer;
+            transition: 0.2s;
+            color: #c0ecff;
+            white-space: nowrap;
+        }
+
+        .skin-option:hover {
+            background: #2c7da0;
+            transform: scale(0.95);
+        }
+
+        .skin-option.active-skin {
+            background: #ffb347;
+            color: #1e2a2f;
+            border-color: #ffb347;
+            font-weight: bold;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5vw;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .info-panel {
+            flex: 1.2;
+            min-width: 220px;
+            max-width: 280px;
+            background: #0a1422aa;
+            backdrop-filter: blur(8px);
+            border-radius: 1.2rem;
+            padding: 1.2vh 1vw;
+            border: 1px solid #2c7da055;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2vh;
+            overflow-y: auto;
+        }
+
+        .stats-card {
+            background: #07121e99;
+            border-radius: 1rem;
+            padding: 1vh 1vw;
+        }
+
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8vw;
+            justify-content: space-between;
+        }
+
+        .stat-item {
+            font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+            font-weight: bold;
+            color: #c0ecff;
+            font-family: monospace;
+        }
+
+        .stat-item span {
+            color: #ffc285;
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            font-weight: 800;
+            margin-right: 3px;
+        }
+
+        .howto-card {
+            background: #07121e99;
+            border-radius: 1rem;
+            padding: 1vh 1vw;
+        }
+
+        .howto-title {
+            font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+            color: #ffc285;
+            margin-bottom: 0.8vh;
+            font-weight: bold;
+            border-left: 3px solid #ffb347;
+            padding-left: 8px;
+        }
+
+        .howto-content {
+            font-size: clamp(0.6rem, 1.6vw, 0.7rem);
+            color: #bbe1ff;
+            line-height: 1.45;
+        }
+
+        .howto-content p {
+            margin: 4px 0;
+        }
+
+        .next-card {
+            background: #07121e99;
+            border-radius: 1rem;
+            padding: 1vh 1vw;
+            text-align: center;
+        }
+
+        .next-label {
+            font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+            color: #9fc7e0;
+        }
+
+        .next-char {
+            font-size: clamp(36px, 6vw, 52px);
+            font-weight: 800;
+            font-family: monospace;
+            color: #33ff33;
+            text-shadow: 0 0 4px #33ff33;
+            line-height: 1;
+        }
+
+        .tip-text {
+            font-size: clamp(0.55rem, 1.5vw, 0.65rem);
+            color: #bbe1ff;
+            margin-top: 0.8vh;
+            border-top: 1px solid #2c7da055;
+            padding-top: 0.8vh;
+        }
+
+        .game-container {
+            flex: 2.5;
+            background: #00000033;
+            border-radius: 1rem;
+            box-shadow: 0 0 20px rgba(0, 180, 255, 0.2);
+            border: 1px solid rgba(80, 180, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: visible;
+        }
+
+        .pause-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 1rem;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .pause-text {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffcc66;
+            text-shadow: 0 0 15px #ffaa33;
+            background: rgba(0,0,0,0.6);
+            padding: 0.5rem 2rem;
+            border-radius: 3rem;
+            border: 2px solid #ffb347;
+            font-family: monospace;
+            letter-spacing: 4px;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .game-container:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+        .game-container:fullscreen {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+        .game-container:-webkit-full-screen canvas {
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .game-container:fullscreen canvas {
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @media (max-width: 800px) {
+            .main-layout { flex-direction: column; }
+            .info-panel { max-width: 100%; overflow-y: visible; }
+            .pause-text { font-size: 2rem; }
+            .skin-selector { flex-wrap: wrap; justify-content: center; }
+            body { overflow-y: auto; }
+            html, body { overflow: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-page">
+    <div class="top-bar">
+        <button class="btn" id="toPracticeBtn">⌨️ 返回基础打字练习</button>
+        <button class="btn reset-level-btn" id="resetCurrentBtn">🔄 重新开始当前关卡</button>
+        <button class="btn reset-all-btn" id="resetAllBtn">🗑️ 重置所有关卡进度</button>
+        <div class="skin-selector" id="skinSelector">
+            <span class="skin-option" data-skin="1">✈️ 科幻战机</span>
+            <span class="skin-option" data-skin="2">🐻 Q版卡通</span>
+            <span class="skin-option" data-skin="3">🛩️ F-22隐身</span>
+            <span class="skin-option" data-skin="4">👾 像素风格</span>
+            <span class="skin-option" data-skin="5">🔷 极简几何</span>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <div class="info-panel">
+            <div class="stats-card">
+                <div class="stats-grid">
+                    <div class="stat-item">🎖️ 得分 <span id="scoreVal">0</span></div>
+                    <div class="stat-item">⚡ 连击 <span id="comboVal">0</span></div>
+                    <div class="stat-item">📌 关卡 <span id="levelNum">1</span>/30</div>
+                    <div class="stat-item">🎯 剩余 <span id="remainTargets">30</span></div>
+                </div>
+            </div>
+
+            <div class="howto-card">
+                <div class="howto-title">📖 怎么玩</div>
+                <div class="howto-content">
+                    <p>• 绿色字符从顶部依次落下</p>
+                    <p>• 敲击键盘上对应的键发射追踪导弹</p>
+                    <p>• 导弹自动追踪目标，命中得分</p>
+                    <p>• 连击越高得分越多（最高+25）</p>
+                    <p>• 每关需击落30个目标</p>
+                    <p>• 关卡越高，下落速度越快</p>
+                    <p>• 顶部按钮可切换5种战机皮肤</p>
+                    <p>• 🖱️ 双击画布进入/退出全屏 | ␣ 空格暂停</p>
+                </div>
+            </div>
+
+            <div class="howto-card">
+                <div class="howto-title">🎯 当前关卡难度</div>
+                <div class="howto-content" id="levelInfo">
+                    第1关：基准排 (asdfghjkl)
+                </div>
+            </div>
+
+            <div class="next-card">
+                <div class="next-label">🎯 下一个落下的字符</div>
+                <div class="next-char" id="nextLetterSpan">?</div>
+                <div class="tip-text" id="gameMsg">
+                    🚀 敲击正确字符 → 发射追踪导弹 | ␣ 空格暂停/继续 | 🖱️ 双击画布全屏 | 💥 命中爆炸音效 | ❌ 按键错误提示音
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container" id="gameContainer">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== 音效系统（页面加载时立即激活）====================
+(function() {
+    var audioCtx = null;
+    var isAudioReady = false;
+    var hitSoundBuffer = null;      // 爆炸音效
+    var errorSoundBuffer = null;    // 错误提示音
+    var initAttempted = false;
+    
+    // 初始化并立即尝试启动 AudioContext
+    function initAndStartAudio() {
+        if (audioCtx) return audioCtx;
+        
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            console.log("AudioContext 创建成功，初始状态:", audioCtx.state);
+            
+            // 关键修复：立即尝试启动 AudioContext（静默启动）
+            // 注意：这需要用户已经与页面有过交互，但我们会用一个技巧：
+            // 在页面加载时创建一个不可见的"静音"节点来激活 AudioContext
+            var silentGain = audioCtx.createGain();
+            silentGain.gain.value = 0;
+            silentGain.connect(audioCtx.destination);
+            
+            // 尝试启动
+            var resumePromise = audioCtx.resume();
+            if (resumePromise) {
+                resumePromise.then(function() {
+                    console.log("AudioContext 已激活，状态:", audioCtx.state);
+                    isAudioReady = true;
+                    // 生成音效缓冲区
+                    generateAllSounds();
+                }).catch(function(e) {
+                    console.log("AudioContext 自动启动失败，等待用户交互:", e);
+                    // 如果自动启动失败，等待用户第一次点击时再启动
+                    isAudioReady = false;
+                    generateAllSounds(); // 仍然预生成缓冲区
+                });
+            } else {
+                generateAllSounds();
+            }
+        } catch(e) { 
+            console.warn("Web Audio API 不支持:", e); 
+        }
+        return audioCtx;
+    }
+    
+    // 生成所有音效缓冲区
+    function generateAllSounds() {
+        if (!audioCtx) return;
+        
+        // 生成爆炸音效
+        if (!hitSoundBuffer) {
+            try {
+                var sampleRate = audioCtx.sampleRate;
+                var duration = 0.35;
+                
+                hitSoundBuffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+                var data = hitSoundBuffer.getChannelData(0);
+                
+                for (var i = 0; i < sampleRate * duration; i++) {
+                    var t = i / sampleRate;
+                    var whiteNoise = (Math.random() * 2 - 1) * Math.exp(-t * 12) * 0.8;
+                    var freq = 80 - t * 120;
+                    if (freq < 35) freq = 35;
+                    var lowBoom = Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 8) * 0.5;
+                    var midHit = Math.sin(2 * Math.PI * 200 * t) * Math.exp(-t * 15) * 0.3;
+                    var sample = (whiteNoise + lowBoom + midHit) * 0.7;
+                    sample = Math.max(-0.7, Math.min(0.7, sample));
+                    data[i] = sample;
+                }
+                console.log("✅ 爆炸音效缓冲区已生成");
+            } catch(e) {
+                console.warn("生成爆炸音效失败:", e);
+            }
+        }
+        
+        // 生成错误提示音
+        if (!errorSoundBuffer) {
+            try {
+                var sampleRate = audioCtx.sampleRate;
+                var duration = 0.15;
+                
+                errorSoundBuffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+                var data = errorSoundBuffer.getChannelData(0);
+                
+                for (var i = 0; i < sampleRate * duration; i++) {
+                    var t = i / sampleRate;
+                    var freq = 600 - t * 3000;
+                    if (freq < 120) freq = 120;
+                    var mainTone = Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 18) * 0.6;
+                    var lowHit = Math.sin(2 * Math.PI * 100 * t) * Math.exp(-t * 12) * 0.3;
+                    var sample = (mainTone + lowHit) * 0.5;
+                    sample = Math.max(-0.5, Math.min(0.5, sample));
+                    data[i] = sample;
+                }
+                console.log("✅ 错误提示音缓冲区已生成");
+            } catch(e) {
+                console.warn("生成错误提示音失败:", e);
+            }
+        }
+    }
+    
+    // 播放爆炸音效
+    function playHitSound() {
+        if (!audioCtx || !hitSoundBuffer) return false;
+        
+        // 确保 AudioContext 是运行状态
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(function() {
+                isAudioReady = true;
+                doPlayHit();
+            }).catch(function(e) {});
+            return false;
+        }
+        
+        doPlayHit();
+        return true;
+    }
+    
+    function doPlayHit() {
+        if (!audioCtx || !hitSoundBuffer) return;
+        try {
+            var source = audioCtx.createBufferSource();
+            source.buffer = hitSoundBuffer;
+            var gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0.45;
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            source.start();
+        } catch(e) {}
+    }
+    
+    // 播放错误提示音
+    function playErrorSound() {
+        if (!audioCtx || !errorSoundBuffer) return false;
+        
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(function() {
+                isAudioReady = true;
+                doPlayError();
+            }).catch(function(e) {});
+            return false;
+        }
+        
+        doPlayError();
+        return true;
+    }
+    
+    function doPlayError() {
+        if (!audioCtx || !errorSoundBuffer) return;
+        try {
+            var source = audioCtx.createBufferSource();
+            source.buffer = errorSoundBuffer;
+            var gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0.35;
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            source.start();
+        } catch(e) {}
+    }
+    
+    // 页面加载时立即初始化并尝试激活音频
+    initAndStartAudio();
+    
+    // 同时监听用户交互，确保音频被激活（备用方案）
+    function ensureAudioOnInteraction() {
+        if (audioCtx && audioCtx.state !== 'running') {
+            audioCtx.resume().then(function() {
+                console.log("用户交互后 AudioContext 已激活");
+                isAudioReady = true;
+            }).catch(function(e) {});
+        }
+        document.removeEventListener('click', ensureAudioOnInteraction);
+        document.removeEventListener('keydown', ensureAudioOnInteraction);
+    }
+    
+    document.addEventListener('click', ensureAudioOnInteraction);
+    document.addEventListener('keydown', ensureAudioOnInteraction);
+    
+    window._missileSound = { 
+        hit: playHitSound,
+        error: playErrorSound
+    };
+})();
+
+// ==================== 主游戏逻辑 ====================
+(function(){
+    // ---------- 鼠标自动隐藏 ----------
+    var canvas = document.getElementById('gameCanvas');
+    var mouseHideTimer = null;
+    
+    function showCursor() {
+        if (canvas) canvas.classList.remove('hide-cursor');
+        if (mouseHideTimer) clearTimeout(mouseHideTimer);
+        mouseHideTimer = setTimeout(function() {
+            if (canvas) canvas.classList.add('hide-cursor');
+        }, 3000);
+    }
+    
+    canvas.addEventListener('mousemove', showCursor);
+    canvas.addEventListener('mouseenter', showCursor);
+    showCursor();
+    
+    // ---------- 全屏功能 ----------
+    var gameContainer = document.getElementById('gameContainer');
+    var isFullscreenMode = false;
+    
+    var savedState = null;
+    var savedCanvasSize = { w: 0, h: 0 };
+    
+    function saveGameState() {
+        savedCanvasSize = { w: W, h: H };
+        savedState = {
+            currentFalling: currentFalling ? {
+                x: currentFalling.x,
+                y: currentFalling.y,
+                char: currentFalling.char,
+                speedY: currentFalling.speedY
+            } : null,
+            missiles: missiles.map(function(m) {
+                return {
+                    x: m.x,
+                    y: m.y,
+                    targetChar: m.target ? m.target.char : null
+                };
+            }),
+            explosions: explosions.map(function(e) {
+                return {
+                    x: e.x,
+                    y: e.y,
+                    life: e.life,
+                    particles: e.particles.map(function(p) {
+                        return { x: p.x, y: p.y, vx: p.vx, vy: p.vy, life: p.life };
+                    })
+                };
+            }),
+            score: score,
+            combo: combo,
+            remainingInLevel: remainingInLevel,
+            isPaused: isPaused,
+            nextLetterChar: nextLetterChar
+        };
+    }
+    
+    function scaleCoord(val, oldSize, newSize) {
+        if (oldSize === 0) return val;
+        return val * (newSize / oldSize);
+    }
+    
+    function restoreGameState() {
+        if (!savedState) return;
+        
+        var oldW = savedCanvasSize.w;
+        var oldH = savedCanvasSize.h;
+        
+        score = savedState.score;
+        combo = savedState.combo;
+        remainingInLevel = savedState.remainingInLevel;
+        isPaused = savedState.isPaused;
+        nextLetterChar = savedState.nextLetterChar || nextLetterChar;
+        
+        var nextSpan = document.getElementById('nextLetterSpan');
+        if (nextSpan) nextSpan.innerText = nextLetterChar;
+        
+        if (savedState.currentFalling) {
+            currentFalling = {
+                x: scaleCoord(savedState.currentFalling.x, oldW, W),
+                y: scaleCoord(savedState.currentFalling.y, oldH, H),
+                char: savedState.currentFalling.char,
+                speedY: savedState.currentFalling.speedY,
+                active: true
+            };
+        } else {
+            currentFalling = null;
+        }
+        
+        missiles = [];
+        for (var i = 0; i < savedState.missiles.length; i++) {
+            var m = savedState.missiles[i];
+            if (currentFalling && m.targetChar === currentFalling.char) {
+                missiles.push({
+                    x: scaleCoord(m.x, oldW, W),
+                    y: scaleCoord(m.y, oldH, H),
+                    target: currentFalling,
+                    targetChar: currentFalling.char,
+                    active: true,
+                    trail: []
+                });
+            }
+        }
+        
+        explosions = [];
+        for (var j = 0; j < savedState.explosions.length; j++) {
+            var e = savedState.explosions[j];
+            var exp = {
+                x: scaleCoord(e.x, oldW, W),
+                y: scaleCoord(e.y, oldH, H),
+                life: e.life,
+                particles: e.particles.map(function(p) {
+                    return {
+                        x: scaleCoord(p.x, oldW, W),
+                        y: scaleCoord(p.y, oldH, H),
+                        vx: p.vx,
+                        vy: p.vy,
+                        life: p.life
+                    };
+                })
+            };
+            explosions.push(exp);
+        }
+        
+        updateUI();
+        updatePauseOverlay();
+        savedState = null;
+    }
+    
+    function updateFullscreenStatus() {
+        var nowFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        if (isFullscreenMode !== nowFullscreen) {
+            saveGameState();
+            isFullscreenMode = nowFullscreen;
+            setTimeout(function() {
+                resizeCanvas();
+                restoreGameState();
+            }, 100);
+        }
+    }
+    
+    function toggleFullscreen() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            saveGameState();
+            if (gameContainer.requestFullscreen) gameContainer.requestFullscreen();
+            else if (gameContainer.webkitRequestFullscreen) gameContainer.webkitRequestFullscreen();
+        } else {
+            saveGameState();
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+    }
+    
+    canvas.addEventListener('dblclick', function(e) {
+        e.stopPropagation();
+        toggleFullscreen();
+    });
+    
+    document.addEventListener('fullscreenchange', updateFullscreenStatus);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenStatus);
+    
+    // ========== 皮肤存储 ==========
+    var SKIN_KEY = 'missile_game_skin';
+    var currentSkin = localStorage.getItem(SKIN_KEY) || '1';
+    
+    function updateSkinUI() {
+        var options = document.querySelectorAll('.skin-option');
+        for (var i = 0; i < options.length; i++) {
+            var opt = options[i];
+            if (opt.dataset.skin === currentSkin) {
+                opt.classList.add('active-skin');
+            } else {
+                opt.classList.remove('active-skin');
+            }
+        }
+    }
+    
+    function setSkin(skinId) {
+        currentSkin = skinId;
+        localStorage.setItem(SKIN_KEY, skinId);
+        updateSkinUI();
+        draw();
+    }
+    
+    var skinOptions = document.querySelectorAll('.skin-option');
+    for (var s = 0; s < skinOptions.length; s++) {
+        skinOptions[s].addEventListener('click', (function(skinId) {
+            return function() { setSkin(skinId); showMessage("🎨 已切换到 " + this.innerText + " 皮肤", false); };
+        })(skinOptions[s].dataset.skin));
+    }
+    
+    // ========== 自适应战机绘制函数 ==========
+    var ctx = canvas.getContext('2d');
+    var scale = 1;
+    
+    function updateScale() {
+        scale = Math.max(0.55, Math.min(1.2, W / 800));
+    }
+    
+    function drawSkin1(px, py) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(scale, scale);
+        ctx.shadowBlur = 4 / scale;
+        ctx.shadowColor = "#00aaff";
+        ctx.beginPath();
+        ctx.moveTo(0, -16);
+        ctx.lineTo(-10, -4);
+        ctx.lineTo(-14, 4);
+        ctx.lineTo(-6, 2);
+        ctx.lineTo(-6, 12);
+        ctx.lineTo(0, 16);
+        ctx.lineTo(6, 12);
+        ctx.lineTo(6, 2);
+        ctx.lineTo(14, 4);
+        ctx.lineTo(10, -4);
+        ctx.fillStyle = "#3a7ca5";
+        ctx.fill();
+        ctx.strokeStyle = "#8cc9ff";
+        ctx.lineWidth = 1 / scale;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -9, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#5fb4e8";
+        ctx.fill();
+        ctx.fillStyle = "#c8eaff";
+        ctx.beginPath();
+        ctx.arc(-2, -11, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#e34234";
+        ctx.fillRect(-18, -1, 5, 3);
+        ctx.fillRect(13, -1, 5, 3);
+        ctx.fillStyle = "#ffaa33";
+        ctx.fillRect(-5, 14, 3, 4);
+        ctx.fillRect(2, 14, 3, 4);
+        ctx.restore();
+    }
+    
+    function drawSkin2(px, py) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(scale, scale);
+        ctx.beginPath();
+        ctx.ellipse(0, -4, 12, 10, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#ff8855";
+        ctx.fill();
+        ctx.fillStyle = "#ffeecc";
+        ctx.beginPath();
+        ctx.ellipse(-4, -8, 2.5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(4, -8, 2.5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#442200";
+        ctx.beginPath();
+        ctx.arc(-4, -8, 1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(4, -8, 1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(0, -3, 3, 2, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#ff6644";
+        ctx.fill();
+        ctx.fillStyle = "#ffcc44";
+        ctx.beginPath();
+        ctx.moveTo(-12, -2);
+        ctx.lineTo(-6, -6);
+        ctx.lineTo(-6, 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(12, -2);
+        ctx.lineTo(6, -6);
+        ctx.lineTo(6, 2);
+        ctx.fill();
+        ctx.fillStyle = "#aa5533";
+        ctx.fillRect(-4, 4, 8, 4);
+        ctx.restore();
+    }
+    
+    function drawSkin3(px, py) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = "#4a5a6e";
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.lineTo(-12, -2);
+        ctx.lineTo(-18, 2);
+        ctx.lineTo(-8, 0);
+        ctx.lineTo(-8, 10);
+        ctx.lineTo(0, 14);
+        ctx.lineTo(8, 10);
+        ctx.lineTo(8, 0);
+        ctx.lineTo(18, 2);
+        ctx.lineTo(12, -2);
+        ctx.fill();
+        ctx.fillStyle = "#8aaacc";
+        ctx.beginPath();
+        ctx.moveTo(-6, -12);
+        ctx.lineTo(0, -16);
+        ctx.lineTo(6, -12);
+        ctx.fill();
+        ctx.fillStyle = "#ffaa55";
+        ctx.fillRect(-20, -2, 6, 3);
+        ctx.fillRect(14, -2, 6, 3);
+        ctx.fillStyle = "#223344";
+        ctx.fillRect(-4, 12, 8, 3);
+        ctx.beginPath();
+        ctx.arc(0, -9, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#3377aa";
+        ctx.fill();
+        ctx.fillStyle = "#88ccff";
+        ctx.beginPath();
+        ctx.arc(-1.5, -10.5, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+    
+    function drawSkin4(px, py) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = "#5a9eff";
+        ctx.fillRect(-12, -14, 24, 6);
+        ctx.fillRect(-14, -8, 28, 6);
+        ctx.fillRect(-16, -2, 32, 6);
+        ctx.fillRect(-14, 4, 28, 6);
+        ctx.fillStyle = "#ffcc44";
+        ctx.fillRect(-6, -10, 12, 4);
+        ctx.fillStyle = "#ff4422";
+        ctx.fillRect(-20, -4, 8, 4);
+        ctx.fillRect(12, -4, 8, 4);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(-4, -18, 8, 4);
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(-2, -16, 4, 2);
+        ctx.fillStyle = "#aa8866";
+        ctx.fillRect(-4, 8, 8, 4);
+        ctx.restore();
+    }
+    
+    function drawSkin5(px, py) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = "#44ccff";
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.lineTo(-10, -4);
+        ctx.lineTo(-6, 2);
+        ctx.lineTo(0, 12);
+        ctx.lineTo(6, 2);
+        ctx.lineTo(10, -4);
+        ctx.fill();
+        ctx.fillStyle = "#88eeff";
+        ctx.beginPath();
+        ctx.arc(0, -5, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(-1.5, -7, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ff8844";
+        ctx.fillRect(-14, 2, 5, 3);
+        ctx.fillRect(9, 2, 5, 3);
+        ctx.fillStyle = "#ffaa66";
+        ctx.fillRect(-4, 10, 8, 3);
+        ctx.restore();
+    }
+    
+    function drawPlaneBySkin() {
+        var px = plane.x;
+        var py = plane.y;
+        switch(currentSkin) {
+            case '1': drawSkin1(px, py); break;
+            case '2': drawSkin2(px, py); break;
+            case '3': drawSkin3(px, py); break;
+            case '4': drawSkin4(px, py); break;
+            case '5': drawSkin5(px, py); break;
+            default: drawSkin1(px, py);
+        }
+    }
+    
+    // ========== 调试参数 ==========
+    var urlParams = new URLSearchParams(window.location.search);
+    var debugLevel = urlParams.get('level');
+    var isDebugMode = false;
+    var debugTargetLevel = null;
+    
+    if (debugLevel !== null) {
+        var parsed = parseInt(debugLevel, 10);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 30) {
+            debugTargetLevel = parsed;
+            isDebugMode = true;
+        }
+    }
+    if (urlParams.get('debug') === '1') isDebugMode = true;
+    
+    // ========== 暂停状态 ==========
+    var isPaused = false;
+    var pauseOverlay = null;
+    
+    function updatePauseOverlay() {
+        if (isPaused && gameRunning && !pendingLevelUp) {
+            if (!pauseOverlay) {
+                pauseOverlay = document.createElement('div');
+                pauseOverlay.className = 'pause-overlay';
+                pauseOverlay.innerHTML = '<div class="pause-text">⏸ 暂停中<br><span style="font-size:1rem;">按空格键继续</span></div>';
+                gameContainer.style.position = 'relative';
+                gameContainer.appendChild(pauseOverlay);
+            }
+        } else {
+            if (pauseOverlay && pauseOverlay.parentNode) {
+                pauseOverlay.remove();
+                pauseOverlay = null;
+            }
+        }
+    }
+    
+    function togglePause() {
+        if (!gameRunning || pendingLevelUp) return;
+        isPaused = !isPaused;
+        updatePauseOverlay();
+        showMessage(isPaused ? "⏸ 游戏已暂停，按空格键继续" : "▶ 游戏继续", false);
+    }
+    
+    // ========== 存储进度 ==========
+    var STORAGE_KEY = 'missile_game_progress';
+    
+    function saveGameProgress() {
+        if (isDebugMode) return;
+        var progress = {
+            currentLevel: currentLevel,
+            score: score,
+            maxCombo: maxCombo,
+            version: 1,
+            saveTime: Date.now()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+    
+    function loadGameProgress() {
+        if (isDebugMode) return false;
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return false;
+        try {
+            var data = JSON.parse(saved);
+            if (data.currentLevel && data.currentLevel >= 1 && data.currentLevel <= 30) {
+                currentLevel = data.currentLevel;
+                score = data.score || 0;
+                maxCombo = data.maxCombo || 0;
+                return true;
+            }
+        } catch(e) {
+            console.warn("加载进度失败", e);
+        }
+        return false;
+    }
+    
+    function resetAllProgress() {
+        if (confirm("⚠️ 确定要重置所有关卡进度吗？这将清空你的关卡记录和得分！")) {
+            localStorage.removeItem(STORAGE_KEY);
+            currentLevel = 1;
+            score = 0;
+            combo = 0;
+            maxCombo = 0;
+            remainingInLevel = 30;
+            levelCompletedFlag = false;
+            pendingLevelUp = false;
+            currentFalling = null;
+            missiles = [];
+            explosions = [];
+            floatingTexts = [];
+            levelStartScore = 0;
+            updateUI();
+            refreshNextLetter();
+            spawnEnemyFromPreview();
+            if (!isDebugMode) saveGameProgress();
+            showMessage("🗑️ 所有关卡进度已重置，从第1关开始！", false);
+        }
+    }
+    
+    function resetCurrentLevel() {
+        if (pendingLevelUp) return;
+        remainingInLevel = 30;
+        levelCompletedFlag = false;
+        pendingLevelUp = false;
+        currentFalling = null;
+        missiles = [];
+        explosions = [];
+        floatingTexts = [];
+        combo = 0;
+        updateUI();
+        refreshNextLetter();
+        spawnEnemyFromPreview();
+        showMessage("🔄 重新开始第 " + currentLevel + " 关！", false);
+    }
+    
+    // ========== 自适应画布 ==========
+    var W = 800, H = 500;
+    
+    function resizeCanvas() {
+        var container = canvas.parentElement;
+        if (!container) return;
+        var containerWidth = container.clientWidth - 4;
+        var aspect = 800 / 500;
+        var newWidth = containerWidth;
+        var newHeight = newWidth / aspect;
+        if (!isFullscreenMode) {
+            var maxHeight = window.innerHeight * 0.55;
+            if (newHeight > maxHeight) {
+                newHeight = maxHeight;
+                newWidth = newHeight * aspect;
+            }
+        }
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        W = canvas.width;
+        H = canvas.height;
+        plane.x = W / 2;
+        plane.y = H - 42;
+        updateScale();
+        draw();
+    }
+    
+    window.addEventListener('resize', function() { resizeCanvas(); });
+    
+    // ========== 基于时间的速度控制 ==========
+    var lastFrameTime = 0;
+    
+    function getBaseSpeedPxPerSecond(level) {
+        if (level <= 3) return 65;
+        if (level <= 6) return 85;
+        if (level <= 10) return 105;
+        if (level <= 14) return 125;
+        if (level <= 18) return 145;
+        if (level <= 22) return 165;
+        if (level <= 26) return 185;
+        return 205;
+    }
+    
+    function getActualSpeedPxPerSecond(level, canvasHeight) {
+        var baseSpeed = getBaseSpeedPxPerSecond(level);
+        return baseSpeed * (canvasHeight / 500);
+    }
+    
+    // ========== 游戏核心变量 ==========
+    var gameRunning = true;
+    var frameRequest = null;
+    var pendingLevelUp = false;
+    var score = 0, combo = 0, maxCombo = 0;
+    var currentLevel = 1, remainingInLevel = 30, levelCompletedFlag = false;
+    var currentFalling = null;
+    var missiles = [];
+    var plane = { x: 400, y: 450 };
+    var floatingTexts = [];
+    var explosions = [];
+    var nextLetterChar = '?';
+    
+    var VALID_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
+    
+    var levelCharSets = {
+        1:"asdfghjkl",
+        2:"asdfghjkl;",
+        3:"qwertyuiop",
+        4:"qwertyuiop",
+        5:"zxcvbnm",
+        6:"zxcvbnm",
+        7:"asdfghjklqwertyuiop",
+        8:"asdfghjklqwertyuiopzxcvbnm",
+        9:"1234567890",
+        10:"1234567890;:",
+        11:"abcdefghijklmnopqrstuvwxyz",
+        12:"abcdefghijklmnopqrstuvwxyz;:,.?",
+        13:"abcdefghijklmnopqrstuvwxyz0123456789",
+        14:"abcdefghijklmnopqrstuvwxyz0123456789;:,.?/",
+        15:"abcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()",
+        16:"abcdefghijklmnopqrstuvwxyz0123456789;:,.?/<>",
+        17:VALID_CHARS,
+        18:VALID_CHARS,
+        19:VALID_CHARS,
+        20:VALID_CHARS
+    };
+    
+    function getLevelCharSet(level) {
+        if (level <= 20) return levelCharSets[level] || VALID_CHARS;
+        return VALID_CHARS;
+    }
+    
+    function getLevelDescription(level) {
+        if (level <= 2) return "基准排 (asdfghjkl / ;)";
+        if (level <= 4) return "上排字母 (qwertyuiop)";
+        if (level <= 6) return "下排字母 (zxcvbnm)";
+        if (level <= 8) return "混合字母";
+        if (level <= 10) return "数字 + 标点";
+        if (level <= 16) return "全部字母 + 数字 + 标点";
+        return "终极混战 (全字符+高速)";
+    }
+    
+    function updateLevelInfo() {
+        var infoDiv = document.getElementById('levelInfo');
+        if (infoDiv) {
+            var speed = getActualSpeedPxPerSecond(currentLevel, H);
+            infoDiv.innerHTML = "第" + currentLevel + "关：" + getLevelDescription(currentLevel) + "<br>下落速度: " + speed.toFixed(0) + " px/秒";
+        }
+    }
+    
+    function generateRandomCharForLevel(level) {
+        var pool = getLevelCharSet(level);
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+    
+    function refreshNextLetter() {
+        if (!gameRunning || pendingLevelUp) return;
+        nextLetterChar = generateRandomCharForLevel(currentLevel);
+        var nextSpan = document.getElementById('nextLetterSpan');
+        if (nextSpan) nextSpan.innerText = nextLetterChar;
+    }
+    
+    function spawnEnemyFromPreview() {
+        if (!gameRunning || pendingLevelUp) return;
+        if (currentFalling !== null) return;
+        var char = nextLetterChar;
+        var randX = 35 + Math.random() * (W - 70);
+        currentFalling = {
+            x: randX,
+            y: -35,
+            char: char,
+            speedY: 0,
+            active: true
+        };
+        refreshNextLetter();
+        
+        // 将等待中的导弹重新绑定到新目标
+        for (var i = 0; i < missiles.length; i++) {
+            var m = missiles[i];
+            if ((!m.target || !m.target.active) && m.targetChar === currentFalling.char) {
+                m.target = currentFalling;
+            }
+        }
+    }
+    
+    // 基于时间的下落更新
+    function updateFallingTimeBased(deltaTime) {
+        if (!gameRunning || pendingLevelUp || isPaused) return;
+        if (!currentFalling) return;
+        
+        var speedPerSecond = getActualSpeedPxPerSecond(currentLevel, H);
+        var moveDistance = speedPerSecond * deltaTime;
+        currentFalling.y += moveDistance;
+        
+        if (currentFalling.y + 45 > H) {
+            currentFalling = null;
+            if (combo !== 0) {
+                combo = 0;
+                updateUI();
+                showMessage("⚠️ 字符坠落！连击已中断", true);
+            }
+            if (remainingInLevel > 0 && !levelCompletedFlag) {
+                spawnEnemyFromPreview();
+            } else if (remainingInLevel <= 0 && !levelCompletedFlag) {
+                completeLevel();
+            }
+        }
+    }
+    
+    // 导弹基于时间的更新
+    function updateMissilesTimeBased(deltaTime) {
+        for (var i = missiles.length - 1; i >= 0; i--) {
+            var m = missiles[i];
+            
+            // 检查目标是否有效
+            var targetValid = m.target && m.target.active && m.target.char === m.targetChar;
+            if (!targetValid && currentFalling && currentFalling.active && m.targetChar === currentFalling.char) {
+                m.target = currentFalling;
+                targetValid = true;
+            }
+            
+            if (!targetValid) {
+                missiles.splice(i, 1);
+                continue;
+            }
+            
+            if (pendingLevelUp || isPaused) continue;
+            
+            // 记录尾迹
+            if (!m.trail) m.trail = [];
+            m.trail.push({ x: m.x, y: m.y });
+            if (m.trail.length > 6) m.trail.shift();
+            
+            var targetX = m.target.x;
+            var targetY = m.target.y - 7;
+            var dx = targetX - m.x;
+            var dy = targetY - m.y;
+            var len = Math.hypot(dx, dy);
+            
+            if (len > 0.01) {
+                var speedPerSecond = 450;
+                var move = speedPerSecond * deltaTime;
+                var vx = (dx / len) * move;
+                var vy = (dy / len) * move;
+                m.x += vx;
+                m.y += vy;
+            }
+            
+            var dist = Math.hypot(m.x - targetX, m.y - targetY);
+            if (dist < 28) {
+                // 命中！播放爆炸音效
+                if (window._missileSound) {
+                    window._missileSound.hit();
+                }
+                
+                var hitChar = m.target.char;
+                var addPoints = 10;
+                combo++;
+                if (combo > maxCombo) maxCombo = combo;
+                if (combo >= 5) addPoints = 15;
+                if (combo >= 10) addPoints = 25;
+                score += addPoints;
+                remainingInLevel--;
+                
+                // 爆炸效果
+                explosions.push({
+                    x: m.target.x,
+                    y: m.target.y - 7,
+                    life: 0.6,
+                    particles: []
+                });
+                for (var j = 0; j < 9; j++) {
+                    explosions[explosions.length-1].particles.push({
+                        x: m.target.x,
+                        y: m.target.y - 7,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3 - 1.2,
+                        life: 0.5 + Math.random() * 0.3
+                    });
+                }
+                addScoreEffect(m.target.x, m.target.y - 10, addPoints);
+                
+                if (m.target) m.target.active = false;
+                currentFalling = null;
+                updateUI();
+                showMessage("💥 追踪导弹命中 [" + hitChar + "]! +" + addPoints, false);
+                if (!isDebugMode) saveGameProgress();
+                
+                if (remainingInLevel <= 0 && !levelCompletedFlag && !pendingLevelUp) {
+                    completeLevel();
+                    return;
+                }
+                if (currentFalling === null && gameRunning && !levelCompletedFlag && !pendingLevelUp) {
+                    spawnEnemyFromPreview();
+                }
+                
+                missiles.splice(i, 1);
+                continue;
+            }
+            
+            if (m.x < -50 || m.x > W + 50 || m.y < -50 || m.y > H + 100) {
+                missiles.splice(i, 1);
+            }
+        }
+    }
+    
+    // 爆炸更新
+    function updateExplosionsTimeBased(deltaTime) {
+        for (var i = explosions.length - 1; i >= 0; i--) {
+            var e = explosions[i];
+            e.life -= deltaTime * 0.7;
+            for (var j = 0; j < e.particles.length; j++) {
+                var p = e.particles[j];
+                p.x += p.vx * deltaTime * 60;
+                p.y += p.vy * deltaTime * 60;
+                p.life -= deltaTime * 1.5;
+            }
+            if (e.life <= 0) {
+                explosions.splice(i, 1);
+            }
+        }
+    }
+    
+    function addMissile(x, y, target) {
+        missiles.push({
+            x: x,
+            y: y,
+            target: target,
+            targetChar: target.char,
+            active: true,
+            trail: []
+        });
+    }
+    
+    // 键盘事件处理
+    function onKeyDownHandler(e) {
+        if (e.key === '/') {
+            e.preventDefault();
+            return;
+        }
+        
+        if (e.key === ' ' || e.key === 'Space') {
+            e.preventDefault();
+            if (gameRunning && !pendingLevelUp) {
+                togglePause();
+            }
+            return;
+        }
+        if (!gameRunning || pendingLevelUp || isPaused) return;
+        
+        var key = e.key;
+        var inputChar = key;
+        var specialMap = {
+            ';': ';', ':': ':', "'": "'", '"': '"', ',': ',', '.': '.', '/': '/',
+            '\\': '\\', '`': '`', '~': '~', '!': '!', '@': '@', '#': '#', '$': '$',
+            '%': '%', '^': '^', '&': '&', '*': '*', '(': '(', ')': ')', '-': '-',
+            '_': '_', '=': '=', '+': '+', '[': '[', ']': ']', '{': '{', '}': '}', '|': '|'
+        };
+        if (specialMap[key]) inputChar = specialMap[key];
+        else if (key.length === 1) inputChar = key;
+        else inputChar = null;
+        
+        var isValid = inputChar && VALID_CHARS.includes(inputChar);
+        
+        if (isValid) {
+            if (currentFalling && currentFalling.char === inputChar) {
+                // 正确输入，发射导弹
+                addMissile(plane.x, plane.y - 16, currentFalling);
+                showMessage("🚀 发射追踪导弹！目标: [" + inputChar + "]", false);
+            } else if (currentFalling && currentFalling.char !== inputChar) {
+                // 按键错误！播放错误提示音
+                if (window._missileSound) {
+                    window._missileSound.error();
+                }
+                combo = 0;
+                updateUI();
+                showMessage("❌ 按下了 [" + inputChar + "]，目标是 [" + currentFalling.char + "]，连击中断", true);
+            } else if (!currentFalling) {
+                // 没有目标时按键也播放错误提示音
+                if (window._missileSound) {
+                    window._missileSound.error();
+                }
+                combo = 0;
+                updateUI();
+                showMessage("⚠️ 没有下落目标，连击中断", true);
+            }
+        } else if (key.length === 1 && !isValid) {
+            // 无效字符也播放错误提示音
+            if (window._missileSound) {
+                window._missileSound.error();
+            }
+            combo = 0;
+            updateUI();
+            showMessage("⚠️ 只能射击有效字符（字母/数字/标点）", true);
+        }
+    }
+    
+    function addScoreEffect(x, y, val) {
+        floatingTexts.push({ x: x, y: y, text: "+" + val, life: 1.0, vx: (Math.random() - 0.5) * 0.4, vy: -1.1 });
+    }
+    
+    function updateUI() {
+        var scoreSpan = document.getElementById('scoreVal');
+        var comboSpan = document.getElementById('comboVal');
+        var levelSpan = document.getElementById('levelNum');
+        var remainSpan = document.getElementById('remainTargets');
+        if (scoreSpan) scoreSpan.innerText = score;
+        if (comboSpan) comboSpan.innerText = combo;
+        if (levelSpan) levelSpan.innerText = currentLevel + "/30";
+        if (remainSpan) remainSpan.innerText = remainingInLevel;
+        updateLevelInfo();
+    }
+    
+    function showMessage(msg, isError) {
+        if (isError === undefined) isError = false;
+        var msgDiv = document.getElementById('gameMsg');
+        if (!msgDiv) return;
+        msgDiv.innerHTML = "🚀 " + msg;
+        if (isError) msgDiv.style.borderLeftColor = '#e74c3c';
+        else msgDiv.style.borderLeftColor = '#ffb347';
+    }
+    
+    var levelStartScore = 0;
+    
+    function showLevelCompleteDialog() {
+        pendingLevelUp = true;
+        currentFalling = null;
+        missiles = [];
+        var existing = document.querySelector('.congrats-overlay');
+        if (existing) existing.remove();
+        var overlay = document.createElement('div');
+        overlay.className = 'congrats-overlay';
+        overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:flex;justify-content:center;align-items:center;z-index:1000;border-radius:1rem;';
+        var isFinal = currentLevel >= 30;
+        var levelGain = score - levelStartScore;
+        overlay.innerHTML = '<div style="background:linear-gradient(135deg,#0f2a3f,#07121e);border-radius:1.2rem;padding:2vh 2vw;text-align:center;border:2px solid #ffb347;box-shadow:0 0 40px rgba(255,180,70,0.4);animation:bounceIn 0.4s ease;">' +
+            '<h2 style="font-size:clamp(1.2rem,4vw,1.6rem);color:#ffcc66;margin:0 0 8px 0;text-shadow:0 0 10px #ffaa33;">🎉 恭喜过关！ 🎉</h2>' +
+            '<p style="font-size:clamp(0.7rem,2.5vw,0.9rem);color:#c0ecff;margin:5px 0;">第 ' + currentLevel + ' 关完成！</p>' +
+            '<p style="font-size:clamp(0.7rem,2.5vw,0.9rem);color:#c0ecff;margin:5px 0;">本关得分: ' + levelGain + '</p>' +
+            (!isFinal ? '<p style="font-size:clamp(0.65rem,2.2vw,0.8rem);color:#ffaa55;margin:8px 0;">⭐ 即将进入第 ' + (currentLevel+1) + ' 关 ⭐</p>' : '<p style="font-size:clamp(0.65rem,2.2vw,0.8rem);color:#ffaa55;margin:8px 0;">🏆 恭喜你完成了所有关卡！ 🏆</p>') +
+            '<div style="font-size:clamp(0.6rem,2vw,0.75rem);color:#ffaa77;margin-top:8px;" id="autoTimerText">5 秒后自动进入下一关...</div>' +
+            '<button id="nextLevelNowBtn" style="background:#ff9944;border:none;border-radius:40px;padding:0.8vh 2vw;font-size:clamp(0.7rem,2vw,0.85rem);font-weight:bold;color:#1e2a2f;cursor:pointer;margin-top:10px;transition:0.2s;">立即进入下一关 →</button>' +
+            '</div>';
+        gameContainer.style.position = 'relative';
+        gameContainer.appendChild(overlay);
+        var timer = 5;
+        var timerText = overlay.querySelector('#autoTimerText');
+        var interval = setInterval(function() {
+            timer--;
+            if (timerText) timerText.innerText = timer + " 秒后自动进入下一关...";
+            if (timer <= 0) {
+                clearInterval(interval);
+                overlay.remove();
+                if (!isFinal) {
+                    proceedToNextLevel();
+                } else {
+                    if (gameRunning) {
+                        gameRunning = false;
+                        if (frameRequest) cancelAnimationFrame(frameRequest);
+                        showGameOverPanel(true);
+                    }
+                }
+            }
+        }, 1000);
+        var nextBtnOv = overlay.querySelector('#nextLevelNowBtn');
+        nextBtnOv.addEventListener('click', function() {
+            clearInterval(interval);
+            overlay.remove();
+            if (!isFinal) {
+                proceedToNextLevel();
+            } else {
+                if (gameRunning) {
+                    gameRunning = false;
+                    if (frameRequest) cancelAnimationFrame(frameRequest);
+                    showGameOverPanel(true);
+                }
+            }
+        });
+    }
+    
+    function proceedToNextLevel() {
+        if (currentLevel >= 30) return;
+        currentLevel++;
+        remainingInLevel = 30;
+        levelCompletedFlag = false;
+        pendingLevelUp = false;
+        currentFalling = null;
+        missiles = [];
+        explosions = [];
+        combo = 0;
+        updateUI();
+        refreshNextLetter();
+        spawnEnemyFromPreview();
+        showMessage("✨ 进入第 " + currentLevel + " 关！速度提升，继续射击！", false);
+        levelStartScore = score;
+        if (!isDebugMode) saveGameProgress();
+    }
+    
+    function completeLevel() {
+        if (levelCompletedFlag || pendingLevelUp) return;
+        levelCompletedFlag = true;
+        if (currentLevel >= 30) {
+            gameRunning = false;
+            if (frameRequest) cancelAnimationFrame(frameRequest);
+            showGameOverPanel(true);
+            if (!isDebugMode) saveGameProgress();
+            return;
+        }
+        if (!isDebugMode) saveGameProgress();
+        showLevelCompleteDialog();
+    }
+    
+    function showGameOverPanel(isVictory) {
+        var existing = document.querySelector('.game-over-panel');
+        if (existing) existing.remove();
+        var panel = document.createElement('div');
+        panel.className = 'game-over-panel';
+        panel.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0a1422ee;backdrop-filter:blur(12px);border-radius:1rem;padding:14px 24px;text-align:center;border:1px solid #ffb347;z-index:10000;color:white;';
+        if (isVictory) {
+            panel.innerHTML = '<div style="font-size:clamp(1rem,3vw,1.2rem);">🏆 全关制霸 🏆</div><div>最终得分: ' + score + '</div><div>最高连击: ' + maxCombo + '</div>' +
+                '<button id="restartGameOverBtn" style="background:#ff9944;border:none;margin:6px;padding:5px 16px;border-radius:40px;cursor:pointer;">🔄 重新闯关</button>' +
+                '<button id="backPracticeOverBtn" style="background:#446688;border:none;margin:6px;padding:5px 16px;border-radius:40px;cursor:pointer;">⌨️ 基础练习</button>';
+        } else {
+            panel.innerHTML = '<div style="font-size:clamp(1rem,3vw,1.2rem);">🏁 游戏终止</div><div>最终得分: ' + score + '</div><div>最高连击: ' + maxCombo + '</div>' +
+                '<button id="restartGameOverBtn" style="background:#ff9944;border:none;margin:6px;padding:5px 16px;border-radius:40px;cursor:pointer;">🔄 重新开始</button>' +
+                '<button id="backPracticeOverBtn" style="background:#446688;border:none;margin:6px;padding:5px 16px;border-radius:40px;cursor:pointer;">⌨️ 基础练习</button>';
+        }
+        document.body.appendChild(panel);
+        var restartBtn = document.getElementById('restartGameOverBtn');
+        var backBtn = document.getElementById('backPracticeOverBtn');
+        if (restartBtn) restartBtn.addEventListener('click', function() { panel.remove(); restartGame(); });
+        if (backBtn) backBtn.addEventListener('click', function() { window.location.href = 'index.html'; });
+    }
+    
+    function restartGame() {
+        var ov = document.querySelector('.congrats-overlay');
+        if (ov) ov.remove();
+        gameRunning = true;
+        pendingLevelUp = false;
+        levelCompletedFlag = false;
+        currentFalling = null;
+        missiles = [];
+        explosions = [];
+        floatingTexts = [];
+        combo = 0;
+        remainingInLevel = 30;
+        if (isPaused) {
+            isPaused = false;
+            updatePauseOverlay();
+        }
+        updateUI();
+        refreshNextLetter();
+        spawnEnemyFromPreview();
+        if (frameRequest) cancelAnimationFrame(frameRequest);
+        gameLoop();
+        showMessage("🚀 重新开始！", false);
+        levelStartScore = score;
+        if (!isDebugMode) saveGameProgress();
+    }
+    
+    // 导弹绘制
+    function drawMissiles() {
+        for (var i = 0; i < missiles.length; i++) {
+            var m = missiles[i];
+            if (m.trail) {
+                for (var t = 0; t < m.trail.length; t++) {
+                    var trailPos = m.trail[t];
+                    ctx.beginPath();
+                    ctx.arc(trailPos.x, trailPos.y, 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(255, 100, 50, " + ((t + 1) / m.trail.length * 0.5) + ")";
+                    ctx.fill();
+                }
+            }
+            ctx.save();
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "#ff6600";
+            ctx.beginPath();
+            ctx.moveTo(m.x + 6, m.y);
+            ctx.lineTo(m.x, m.y - 3.5);
+            ctx.lineTo(m.x - 6, m.y);
+            ctx.lineTo(m.x, m.y + 3.5);
+            ctx.fillStyle = "#ff5500";
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(m.x, m.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffaa44";
+            ctx.fill();
+            ctx.fillStyle = "#ffffaa";
+            ctx.beginPath();
+            ctx.arc(m.x, m.y, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+    
+    // 爆炸绘制
+    function drawExplosions() {
+        for (var i = 0; i < explosions.length; i++) {
+            var e = explosions[i];
+            for (var j = 0; j < e.particles.length; j++) {
+                var p = e.particles[j];
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 100, 30, " + (p.life * 0.8) + ")";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(p.x - 1, p.y - 1, 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 220, 100, " + p.life + ")";
+                ctx.fill();
+            }
+        }
+    }
+    
+    // ========== 主绘制 ==========
+    function draw() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#021a2b";
+        ctx.fillRect(0, 0, W, H);
+        for (var i = 0; i < 70; i++) {
+            ctx.fillStyle = "rgba(255,240,200," + (0.2 + Math.sin(Date.now() * 0.001 + i) * 0.1) + ")";
+            ctx.fillRect((i * 131) % W, (i * 57 + Date.now() * 0.3) % H, 1, 1);
+        }
+        var fontSize = Math.max(32, Math.min(80, Math.floor(W / 20)));
+        if (currentFalling && !pendingLevelUp && !isPaused) {
+            ctx.save();
+            ctx.font = "bold " + fontSize + "px 'JetBrains Mono', monospace";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = "#33ff33";
+            ctx.fillStyle = "#33ff33";
+            ctx.fillText(currentFalling.char, currentFalling.x, currentFalling.y);
+            ctx.strokeStyle = "#228822";
+            ctx.strokeText(currentFalling.char, currentFalling.x, currentFalling.y);
+            ctx.restore();
+        } else if (currentFalling && isPaused) {
+            ctx.save();
+            ctx.globalAlpha = 0.6;
+            ctx.font = "bold " + fontSize + "px 'JetBrains Mono', monospace";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = "#33ff33";
+            ctx.fillStyle = "#33ff33";
+            ctx.fillText(currentFalling.char, currentFalling.x, currentFalling.y);
+            ctx.strokeStyle = "#228822";
+            ctx.strokeText(currentFalling.char, currentFalling.x, currentFalling.y);
+            ctx.restore();
+        }
+        drawMissiles();
+        drawExplosions();
+        drawPlaneBySkin();
+        for (var i = 0; i < floatingTexts.length; i++) {
+            var txt = floatingTexts[i];
+            ctx.font = "bold 14px monospace";
+            ctx.fillStyle = "rgba(255, 200, 100, " + txt.life + ")";
+            ctx.fillText(txt.text, txt.x - 7, txt.y - 5);
+            txt.life -= 0.025;
+            txt.x += txt.vx;
+            txt.y += txt.vy;
+        }
+        floatingTexts = floatingTexts.filter(function(t) { return t.life > 0; });
+        ctx.beginPath();
+        ctx.arc(plane.x, plane.y - 9, 9 * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = "#ffbb77";
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([3, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+    
+    // 基于时间的游戏更新主循环
+    var lastTimestamp = 0;
+    
+    function updateGame(currentTime) {
+        if (!gameRunning || pendingLevelUp) return;
+        
+        if (!lastTimestamp) {
+            lastTimestamp = currentTime;
+            return;
+        }
+        
+        var deltaTime = Math.min(0.033, (currentTime - lastTimestamp) / 1000);
+        lastTimestamp = currentTime;
+        
+        if (isPaused) return;
+        
+        updateFallingTimeBased(deltaTime);
+        updateMissilesTimeBased(deltaTime);
+        updateExplosionsTimeBased(deltaTime);
+    }
+    
+    function gameLoop(timestamp) {
+        if (!gameRunning && document.querySelector('.game-over-panel')) {
+            if (frameRequest) cancelAnimationFrame(frameRequest);
+            return;
+        }
+        updateGame(timestamp);
+        draw();
+        frameRequest = requestAnimationFrame(gameLoop);
+    }
+    
+    // ========== 初始化 ==========
+    setTimeout(function() { resizeCanvas(); }, 100);
+    window.addEventListener('resize', function() { resizeCanvas(); });
+    var loaded = loadGameProgress();
+    if (!loaded && !isDebugMode) {
+        currentLevel = 1;
+        score = 0;
+        maxCombo = 0;
+    } else if (!loaded && isDebugMode) {
+        currentLevel = 1;
+        score = 0;
+        maxCombo = 0;
+    }
+    if (debugTargetLevel !== null) currentLevel = debugTargetLevel;
+    remainingInLevel = 30;
+    levelCompletedFlag = false;
+    pendingLevelUp = false;
+    levelStartScore = score;
+    plane.x = W / 2;
+    plane.y = H - 42;
+    updateUI();
+    refreshNextLetter();
+    spawnEnemyFromPreview();
+    updateSkinUI();
+    updateFullscreenStatus();
+    window.addEventListener('keydown', onKeyDownHandler);
+    document.getElementById('toPracticeBtn').addEventListener('click', function() { window.location.href = 'index.html'; });
+    document.getElementById('resetCurrentBtn').addEventListener('click', function() { resetCurrentLevel(); });
+    document.getElementById('resetAllBtn').addEventListener('click', function() { resetAllProgress(); });
+    window.debugJumpToLevel = function(level) {
+        if (level >= 1 && level <= 30) {
+            currentLevel = level;
+            remainingInLevel = 30;
+            levelCompletedFlag = false;
+            pendingLevelUp = false;
+            currentFalling = null;
+            missiles = [];
+            explosions = [];
+            floatingTexts = [];
+            combo = 0;
+            updateUI();
+            refreshNextLetter();
+            spawnEnemyFromPreview();
+            levelStartScore = score;
+            showMessage("🔧 跳转到第 " + currentLevel + " 关", false);
+        }
+    };
+    gameLoop();
+})();
+</script>
+</body>
+</html>

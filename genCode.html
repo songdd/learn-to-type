@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>邀请码管理后台</title>
+    <style>
+        body {
+            background: #1a1a2e;
+            color: white;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        input, button {
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            border: none;
+        }
+        input {
+            background: #2a2a4e;
+            color: white;
+            width: 200px;
+        }
+        button {
+            background: #ff0050;
+            color: white;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            text-align: left;
+        }
+        .code {
+            font-family: monospace;
+            background: #0f0f1a;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .copy-btn {
+            background: #2c7da0;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔑 邀请码生成器</h1>
+    
+    <div>
+        <input type="text" id="friendName" placeholder="好友名称（如：张潇）" autocomplete="off">
+        <input type="text" id="douyinId" placeholder="抖音号（可选）" autocomplete="off">
+        <button id="generateBtn">✨ 生成邀请码</button>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <label style="font-size:12px">🔗 你的域名：</label>
+        <input type="text" id="domain" value="https://your-domain.edgeone.app" style="width:300px; font-size:12px">
+    </div>
+    
+    <h3>📋 已生成的邀请码</h3>
+    <table id="codeTable">
+        <thead>
+            <tr><th>好友名称</th><th>邀请码</th><th>专属链接</th><th>操作</th></tr>
+        </thead>
+        <tbody id="codeList"></tbody>
+    </table>
+    
+    <div style="margin-top: 20px; background: #0f0f1a; padding: 15px; border-radius: 8px;">
+        <h4>📌 复制以下代码到 functions/verify.js</h4>
+        <pre id="exportCode" style="background: #000; padding: 10px; overflow-x: auto; font-size: 12px;"></pre>
+        <button id="copyCodeBtn">📋 复制代码</button>
+    </div>
+</div>
+
+<script>
+    let codes = [];
+
+    // 生成随机邀请码
+    function generateRandomCode(name) {
+        const prefix = name.substring(0, 2).toUpperCase();
+        const random = Math.random().toString(36).substring(2, 10);
+        const timestamp = Date.now().toString().slice(-4);
+        return `${prefix}${random}${timestamp}`;
+    }
+
+    // 添加新邀请码
+    function addInviteCode(name, douyinId) {
+        const code = generateRandomCode(name);
+        const newCode = {
+            id: Date.now(),
+            name: name,
+            douyinId: douyinId || '',
+            code: code,
+            used: false,
+            createdAt: new Date().toLocaleString()
+        };
+        codes.push(newCode);
+        renderTable();
+        updateExportCode();
+        return newCode;
+    }
+
+    // 渲染表格
+    function renderTable() {
+        const tbody = document.getElementById('codeList');
+        const domain = document.getElementById('domain').value;
+        tbody.innerHTML = '';
+        
+        codes.forEach((item, index) => {
+            const link = `${domain}/login.html?code=${item.code}`;
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td><span class="code">${item.code}</span></td>
+                <td style="max-width: 300px; overflow-x: auto;">${link}</td>
+                <td>
+                    <button class="copy-btn" onclick="copyToClipboard('${link}')">复制链接</button>
+                    <button class="copy-btn" onclick="deleteCode(${index})" style="background:#8b2b2b">删除</button>
+                </td>
+            `;
+        });
+    }
+
+    // 删除邀请码
+    function deleteCode(index) {
+        codes.splice(index, 1);
+        renderTable();
+        updateExportCode();
+    }
+
+    // 复制到剪贴板
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        alert('已复制：' + text);
+    }
+
+    // 生成后端代码
+    function updateExportCode() {
+        const dbObject = {};
+        codes.forEach(item => {
+            dbObject[item.code] = {
+                name: item.name,
+                used: false,
+                createdAt: new Date().toISOString()
+            };
+        });
+        
+        const code = `// functions/verify.js
+const INVITE_DB = ${JSON.stringify(dbObject, null, 4)};
+
+export async function onRequest(context) {
+    const { request } = context;
+    
+    // 处理跨域
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        });
+    }
+    
+    try {
+        const { code } = await request.json();
+        
+        if (INVITE_DB[code]) {
+            const record = INVITE_DB[code];
+            if (record.used) {
+                return new Response(JSON.stringify({ 
+                    success: false, 
+                    message: "此邀请码已被使用" 
+                }), {
+                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+                });
+            } else {
+                // 标记为已使用（注意：在生产环境需要持久化存储）
+                record.used = true;
+                return new Response(JSON.stringify({ 
+                    success: true, 
+                    name: record.name,
+                    message: "验证成功！"
+                }), {
+                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+                });
+            }
+        } else {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                message: "邀请码无效" 
+            }), {
+                headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+            });
+        }
+    } catch(e) {
+        return new Response(JSON.stringify({ 
+            success: false, 
+            message: "请求格式错误" 
+        }), {
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+        });
+    }
+}`;
+        
+        document.getElementById('exportCode').innerText = code;
+    }
+
+    // 生成按钮点击
+    document.getElementById('generateBtn').addEventListener('click', () => {
+        const name = document.getElementById('friendName').value.trim();
+        const douyinId = document.getElementById('douyinId').value.trim();
+        
+        if (!name) {
+            alert('请输入好友名称');
+            return;
+        }
+        
+        addInviteCode(name, douyinId);
+        document.getElementById('friendName').value = '';
+        document.getElementById('douyinId').value = '';
+    });
+
+    // 复制代码按钮
+    document.getElementById('copyCodeBtn').addEventListener('click', () => {
+        const code = document.getElementById('exportCode').innerText;
+        navigator.clipboard.writeText(code);
+        alert('后端代码已复制！');
+    });
+
+    // 域名变化时刷新链接
+    document.getElementById('domain').addEventListener('input', () => {
+        renderTable();
+    });
+
+    // 示例数据
+    addInviteCode('张潇', 'zhangxiao');
+    addInviteCode('李华', 'lihua');
+</script>
+</body>
+</html>
