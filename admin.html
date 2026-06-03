@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>邀请码管理 - 战机打字员</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部紧凑 */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 40px;
+            margin-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 22px;
+            background: linear-gradient(135deg, #fff, #8cc9ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        /* 卡片内边距减小 */
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-left: 3px solid #ff0050;
+            padding-left: 10px;
+        }
+
+        /* 表单紧凑 */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .form-field {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .form-field label {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .form-field input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 13px;
+            color: white;
+            outline: none;
+        }
+
+        .form-field input:focus {
+            border-color: #ff0050;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff0050, #ff6b35);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 0, 80, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 80, 0.3);
+            color: #ff6b6b;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 80, 0.5);
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        /* 预览区域紧凑 */
+        .preview-area {
+            margin-top: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .preview-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .preview-code {
+            font-family: monospace;
+            font-size: 14px;
+            color: #7cff9e;
+            word-break: break-all;
+        }
+
+        .preview-link {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 6px;
+            word-break: break-all;
+        }
+
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff0050;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 13px;
+        }
+
+        /* 表格紧凑 */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px 6px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        th {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        td {
+            color: white;
+            font-size: 12px;
+        }
+
+        .code-cell {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .status-used {
+            background: rgba(255, 0, 80, 0.2);
+            color: #ff6b6b;
+        }
+
+        .status-unused {
+            background: rgba(0, 255, 100, 0.15);
+            color: #7cff9e;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* 统计卡片紧凑 */
+        .stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 10px 16px;
+            flex: 1;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b35;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .stats-tip {
+            text-align: right;
+            margin-bottom: 12px;
+        }
+
+        .stats-tip span {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        /* 过滤栏紧凑 */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-item label {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+        .filter-item input, .filter-item select {
+            width: 100%;
+            padding: 7px 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-size: 12px;
+            color: white;
+            outline: none;
+        }
+
+        .filter-item input:focus, .filter-item select:focus {
+            border-color: #ff0050;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 分页栏紧凑 */
+        .pagination-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-size-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .page-info {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        .record-info {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 1000;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            padding: 30px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .card { padding: 12px 16px; }
+            .form-group { flex-direction: column; }
+            .form-field { width: 100%; }
+            .filter-bar { flex-direction: column; }
+            .filter-item { width: 100%; }
+            .stats { gap: 8px; }
+            .stat-card { padding: 8px 12px; }
+            .stat-number { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 头部 -->
+    <div class="header">
+        <div class="logo">🔑</div>
+        <h1>邀请码管理</h1>
+        <div class="subtitle">生成 · 管理 · 入库</div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="totalCount">--</div>
+            <div class="stat-label">总邀请码</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="usedCount">--</div>
+            <div class="stat-label">已使用</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="unusedCount">--</div>
+            <div class="stat-label">未使用</div>
+        </div>
+    </div>
+    <div class="stats-tip">
+        <span>📊 全量统计</span>
+    </div>
+
+    <!-- 生成邀请码 -->
+    <div class="card">
+        <div class="card-title">✨ 生成邀请码</div>
+        <div class="form-group">
+            <div class="form-field">
+                <label>好友名称</label>
+                <input type="text" id="friendName" placeholder="例：张潇" autocomplete="off">
+            </div>
+            <div class="form-field">
+                <label>抖音号（可选）</label>
+                <input type="text" id="douyinId" placeholder="用于生成前缀" autocomplete="off">
+            </div>
+            <button class="btn btn-success" id="saveToDbBtn">💾 入库</button>
+        </div>
+        <div id="previewArea" style="margin-top: 12px; display: none;">
+            <div class="preview-area">
+                <div class="preview-label">📝 预览</div>
+                <div class="preview-code" id="previewCode"></div>
+                <div class="preview-link" id="previewLink"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选条件 -->
+    <div class="card" style="padding: 12px 16px;">
+        <div class="filter-bar">
+            <div class="filter-item">
+                <label>👤 好友名称</label>
+                <input type="text" id="filterName" placeholder="搜索" autocomplete="off">
+            </div>
+            <div class="filter-item">
+                <label>📋 状态</label>
+                <select id="filterStatus">
+                    <option value="all">全部</option>
+                    <option value="unused">未使用</option>
+                    <option value="used">已使用</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" id="searchBtn">🔍 搜索</button>
+                <button class="btn btn-secondary" id="clearFilterBtn">🗑️ 清空</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="card" style="padding: 10px 16px;">
+        <div class="pagination-bar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: rgba(255,255,255,0.5); font-size: 11px;">每页</span>
+                <select id="pageSizeSelect" class="page-size-select">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span style="color: rgba(255,255,255,0.5); font-size: 11px;">条</span>
+            </div>
+            <div class="pagination-controls">
+                <button id="prevPageBtn" class="btn btn-secondary btn-sm" disabled>◀</button>
+                <span id="pageInfo" class="page-info">第 1 / 1 页</span>
+                <button id="nextPageBtn" class="btn btn-secondary btn-sm" disabled>▶</button>
+            </div>
+            <div>
+                <span id="recordInfo" class="record-info">共 0 条</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 邀请码列表 -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-container">
+            <table id="codeTable">
+                <thead>
+                    <tr>
+                        <th>ID</th><th>好友</th><th>邀请码</th><th>状态</th><th>创建时间</th><th>链接</th><th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="codeList">
+                    <tr class="empty-row"><td colspan="7">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 分页变量
+    let currentPage = 1;
+    let pageSize = 20;
+    let totalRecords = 0;
+    let totalPages = 1;
+    
+    // 过滤条件
+    let filterName = '';
+    let filterStatus = 'all';
+    
+    let currentPreviewCode = null;
+    let currentPreviewName = null;
+    
+    // 显示/隐藏加载动画
+    function showLoading(show, text = '加载中...') {
+        let overlay = document.getElementById('loadingOverlay');
+        if (show) {
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'loadingOverlay';
+                overlay.className = 'loading-overlay';
+                overlay.innerHTML = `<div class="spinner"></div><div class="loading-text">${text}</div>`;
+                document.body.appendChild(overlay);
+            } else {
+                const textEl = overlay.querySelector('.loading-text');
+                if (textEl) textEl.textContent = text;
+                overlay.style.display = 'flex';
+            }
+        } else {
+            if (overlay) overlay.style.display = 'none';
+        }
+    }
+    
+    function showToast(message, isError = false) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = isError ? 'rgba(255, 0, 80, 0.9)' : 'rgba(0, 0, 0, 0.85)';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { if (toast) toast.remove(); }, 2000);
+    }
+    
+    // 生成邀请码
+    function generateCode(name, douyinId) {
+        const cleanName = name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '');
+        const suffix = Math.random().toString(36).substring(2, 8);
+        let prefix = '';
+        if (douyinId && douyinId.trim()) {
+            prefix = douyinId.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        } else {
+            prefix = cleanName.substring(0, 4).toLowerCase();
+        }
+        if (!prefix) prefix = 'friend';
+        return `${prefix}_${suffix}`;
+    }
+    
+    function getDomain() { return window.location.origin; }
+    
+    function buildFilterParams() {
+        const params = new URLSearchParams();
+        params.append('page', currentPage);
+        params.append('pageSize', pageSize);
+        if (filterName && filterName.trim() !== '') params.append('name', filterName.trim());
+        if (filterStatus !== 'all') params.append('used', filterStatus === 'used' ? 'true' : 'false');
+        return params.toString();
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    
+    function renderTable(data) {
+        const tbody = document.getElementById('codeList');
+        const domain = getDomain();
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">暂无数据</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        for (const item of data) {
+            const link = `${domain}/login.html?code=${encodeURIComponent(item.code)}`;
+            const createdAt = item.created_at ? new Date(item.created_at).toLocaleString('zh-CN') : '-';
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${item.id || '-'}</td>
+                <td style="font-weight:500;">${escapeHtml(item.name)}</td>
+                <td><span class="code-cell">${escapeHtml(item.code)}</span></td>
+                <td><span class="status-badge ${item.used ? 'status-used' : 'status-unused'}">${item.used ? '已使用' : '未使用'}</span></td>
+                <td style="font-size:11px;">${createdAt}</td>
+                <td style="max-width:200px; overflow-x:auto;"><span style="font-size:10px; word-break:break-all;">${escapeHtml(link)}</span></td>
+                <td class="action-buttons">
+                    <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${escapeHtml(link)}', '链接')">📋</button>
+                    <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${escapeHtml(item.code)}', '邀请码')">🔑</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteInvite(${item.id}, '${escapeHtml(item.code)}')">🗑️</button>
+                </td>
+            `;
+        }
+    }
+    
+    function updatePagination() {
+        document.getElementById('pageInfo').innerText = `第 ${currentPage} / ${totalPages} 页`;
+        document.getElementById('recordInfo').innerText = `共 ${totalRecords} 条`;
+        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+        document.getElementById('nextPageBtn').disabled = currentPage >= totalPages || totalPages === 0;
+    }
+    
+    async function updateStats() {
+        try {
+            const res = await fetch('/api/get-stats', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+            const result = await res.json();
+            if (result.success) {
+                document.getElementById('totalCount').innerText = result.total;
+                document.getElementById('usedCount').innerText = result.used;
+                document.getElementById('unusedCount').innerText = result.unused;
+            }
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadInviteCodes() {
+        showLoading(true, '加载中...');
+        try {
+            const res = await fetch(`/api/get-invites?${buildFilterParams()}`);
+            const result = await res.json();
+            if (result.success) {
+                renderTable(result.data);
+                totalRecords = result.total;
+                totalPages = result.totalPages;
+                updatePagination();
+                await updateStats();
+            } else {
+                showToast(result.message || '加载失败', true);
+                renderTable([]);
+            }
+        } catch(e) {
+            showToast('网络错误', true);
+            renderTable([]);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function refreshCurrentPage() { await loadInviteCodes(); }
+    
+    function doSearch() { currentPage = 1; loadInviteCodes(); }
+    
+    function clearFilter() {
+        document.getElementById('filterName').value = '';
+        document.getElementById('filterStatus').value = 'all';
+        filterName = '';
+        filterStatus = 'all';
+        currentPage = 1;
+        loadInviteCodes();
+        showToast('已清空筛选', false);
+    }
+    
+    function updatePreview() {
+        const name = document.getElementById('friendName').value.trim();
+        const douyinId = document.getElementById('douyinId').value.trim();
+        if (name) {
+            const code = generateCode(name, douyinId);
+            currentPreviewCode = code;
+            currentPreviewName = name;
+            const link = `${getDomain()}/login.html?code=${encodeURIComponent(code)}`;
+            document.getElementById('previewCode').innerText = code;
+            document.getElementById('previewLink').innerText = link;
+            document.getElementById('previewArea').style.display = 'block';
+        } else {
+            document.getElementById('previewArea').style.display = 'none';
+            currentPreviewCode = null;
+            currentPreviewName = null;
+        }
+    }
+    
+    async function saveToDatabase() {
+        const name = document.getElementById('friendName').value.trim();
+        const douyinId = document.getElementById('douyinId').value.trim();
+        if (!name) { showToast('请输入好友名称', true); return; }
+        const code = generateCode(name, douyinId);
+        showLoading(true, '入库中...');
+        try {
+            const res = await fetch('/api/add-invite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, name })
+            });
+            const result = await res.json();
+            if (result.success) {
+                showToast(`✅ ${code} 已入库`);
+                document.getElementById('friendName').value = '';
+                document.getElementById('douyinId').value = '';
+                document.getElementById('previewArea').style.display = 'none';
+                await refreshCurrentPage();
+            } else {
+                showToast(result.message || '入库失败', true);
+            }
+        } catch(e) { showToast('网络错误', true); }
+        finally { showLoading(false); }
+    }
+    
+    async function deleteInvite(id, code) {
+        if (!confirm(`删除 "${code}"？`)) return;
+        showLoading(true, '删除中...');
+        try {
+            const res = await fetch('/api/delete-invite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            const result = await res.json();
+            if (result.success) {
+                showToast(`✅ 已删除 ${code}`);
+                await refreshCurrentPage();
+            } else {
+                showToast(result.message || '删除失败', true);
+            }
+        } catch(e) { showToast('网络错误', true); }
+        finally { showLoading(false); }
+    }
+    
+    function copyToClipboard(text, label) {
+        navigator.clipboard.writeText(text).then(() => showToast(`✅ ${label}已复制`)).catch(() => showToast('复制失败', true));
+    }
+    
+    function goPrevPage() { if (currentPage > 1) { currentPage--; loadInviteCodes(); } }
+    function goNextPage() { if (currentPage < totalPages) { currentPage++; loadInviteCodes(); } }
+    function onPageSizeChange() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; loadInviteCodes(); }
+    function getFilterValues() { filterName = document.getElementById('filterName').value; filterStatus = document.getElementById('filterStatus').value; }
+    
+    function bindEvents() {
+        document.getElementById('saveToDbBtn').addEventListener('click', saveToDatabase);
+        document.getElementById('friendName').addEventListener('input', updatePreview);
+        document.getElementById('douyinId').addEventListener('input', updatePreview);
+        document.getElementById('prevPageBtn').addEventListener('click', goPrevPage);
+        document.getElementById('nextPageBtn').addEventListener('click', goNextPage);
+        document.getElementById('pageSizeSelect').addEventListener('change', onPageSizeChange);
+        document.getElementById('searchBtn').addEventListener('click', () => { getFilterValues(); doSearch(); });
+        document.getElementById('clearFilterBtn').addEventListener('click', clearFilter);
+        document.getElementById('filterName').addEventListener('keypress', (e) => { if (e.key === 'Enter') { getFilterValues(); doSearch(); } });
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => { bindEvents(); loadInviteCodes(); });
+</script>
+</body>
+</html>

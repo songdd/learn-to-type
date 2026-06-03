@@ -389,27 +389,20 @@
 </div>
 <script>
 // 在 index.html 的 <script> 最开头添加
+// 在 index.html 的 <script> 最开头
 (function() {
-    // 检查是否已登录
+    // 只检查是否有登录凭证，不检查过期时间
     const loggedIn = localStorage.getItem('logged_in');
-    const loginTime = localStorage.getItem('login_time');
+    const userName = localStorage.getItem('user_name');
     
-    if (!loggedIn || !loginTime) {
+    if (!loggedIn || !userName) {
+        // 没有登录凭证，跳转到登录页
         window.location.href = 'login.html';
         return;
     }
     
-    // 登录有效期 7 天
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;
-    if (Date.now() - parseInt(loginTime) > sevenDays) {
-        localStorage.removeItem('logged_in');
-        localStorage.removeItem('user_name');
-        localStorage.removeItem('login_time');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    console.log('欢迎回来，', localStorage.getItem('user_name'));
+    // 可选：在控制台显示欢迎信息
+    console.log('🎮 欢迎回来，', userName);
 })();
     
 // ==================== 真实键盘音效系统（预加载，无延迟）====================

@@ -1,29 +1,5 @@
-# 依赖目录
-node_modules/
-vendor/
-
-# 环境变量
 .env
-.env.local
-
-# 系统文件
-.DS_Store
-Thumbs.db
-
-# 编辑器配置
-.vscode/
-.idea/
-
-# 日志文件
-*.log
-npm-debug.log*
-
-# 编译产物
-dist/
-build/
-*.exe
-# Tencent Cloud EdgeOne
-.env
-.edgeone/*
-.tef_dist/*
-  
+.edgeone
+.git
+node_modules
+package-lock.json
