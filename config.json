@@ -42,6 +42,14 @@
                     },
                     {
                     "id": 5,
+                    "description": "🐒 练习 · F J D K",
+                    "url": "./basictype.html",
+                    "keys": ["F", "J", "D", "K"],
+                    "num": 60,
+                    "level": "intermediate"
+                    },                    
+                    {
+                    "id": 6,
                     "description": "🦄 学习 · S L",
                     "background": "linear-gradient(130deg, #7FB3D5, #5DADE2)",
                     "url": "./basictype.html",
@@ -49,7 +57,7 @@
                     "level": "beginner"
                     },
                     {
-                    "id": 6,
+                    "id": 7,
                     "description": "🐢 练习 · S L",
                     "background": "linear-gradient(115deg, #FFB6C1, #FFA07A)",
                     "url": "./basictype.html",
@@ -57,7 +65,15 @@
                     "level": "intermediate"
                     },
                     {
-                    "id": 7,
+                    "id": 8,
+                    "description": "🐢 练习 · F J D K S L",
+                    "url": "./basictype.html",
+                    "keys": ["F", "J", "D", "K", "S", "L"],
+                    "num": 60,
+                    "level": "intermediate"
+                    },                    
+                    {
+                    "id": 9,
                     "description": "🐱 学习 · A ;",
                     "background": "linear-gradient(120deg, #6A9C89, #4A7C6F)",
                     "url": "./basictype.html",
@@ -65,7 +81,7 @@
                     "level": "beginner"
                     },
                     {
-                    "id": 8,
+                    "id": 10,
                     "description": "🎈 练习 · A ;",
                     "background": "linear-gradient(135deg, #FFB347, #FF8C42)",
                     "url": "./basictype.html",
@@ -73,211 +89,302 @@
                     "level": "intermediate"
                     },
                     {
-                    "id": 9,
+                    "id": 11,
+                    "description": "🎈 练习 · 8个基准键",
+                    "url": "./basictype.html",
+                    "keys": ["A", "S", "D", "F", "J", "K", "L", ";"],
+                    "num": 60,
+                    "level": "intermediate"
+                    },                    
+                    {
+                    "id": 12,
                     "description": "🐱 学习 · G H",
                     "url": "./basictype.html",
                     "keys": ["G", "H"],
                     "level": "beginner"
                     },
                     {
-                    "id": 10,
+                    "id": 13,
                     "description": "🎈 练习 · G H",
                     "url": "./basictype.html",
                     "keys": ["G", "H"],
                     "level": "intermediate"
                     },                    
                     {
-                    "id": 11,
+                    "id": 14,
                     "description": "🎈 练习 · 基准键",
                     "url": "./basictype.html",
                     "keys": ["A", "S", "D", "F", "G", "H","J", "K", "L", ";"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 12,
+                    "id": 15,
                     "description": "🎈 加练 · 基准键",
                     "url": "./basictype.html",
                     "keys": ["A", "S", "D", "F", "G", "H","J", "K", "L", ";"],
                     "level": "advanced"
                     },
                     {
-                    "id": 13,
+                    "id": 16,
                     "description": "🐣 学习 · R U",
                     "url": "./basictype.html",
                     "keys": ["R", "U"],
                     "level": "beginner"
                     },
                     {
-                    "id": 14,
+                    "id": 17,
                     "description": "🐬 练习 · R U",
                     "url": "./basictype.html",
                     "keys": ["R", "U"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 15,
+                    "id": 18,
                     "description": "🦁 学习 · T Y",
                     "url": "./basictype.html",
                     "keys": ["T", "Y"],
                     "level": "beginner"
                     },
                     {
-                    "id": 16,
+                    "id": 19,
                     "description": "🐒 练习 · T Y",
                     "url": "./basictype.html",
                     "keys": ["T", "Y"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 17,
+                    "id": 20,
+                    "description": "🐒 练习 · R U T Y",
+                    "url": "./basictype.html",
+                    "keys": ["R", "U", "T", "Y"],
+                    "level": "intermediate"
+                    },                    
+                    {
+                    "id": 21,
                     "description": "🦄 学习 · E I",
                     "url": "./basictype.html",
                     "keys": ["E", "I"],
                     "level": "beginner"
                     },
                     {
-                    "id": 18,
+                    "id": 22,
                     "description": "🐢 练习 · E I",
                     "url": "./basictype.html",
                     "keys": ["E", "I"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 19,
+                    "id": 23,
+                    "description": "🐢 练习 · R U T Y E I",
+                    "url": "./basictype.html",
+                    "keys": ["R", "U", "T", "Y", "E", "I"],
+                    "level": "intermediate"
+                    },                    
+                    {
+                    "id": 24,
                     "description": "🐱 学习 · W O",
                     "url": "./basictype.html",
                     "keys": ["W", "O"],
                     "level": "beginner"
                     },
                     {
-                    "id": 20,
+                    "id": 25,
                     "description": "🎈 练习 · W O",
                     "url": "./basictype.html",
                     "keys": ["W", "O"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 21,
+                    "id": 26,
+                    "description": "🎈 练习 · R U T Y E I W O",
+                    "url": "./basictype.html",
+                    "keys": ["R", "U", "T", "Y", "E", "I", "W", "O"],
+                    "num": 60,
+                    "level": "intermediate"
+                    },                    
+                    {
+                    "id": 27,
                     "description": "🐱 学习 · Q P",
                     "url": "./basictype.html",
                     "keys": ["Q", "P"],
                     "level": "beginner"
                     },
                     {
-                    "id": 22,
+                    "id": 28,
                     "description": "🎈 练习 · Q P",
                     "url": "./basictype.html",
                     "keys": ["Q", "P"],
                     "level": "intermediate"
                     },                    
                     {
-                    "id": 23,
+                    "id": 29,
                     "description": "🎈 练习 · 上排键",
                     "url": "./basictype.html",
                     "keys": ["Q", "W", "E", "R", "T", "Y","U", "I", "O", "P"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 24,
+                    "id": 30,
                     "description": "🎈 加练 · 上排键",
                     "url": "./basictype.html",
                     "keys": ["Q", "W", "E", "R", "T", "Y","U", "I", "O", "P"],
+                    "num": 60,
                     "level": "advanced"
                     },
                     {
-                    "id": 25,
-                    "description": "🐣 学习 · V B N",
-                    "url": "./basictype.html",
-                    "keys": ["V","B", "N"],
-                    "level": "beginner"
-                    },
-                    {
-                    "id": 26,
-                    "description": "🐬 练习 · V B N",
-                    "url": "./basictype.html",
-                    "keys": ["V", "B", "N"],
-                    "level": "intermediate"
-                    },
-                    {
-                    "id": 27,
-                    "description": "🦁 学习 · C M",
-                    "url": "./basictype.html",
-                    "keys": ["C", "M"],
-                    "level": "beginner"
-                    },
-                    {
-                    "id": 28,
-                    "description": "🐒 练习 · C M",
-                    "url": "./basictype.html",
-                    "keys": ["C", "M"],
-                    "level": "intermediate"
-                    },
-                    {
-                    "id": 29,
-                    "description": "🦄 学习 · X ,",
-                    "url": "./basictype.html",
-                    "keys": ["X", ","],
-                    "level": "beginner"
-                    },
-                    {
-                    "id": 30,
-                    "description": "🐢 练习 · X ,",
-                    "url": "./basictype.html",
-                    "keys": ["X", ","],
-                    "level": "intermediate"
-                    },
-                    {
                     "id": 31,
-                    "description": "🐱 学习 · Z .",
+                    "description": "🐣 学习 · V M",
                     "url": "./basictype.html",
-                    "keys": ["Z", "."],
+                    "keys": ["V", "M"],
                     "level": "beginner"
                     },
                     {
                     "id": 32,
-                    "description": "🎈 练习 · Z .",
+                    "description": "🐬 练习 · V M",
                     "url": "./basictype.html",
-                    "keys": ["Z", "."],
+                    "keys": ["V", "M"],
                     "level": "intermediate"
-                    },             
+                    },
                     {
                     "id": 33,
-                    "description": "🎈 练习 · 下排键",
+                    "description": "🦁 学习 · C ,",
                     "url": "./basictype.html",
-                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", "."],
-                    "level": "intermediate"
+                    "keys": ["C", ","],
+                    "level": "beginner"
                     },
                     {
                     "id": 34,
-                    "description": "🎈 加练 · 下排键",
+                    "description": "🐒 练习 · C ,",
                     "url": "./basictype.html",
-                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", "."],
-                    "level": "advanced"
+                    "keys": ["C", ","],
+                    "level": "intermediate"
                     },
                     {
                     "id": 35,
+                    "description": "🐒 练习 · V M C ,",
+                    "url": "./basictype.html",
+                    "keys": ["V", "M", "C", ","],
+                    "level": "intermediate"
+                    },
+                    {
+                    "id": 36,
+                    "description": "🐒 练习 · V M C ,",
+                    "url": "./basictype.html",
+                    "keys": ["V", "M", "C", ","],
+                    "level": "advanced",
+                    "num": 60
+                    },                                        
+                    {
+                    "id": 37,
+                    "description": "🦄 学习 · X .",
+                    "url": "./basictype.html",
+                    "keys": ["X", "."],
+                    "level": "beginner"
+                    },
+                    {
+                    "id": 38,
+                    "description": "🐢 练习 · X .",
+                    "url": "./basictype.html",
+                    "keys": ["X", "."],
+                    "level": "intermediate"
+                    },
+                    {
+                    "id": 39,
+                    "description": "🐢 练习 ·  V M C , X .",
+                    "url": "./basictype.html",
+                    "keys": ["V", "M", "C", ",", "X", "."],
+                    "level": "intermediate"
+                    },    
+                    {
+                    "id": 40,
+                    "description": "🐢 练习 ·  V M C , X .",
+                    "url": "./basictype.html",
+                    "keys": ["V", "M", "C", ",", "X", "."],
+                    "num": 60,
+                    "level": "advanced"
+                    },                                        
+                    {
+                    "id": 41,
+                    "description": "🐱 学习 · Z /",
+                    "url": "./basictype.html",
+                    "keys": ["Z", "/"],
+                    "level": "beginner"
+                    },
+                    {
+                    "id": 42,
+                    "description": "🎈 练习 · Z /",
+                    "url": "./basictype.html",
+                    "keys": ["Z", "/"],
+                    "level": "intermediate"
+                    },    
+                    {
+                    "id": 43,
+                    "description": "🎈 练习 · V M C , X . Z /",
+                    "url": "./basictype.html",
+                    "keys": ["V", "M", "C", ",", "X", ".", "Z", "/"],
+                    "level": "intermediate"
+                    },      
+                    {
+                    "id": 44,
+                    "description": "🎈 练习 · V M C , X . Z /",
+                    "url": "./basictype.html",
+                    "keys": ["V", "M", "C", ",", "X", ".", "Z", "/"],
+                    "num": 60,
+                    "level": "advanced"
+                    }, 
+                    {
+                    "id": 45,
+                    "description": "🐱 学习 · B N",
+                    "url": "./basictype.html",
+                    "keys": ["B", "N"],
+                    "level": "beginner"
+                    },
+                    {
+                    "id": 46,
+                    "description": "🎈 练习 · B N",
+                    "url": "./basictype.html",
+                    "keys": ["B", "N"],
+                    "level": "intermediate"
+                    },                       
+                    {
+                    "id": 47,
+                    "description": "🎈 练习 · 下排键",
+                    "url": "./basictype.html",
+                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", ".", "/"],
+                    "level": "intermediate"
+                    },
+                    {
+                    "id": 48,
+                    "description": "🎈 加练 · 下排键",
+                    "url": "./basictype.html",
+                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", ".", "/"],
+                    "num": 60,
+                    "level": "advanced"
+                    },
+                    {
+                    "id": 49,
                     "description": "🎈 练习 · 数字键",
                     "url": "./basictype.html",
                     "keys": ["1", "2", "3", "4", "5", "6","7", "8", "9", "0"],
                     "level": "intermediate"
                     },
                     {
-                    "id": 36,
+                    "id": 50,
                     "description": "🎈 加练 · 数字键",
                     "url": "./basictype.html",
                     "keys": ["1", "2", "3", "4", "5", "6","7", "8", "9", "0"],
                     "level": "advanced",
-                    "num": 40
+                    "num": 60
                     },	
                     {
-                    "id": 37,
+                    "id": 51,
                     "description": "🎈 综合练习 · 全键盘",
                     "url": "./basictype.html",
                     "level": "intermediate",
                     "num": 60
                     },
                     {
-                    "id": 38,
+                    "id": 52,
                     "description": "🎈 综合练习 · 全键盘",
                     "url": "./basictype.html",
                     "level": "advanced",
@@ -287,7 +394,7 @@
         },
         {
         "id": "2",
-        "code": "game",
+        "code": "plane_shooter",
         "name": "小飞机射击",
         "description": "从基础键位到全键进阶，用游戏闯关模式逐级解锁打字技能，适合零基础与中级用户。每关聚焦特定键区，像玩游戏升段位一样轻松建立指法记忆，练出扎实手感。",
         "levels": [
@@ -310,7 +417,7 @@
         },
         {
         "id": "3",
-        "code": "game",
+        "code": "whackamole",
         "name": "打地鼠",
         "description": "小时候的经典游戏，可爱的仓鼠你想打吗？那就来玩吧。",
         "levels": [

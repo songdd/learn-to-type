@@ -564,7 +564,7 @@
     // ✅ 读取 num 参数，默认30，限制1-60
     let urlNum = parseInt(urlParams.get('num')) || 30;
     if (urlNum < 1) urlNum = 30;
-    if (urlNum > 60) urlNum = 60;  // 限制最大60个字符
+    if (urlNum > 90) urlNum = 90;  // 限制最大90个字符
     
     const isDebug = urlParams.get('debug') === '1';
     
@@ -1438,7 +1438,7 @@
     }
     
     function backToMenu() {
-        window.location.href = 'tapGate.html';
+        window.location.href = 'index.html';
     }
     
     function loadConfigAndInit() {
@@ -1520,7 +1520,7 @@
                     urlNum = currentLevelData.num || 30;
                 }
                 if (urlNum < 1) urlNum = 30;
-                if (urlNum > 60) urlNum = 60;
+                if (urlNum > 90) urlNum = 90;
                 
                 updateUrlParams();
                 initPractice();
