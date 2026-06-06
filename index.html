@@ -2,1151 +2,949 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>打字练习 · 21关渐进盲打 | 精准解锁 + 战机模式入口 | 真实键盘音效</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>打字练习 · 儿童乐园闯关</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            user-select: none;
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a3a 0%, #0f1a24 100%);
-            font-family: 'Segoe UI', 'Roboto', 'JetBrains Mono', monospace;
+            background: linear-gradient(145deg, #FFE8C5 0%, #FFD6A5 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
+            font-family: 'Comic Neue', 'Comic Neue', 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', 'Poppins', cursive, sans-serif;
+            padding: 30px 20px 50px;
         }
 
-        .app-container {
+        .container {
             max-width: 1400px;
-            width: 100%;
-            background: rgba(22, 32, 45, 0.85);
-            backdrop-filter: blur(2px);
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
-            padding: 1rem 1.2rem 1.2rem 1.2rem;
-            border: 1px solid rgba(72, 120, 150, 0.4);
+            margin: 0 auto;
         }
 
-        .stats-bar {
+        /* 调试面板样式 */
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.85);
+            border-radius: 12px;
+            padding: 10px 15px;
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
+            z-index: 10000;
+            backdrop-filter: blur(8px);
+            border: 1px solid #ff9800;
             flex-wrap: wrap;
-            gap: 8px;
-            background: #0e1a24c9;
-            border-radius: 50px;
-            padding: 6px 16px;
-            margin-bottom: 8px;
         }
-
-        .stat {
-            background: #07121b;
-            padding: 4px 14px;
-            border-radius: 30px;
-            color: #cfecf0;
-            font-weight: 600;
-            font-size: 0.85rem;
-            font-family: monospace;
-        }
-
-        .stat span {
-            color: #6bc6ff;
-            font-weight: 800;
-            font-size: 1.1rem;
-            margin-right: 4px;
-        }
-
-        .rule-banner {
-            background: #0f2a2f;
-            border-radius: 28px;
-            padding: 6px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
-            font-size: 0.7rem;
-            color: #b8e2f2;
-            border: 1px solid #2c7da0;
-        }
-        .rule-banner span {
-            background: #1c4e5c;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        .rule-banner .high { background: #ffb347; color: #1e2a2f; }
-        .rule-banner .auto-reset { background: #8b5a2b; color: #ffd966; }
-        .save-badge {
-            background: #2c7da0;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-        }
-        .game-mode-link {
-            background: #e67e22;
-            color: white;
-            padding: 2px 14px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
+        .debug-btn {
+            background: #ff9800;
             border: none;
-            font-family: monospace;
-        }
-        .game-mode-link:hover {
-            background: #f39c12;
-            transform: scale(0.96);
-            box-shadow: 0 0 8px #ffb347;
-        }
-
-        .major-level-nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
-            background: #0a1620b3;
             padding: 6px 12px;
-            border-radius: 40px;
-            align-items: center;
-        }
-
-        .major-btn {
-            background: #1f3a48;
-            border: none;
-            padding: 5px 14px;
-            border-radius: 32px;
-            font-weight: bold;
-            color: #cbdce6;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.8rem;
-            font-family: monospace;
-        }
-
-        .major-btn.active-major {
-            background: #2c7da0 !important;
-            color: white !important;
-            box-shadow: 0 0 5px #2c7da0;
-        }
-
-        .major-btn.locked-flash {
-            animation: lockFlash 0.5s ease-in-out 3;
-            background: #e74c3c !important;
-            color: white !important;
-        }
-
-        .sub-level-panel {
-            background: #0b1620dd;
-            border-radius: 24px;
-            padding: 6px 12px;
-            margin-bottom: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-            border: 1px solid #2f5e7a;
-        }
-
-        .sub-level-btn {
-            background: #1f3a48;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 28px;
+            border-radius: 20px;
             font-size: 0.7rem;
             font-weight: bold;
-            color: #d1e5f0;
             cursor: pointer;
-            transition: all 0.15s;
+            font-family: monospace;
+            transition: 0.2s;
         }
-
-        .sub-level-btn.active-sub {
-            background: #ffb347 !important;
-            color: #1e2a2f !important;
-            box-shadow: 0 0 6px #ffaa33;
-            transform: scale(1.01);
+        .debug-btn:hover {
+            background: #ffb347;
+            transform: scale(1.02);
         }
-
-        .sub-level-btn.locked-sub {
-            opacity: 0.6;
-            cursor: pointer;
+        .debug-btn.danger {
+            background: #e74c3c;
+            color: white;
         }
-
-        .sub-level-btn.locked-flash {
-            animation: lockFlash 0.5s ease-in-out 3;
-            background: #e74c3c !important;
-            color: white !important;
-            opacity: 1;
+        .debug-btn.danger:hover {
+            background: #ff6b6b;
         }
-
-        @keyframes lockFlash {
-            0% { background: #e74c3c; transform: scale(1); }
-            50% { background: #ff6b6b; transform: scale(1.05); }
-            100% { background: #e74c3c; transform: scale(1); }
-        }
-
-        .message-area.flash-error {
-            animation: msgFlash 0.5s ease-in-out 3;
-            background: #e74c3c !important;
-            color: white !important;
-            font-weight: bold;
-        }
-
-        @keyframes msgFlash {
-            0% { background: #e74c3c; transform: scale(1); }
-            50% { background: #ff6b6b; transform: scale(1.02); }
-            100% { background: #e74c3c; transform: scale(1); }
-        }
-
         .debug-badge {
             background: #ff9800;
             color: #1e2a2a;
             padding: 2px 10px;
-            border-radius: 24px;
+            border-radius: 20px;
             font-size: 0.65rem;
             font-weight: bold;
-            margin-left: auto;
+            margin-left: 10px;
         }
 
-        .practice-area {
-            background: #0b1620dd;
-            border-radius: 1.2rem;
-            padding: 0.8rem 1rem;
-            margin-bottom: 12px;
+        .section-wrapper {
+            margin-bottom: 35px;
+        }
+        .section-wrapper:last-child {
+            margin-bottom: 0;
         }
 
-        .reference-text {
-            font-size: 1.4rem;
-            font-weight: 500;
-            word-break: break-word;
-            line-height: 1.3;
-            color: #eef4ff;
-            background: #05111c;
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-family: 'Fira Code', monospace;
-            margin-bottom: 12px;
-            text-align: left;
-        }
-
-        .current-char-highlight {
-            background: #ffb74d;
-            color: #1e2a2f;
-            padding: 0 3px;
-            border-radius: 10px;
-            font-weight: bold;
-            box-shadow: 0 0 0 2px #ffb347;
-        }
-
-        .typing-input {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 1.3rem;
-            font-family: 'Fira Code', monospace;
-            background: #010a13;
-            border: 2px solid #2c7da0;
-            border-radius: 40px;
-            color: #b3f0ff;
-            outline: none;
-            text-align: left;
-            letter-spacing: 1px;
-            font-weight: 500;
-        }
-
-        .typing-input:focus {
-            border-color: #ffb347;
-            box-shadow: 0 0 6px #ffb34780;
-        }
-
-        .virtual-keyboard {
-            background: #0d1c26;
-            border-radius: 1.2rem;
-            padding: 8px 8px;
-            margin-top: 12px;
-            overflow-x: auto;
-        }
-
-        .key-row {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 4px;
-            flex-wrap: nowrap;
-            min-width: 540px;
-        }
-
-        .key {
-            background: #1f2f3a;
-            color: #d9e2e8;
-            padding: 5px 8px;
-            min-width: 38px;
-            text-align: center;
-            border-radius: 8px;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.75rem;
-        }
-
-        .key.highlight {
-            background: #ffb347;
-            color: #0a1c28;
-            transform: scale(0.97);
-            box-shadow: 0 0 6px #ffaa33;
-        }
-
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn {
-            background: #1f4b5e;
-            border: none;
-            padding: 6px 18px;
-            border-radius: 32px;
-            font-weight: bold;
-            color: white;
+        .section-header {
+            border-radius: 22px;
+            margin-bottom: 18px;
+            padding: 14px 20px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            position: relative;
+        }
+        .section-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+        }
+        .section-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .section-title-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+        .arrow-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            background: rgba(255,255,255,0.3);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
+            color: #fff;
+        }
+        .arrow-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+        .title-text {
+            flex: 1;
+        }
+        .title-text h2 {
+            font-size: 1.35rem;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .title-text .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #fff;
+            margin-top: 2px;
+        }
+        .description-text {
+            max-width: 450px;
+            color: #FFF3E0;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            background: rgba(0,0,0,0.2);
+            padding: 6px 14px;
+            border-radius: 18px;
+        }
+        .group-progress {
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.3);
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+            color: #fff;
+            font-weight: bold;
+        }
+        .reset-progress-btn {
+            background: rgba(0,0,0,0.2);
+            border: none;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            margin-left: 8px;
             transition: 0.2s;
-            font-size: 0.8rem;
+        }
+        .reset-progress-btn:hover {
+            background: rgba(0,0,0,0.4);
+        }
+        @media (max-width: 700px) {
+            .section-header {
+                padding: 10px 16px;
+                margin-bottom: 14px;
+                border-radius: 18px;
+            }
+            .title-text h2 {
+                font-size: 1.1rem;
+            }
+            .arrow-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 1.2rem;
+            }
+            .description-text {
+                font-size: 0.7rem;
+                max-width: 100%;
+                padding: 4px 10px;
+            }
+            .section-wrapper {
+                margin-bottom: 25px;
+            }
+            .debug-panel {
+                bottom: 10px;
+                right: 10px;
+                padding: 6px 10px;
+            }
+            .debug-btn {
+                padding: 4px 8px;
+                font-size: 0.6rem;
+            }
         }
 
-        .btn-primary {
-            background: #2c7da0;
+        .levels-wrapper {
+            transition: max-height 0.4s ease-out, opacity 0.3s ease;
+            overflow: hidden;
+            max-height: 10000px;
+            opacity: 1;
+            padding-top: 6px;
+        }
+        .levels-wrapper.collapsed {
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            padding-top: 0;
         }
 
-        .btn-primary:hover {
-            background: #3e95b8;
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+            justify-items: center;
+            align-items: start;
         }
 
-        .btn-reset-progress {
-            background: #8b5a2b;
+        .level-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 8px 16px -6px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid rgba(255,245,190,0.8);
+            aspect-ratio: 1 / 0.9;
         }
-        .btn-reset-progress:hover {
-            background: #a06b35;
+        .level-card.card-completed {
+            border: 3px solid #4CAF50;
+            box-shadow: 0 0 0 2px #C8E6C9, 0 8px 16px -6px rgba(0,0,0,0.2);
+        }
+        .completed-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4CAF50;
+            color: white;
+            font-size: 1rem;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 10;
+            border: 2px solid white;
+            font-weight: bold;
         }
 
-        .message-area {
-            background: #0a141f;
-            padding: 8px 12px;
-            border-radius: 28px;
-            color: #88c9f0;
-            font-size: 0.8rem;
-            margin-top: 12px;
-            text-align: center;
-            font-weight: 500;
-            line-height: 1.4;
+        .card-bg-layer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            padding: 12px 8px 14px 8px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
             transition: all 0.2s;
+            overflow: hidden;
         }
 
-        @media (max-width: 750px) {
-            .reference-text { font-size: 1rem; padding: 10px; }
-            .typing-input { font-size: 1rem; padding: 10px; }
-            .key { padding: 3px 5px; min-width: 30px; font-size: 0.65rem; }
-            .major-btn { padding: 4px 12px; font-size: 0.7rem; }
-            .sub-level-btn { padding: 3px 10px; font-size: 0.65rem; }
-            .stat { font-size: 0.75rem; padding: 3px 10px; }
-            .rule-banner { font-size: 0.6rem; gap: 8px; }
+        .level-badge {
+            align-self: flex-start;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            color: #FFF7E8;
+            border: 1px solid #FFE0A3;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 8px;
+            white-space: nowrap;
+        }
+        
+        .practice-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin: 4px 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .practice-text {
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 40px;
+            color: #fff9e8;
+            text-shadow: 0 2px 4px #00000030;
+            font-family: 'Comic Neue', 'Comic Sans MS', monospace;
+            border: 1px solid rgba(255,245,180,0.6);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+        }
+
+        .card-footer {
+            height: 5px;
+            background: linear-gradient(90deg, #F9C74F, #F9844A, #F8961E, #90BE6D, #43AA8B);
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 25px -10px rgba(0, 0, 0, 0.3);
+            border-color: #FFD966;
+        }
+        .level-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .level-card::before {
+            content: "⭐";
+            position: absolute;
+            top: -6px;
+            right: 8px;
+            font-size: 14px;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .level-card.card-completed::before {
+            opacity: 1;
+            color: #FFD700;
+            text-shadow: 0 0 2px orange;
+        }
+
+        @media (max-width: 1100px) {
+            .levels-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+        }
+        @media (max-width: 700px) {
+            .levels-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            body {
+                padding: 20px 12px 40px;
+            }
+            .level-badge {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+            }
+            .levels-wrapper {
+                padding-top: 4px;
+            }
+        }
+        @media (max-width: 480px) {
+            .levels-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+
+        .status-message {
+            text-align: center;
+            background: #F4A261CC;
+            color: #2d3e2b;
+            padding: 20px 28px;
+            border-radius: 60px;
+            margin: 40px auto;
+            max-width: 500px;
+            font-weight: bold;
+            backdrop-filter: blur(6px);
+            font-size: 1.2rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,215,150,0.6);
+            border-radius: 50%;
+            border-top-color: #F4A261;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-box {
+            background: #E9C46A;
+            border-left: 6px solid #E76F51;
+        }
+
+        .fade-in {
+            animation: bounceIn 0.35s ease-out forwards;
+        }
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .cute-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2A9D8F;
+            color: #FFF3E0;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            z-index: 9999;
+            border: 2px solid #F9C74F;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            font-family: inherit;
+            max-width: 85vw;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <div class="stats-bar">
-        <div class="stat"><span>⌨️ WPM</span> <span id="wpmValue">0</span></div>
-        <div class="stat"><span>🎯 准确率</span> <span id="accuracyValue">100</span>%</div>
-        <div class="stat"><span>⏱️ 用时</span> <span id="timerValue">0</span> s</div>
-        <div class="stat"><span>✨ 进度</span> <span id="progressCount">0</span>/<span id="totalChars">0</span></div>
-    </div>
-    <div class="rule-banner">
-        📋 解锁条件：<span>准确率 ≥90% 且练习≥3次</span> 或 <span class="high">准确率 ≥98% 直接解锁</span>
-        <span class="auto-reset">🔄 未达标(＜90%)自动重置</span>
-        <span class="save-badge">💾 进度自动保存</span>
-        <button id="arcadeModeBtn" class="game-mode-link">🎮 战机打字母 · 街机模式</button>
-    </div>
-    <div class="major-level-nav" id="majorNav"></div>
-    <div id="subPanel" class="sub-level-panel"></div>
-    <div class="practice-area">
-        <div class="reference-text" id="refText"></div>
-        <input type="text" class="typing-input" id="userInput" autocomplete="off" placeholder="开始打字..." autofocus>
-        <div class="virtual-keyboard" id="virtualKeyboard"></div>
-        <div class="action-bar">
-            <button class="btn" id="resetBtn">🔄 重置当前关卡</button>
-            <button class="btn btn-primary" id="nextLevelBtn">⏩ 下一关</button>
-            <button class="btn btn-reset-progress" id="resetAllProgressBtn">🗑️ 重置全部进度</button>
+<div class="container">
+    <div id="dynamicContent">
+        <div class="status-message" style="grid-column: 1/-1;">
+            <span class="loading-spinner"></span> 正在加载 config.json ...
         </div>
-        <div class="message-area" id="msgArea">✨ 点击未解锁关卡会有红色闪烁提示 | 进度自动保存 | 真实机械键盘音效（预加载，无延迟）</div>
     </div>
 </div>
-<script>
-// 在 index.html 的 <script> 最开头添加
-// 在 index.html 的 <script> 最开头
-(function() {
-    // 只检查是否有登录凭证，不检查过期时间
-    const loggedIn = localStorage.getItem('logged_in');
-    const userName = localStorage.getItem('user_name');
-    
-    if (!loggedIn || !userName) {
-        // 没有登录凭证，跳转到登录页
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    // 可选：在控制台显示欢迎信息
-    console.log('🎮 欢迎回来，', userName);
-})();
-    
-// ==================== 真实键盘音效系统（预加载，无延迟）====================
-(function() {
-    let audioCtx = null;
-    let isAudioAllowed = false;
-    let correctSoundBuffer = null;
-    let errorSoundBuffer = null;
-    let isGenerating = false;
-    let generatePromise = null;
-    
-    // 初始化 AudioContext（静默创建，不自动启动）
-    function initAudio() {
-        if (audioCtx) return audioCtx;
-        try {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            console.log("AudioContext 创建成功，状态:", audioCtx.state);
-        } catch(e) { 
-            console.warn("Web Audio API 不支持:", e); 
-        }
-        return audioCtx;
-    }
-    
-    // 生成逼真的机械键盘敲击音效（青轴手感）- 立即执行，预加载
-    function generateSoundBuffers() {
-        if (correctSoundBuffer && errorSoundBuffer) return Promise.resolve(true);
-        if (isGenerating) return generatePromise;
-        
-        const ctx = initAudio();
-        if (!ctx) return Promise.resolve(false);
-        
-        isGenerating = true;
-        generatePromise = new Promise((resolve) => {
-            try {
-                const sampleRate = ctx.sampleRate;
-                const duration = 0.12;
-                
-                // 正确输入音效缓冲区
-                correctSoundBuffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
-                const correctData = correctSoundBuffer.getChannelData(0);
-                
-                // 错误输入音效缓冲区
-                errorSoundBuffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
-                const errorData = errorSoundBuffer.getChannelData(0);
-                
-                for (let i = 0; i < sampleRate * duration; i++) {
-                    const t = i / sampleRate;
-                    
-                    // === 正确音效：机械键盘青轴 ===
-                    let mainClick = Math.sin(2 * Math.PI * 1200 * t) * Math.exp(-t * 35);
-                    let harmonic = Math.sin(2 * Math.PI * 400 * t) * Math.exp(-t * 25) * 0.6;
-                    let thump = Math.sin(2 * Math.PI * 80 * t) * Math.exp(-t * 18) * 0.4;
-                    let spring = Math.sin(2 * Math.PI * 2500 * t) * Math.exp(-t * 50) * 0.25;
-                    
-                    let correctSample = (mainClick + harmonic + thump + spring) * 0.8;
-                    correctSample = Math.max(-0.8, Math.min(0.8, correctSample));
-                    correctData[i] = correctSample;
-                    
-                    // === 错误音效：低沉"啵"声 ===
-                    let freq = 400 - t * 2000;
-                    if (freq < 60) freq = 60;
-                    let mainSound = Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 22);
-                    let lowThump = Math.sin(2 * Math.PI * 60 * t) * Math.exp(-t * 15) * 0.5;
-                    
-                    let errorSample = (mainSound + lowThump) * 0.6;
-                    errorSample = Math.max(-0.6, Math.min(0.6, errorSample));
-                    errorData[i] = errorSample;
-                }
-                
-                console.log("✅ 音效缓冲区预生成完成");
-                isGenerating = false;
-                resolve(true);
-            } catch(e) {
-                console.warn("生成音效失败:", e);
-                isGenerating = false;
-                resolve(false);
-            }
-        });
-        
-        return generatePromise;
-    }
-    
-    // 立即开始预生成音效（不依赖用户交互）
-    generateSoundBuffers();
-    
-    // 播放音效
-    function playSound(buffer, volume = 0.5) {
-        if (!audioCtx || !isAudioAllowed || !buffer) return false;
-        
-        try {
-            if (audioCtx.state !== 'running') {
-                return false;
-            }
-            
-            const source = audioCtx.createBufferSource();
-            source.buffer = buffer;
-            
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.value = volume;
-            
-            source.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            source.start();
-            return true;
-        } catch(e) {
-            console.warn("播放音效失败:", e);
-            return false;
-        }
-    }
-    
-    let lastPlayTime = 0;
-    function playKeySound(isError = false) {
-        // 限制播放频率
-        const now = Date.now();
-        if (now - lastPlayTime < 50) return;
-        lastPlayTime = now;
-        
-        if (!audioCtx) {
-            initAudio();
-        }
-        
-        if (!isAudioAllowed) {
-            console.log("音效未启用，等待用户交互后播放");
-            return;
-        }
-        
-        if (audioCtx && audioCtx.state !== 'running') {
-            audioCtx.resume().then(() => {
-                if (isError) {
-                    playSound(errorSoundBuffer, 0.4);
-                } else {
-                    playSound(correctSoundBuffer, 0.5);
-                }
-            }).catch(e => console.log("恢复 AudioContext 失败:", e));
-            return;
-        }
-        
-        if (isError) {
-            playSound(errorSoundBuffer, 0.4);
-        } else {
-            playSound(correctSoundBuffer, 0.5);
-        }
-    }
-    
-    // 用户交互时启用音效并播放测试音
-    let hasEnabled = false;
-    function enableAudio() {
-        if (hasEnabled) return;
-        hasEnabled = true;
-        
-        initAudio();
-        
-        if (audioCtx) {
-            // 确保音效已生成
-            generateSoundBuffers().then(() => {
-                audioCtx.resume().then(() => {
-                    isAudioAllowed = true;
-                    console.log("🎧 真实键盘音效已启用！");
-                    // 播放测试音，确认音效正常工作
-                    setTimeout(() => {
-                        if (correctSoundBuffer) {
-                            playSound(correctSoundBuffer, 0.25);
-                        }
-                    }, 50);
-                }).catch(e => {
-                    console.log("AudioContext 启动失败:", e);
-                    isAudioAllowed = true;
-                });
-            });
-        } else {
-            isAudioAllowed = true;
-            console.log("浏览器不支持 Web Audio API");
-        }
-        
-        document.removeEventListener('click', enableAudio);
-        document.removeEventListener('keydown', enableAudio);
-    }
-    
-    document.addEventListener('click', enableAudio);
-    document.addEventListener('keydown', enableAudio);
-    
-    window._typingSound = { 
-        play: playKeySound, 
-        isAllowed: () => isAudioAllowed 
-    };
-})();
 
-// ==================== 主游戏逻辑 ====================
-(function(){
-    const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
-    const STORAGE_KEY = 'typing_practice_progress';
-    
-    function fullyShuffleArray(arr) {
-        for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
-        return arr;
-    }
-    function slightShuffle(baseStr, repeatTimes) {
-        let blocks = [];
-        for (let i = 0; i < baseStr.length; i++) {
-            let block = [];
-            for (let r = 0; r < repeatTimes; r++) block.push(baseStr[i]);
-            for (let k = block.length - 1; k > 0; k--) { const rand = Math.floor(Math.random() * (k + 1)); [block[k], block[rand]] = [block[rand], block[k]]; }
-            blocks.push(block);
+<script>
+    // ==================== 检查 debug 参数 ====================
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDebug = urlParams.get('debug') === '1';
+
+    // ==================== 登录验证 ====================
+    (function() {
+        // 检查是否有登录凭证
+        const loggedIn = localStorage.getItem('logged_in');
+        const userName = localStorage.getItem('user_name');
+        
+        // 调试模式下跳过登录验证
+        if (!isDebug && (!loggedIn || !userName)) {
+            window.location.href = 'login.html';
+            return;
         }
-        for (let swap = 0; swap < baseStr.length * 2; swap++) {
-            let idxA = Math.floor(Math.random() * blocks.length), idxB = Math.floor(Math.random() * blocks.length);
-            if (idxA !== idxB) { [blocks[idxA], blocks[idxB]] = [blocks[idxB], blocks[idxA]]; }
+        
+        if (isDebug) {
+            console.log('🐞 调试模式已启用，跳过登录验证');
+            // 调试模式下自动设置一个测试用户
+            if (!localStorage.getItem('logged_in')) {
+                localStorage.setItem('logged_in', 'true');
+                localStorage.setItem('user_name', 'Debug_User');
+            }
         }
-        let result = [];
-        for (let block of blocks) result.push(...block);
-        for (let i = 0; i < result.length * 0.3; i++) { let p = Math.floor(Math.random() * result.length), q = Math.floor(Math.random() * result.length); [result[p], result[q]] = [result[q], result[p]]; }
-        return result.join('');
+        
+        if (userName) {
+            console.log('🎮 欢迎回来，', userName);
+        }
+    })();
+
+    // ==================== 调试功能 ====================
+    function showDebugPanel() {
+        if (!isDebug) return;
+        
+        const panel = document.createElement('div');
+        panel.className = 'debug-panel';
+        panel.innerHTML = `
+            <span class="debug-badge">🐞 DEBUG MODE</span>
+            <button id="debugClearLoginBtn" class="debug-btn danger">🗑️ 清除登录信息</button>
+            <button id="debugClearProgressBtn" class="debug-btn">📊 清除所有进度</button>
+            <button id="debugUnlockAllBtn" class="debug-btn">🔓 解锁所有关卡</button>
+            <button id="debugReloadBtn" class="debug-btn">🔄 重新加载</button>
+        `;
+        document.body.appendChild(panel);
+        
+        // ✅ 清除登录信息（去掉 debug 参数后跳转）
+        document.getElementById('debugClearLoginBtn').addEventListener('click', () => {
+            if (confirm('⚠️ 确定清除登录信息？清除后需要重新登录。')) {
+                localStorage.removeItem('logged_in');
+                localStorage.removeItem('user_name');
+                alert('已清除登录信息，即将跳转到登录页');
+                // 跳转到没有 debug 参数的页面
+                window.location.href = window.location.pathname;
+            }
+        });
+        
+        // 清除所有进度
+        document.getElementById('debugClearProgressBtn').addEventListener('click', () => {
+            if (confirm('⚠️ 确定清除所有通关进度吗？此操作不可恢复！')) {
+                // 清除所有分组进度
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('typing_completed_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                alert('已清除所有通关进度，页面即将刷新');
+                window.location.reload();
+            }
+        });
+        
+        // 解锁所有关卡
+        document.getElementById('debugUnlockAllBtn').addEventListener('click', () => {
+            if (confirm('🔓 确定解锁所有关卡吗？')) {
+                // 获取所有分组并解锁所有关卡
+                fetch(CONFIG_PATH, { cache: 'no-cache' })
+                    .then(res => res.json())
+                    .then(data => {
+                        const groups = data['learn-to-type'] || [];
+                        groups.forEach(group => {
+                            const groupCode = group.code || 'default';
+                            const key = `typing_completed_${groupCode}`;
+                            const allLevelIds = group.levels.map(level => level.id);
+                            localStorage.setItem(key, JSON.stringify(allLevelIds));
+                        });
+                        alert('✅ 已解锁所有关卡！页面即将刷新');
+                        window.location.reload();
+                    })
+                    .catch(err => {
+                        console.error('加载配置失败:', err);
+                        alert('解锁失败，请检查 config.json');
+                    });
+            }
+        });
+        
+        // 重新加载页面
+        document.getElementById('debugReloadBtn').addEventListener('click', () => {
+            window.location.reload();
+        });
     }
-    function fullShuffle(baseStr, repeatTimes) {
-        let arr = [];
-        for (let i = 0; i < baseStr.length; i++) { for (let r = 0; r < repeatTimes; r++) arr.push(baseStr[i]); }
-        return fullyShuffleArray(arr).join('');
-    }
-    function orderText(baseStr, repeatTimes) {
-        let arr = [];
-        for (let i = 0; i < baseStr.length; i++) { for (let r = 0; r < repeatTimes; r++) arr.push(baseStr[i]); }
-        return arr.join('');
-    }
-    
-    const HOME = "asdfghjkl;", TOP = "qwertyuiop", BOTTOM = "zxcvbnm";
-    const SYMS = "`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
-    const ALL = "abcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
-    const DIGITS = "1234567890";
-    const UPPER_LOWER = (() => { let s = ''; for(let i=0;i<26;i++) s += String.fromCharCode(65+i) + String.fromCharCode(97+i); return s; })();
-    
-    const groups = [
-        { name:"L1 基准", base:HOME, repeat:5 }, { name:"L2 上排", base:TOP, repeat:5 },
-        { name:"L3 下排", base:BOTTOM, repeat:5 }, { name:"L4 大写", base:UPPER_LOWER, repeat:5 },
-        { name:"L5 数字", base:DIGITS, repeat:5 }, { name:"L6 符号", base:SYMS, repeat:5 },
-        { name:"L7 综合", base:ALL, repeat:3 }
+
+    /**
+     * 打字练习关卡选择器 - 支持分组折叠，完成进度记录，动态num参数
+     */
+    const CONFIG_PATH = './config.json';
+    const container = document.getElementById('dynamicContent');
+
+    const LEVEL_MAP = {
+        'beginner': { code: 'beginner', name: '初级', desc: '顺序排列' },
+        'intermediate': { code: 'intermediate', name: '中级', desc: '轻微打乱' },
+        'advanced': { code: 'advanced', name: '高级', desc: '完全打乱' }
+    };
+
+    const GROUP_HEADER_COLORS = [
+        "linear-gradient(135deg, #FF6B6B, #EE5A24)",
+        "linear-gradient(135deg, #4ECDC4, #2C8F8F)",
+        "linear-gradient(135deg, #FFE66D, #F39C12)",
+        "linear-gradient(135deg, #9B59B6, #6C3483)",
+        "linear-gradient(135deg, #3498DB, #1F618D)",
+        "linear-gradient(135deg, #1ABC9C, #117A65)",
+        "linear-gradient(135deg, #E74C3C, #B03A2E)",
+        "linear-gradient(135deg, #2ECC71, #1E8449)",
+        "linear-gradient(135deg, #FF69B4, #C71585)",
+        "linear-gradient(135deg, #D35400, #A04000)",
+        "linear-gradient(135deg, #16A085, #0E6655)",
+        "linear-gradient(135deg, #27AE60, #1D8348)",
+        "linear-gradient(135deg, #2980B9, #1A5276)",
+        "linear-gradient(135deg, #8E44AD, #6C3483)",
+        "linear-gradient(135deg, #F1C40F, #D4AC0D)",
+        "linear-gradient(135deg, #E84393, #B53471)",
+        "linear-gradient(135deg, #6C5CE7, #4A3B9E)",
+        "linear-gradient(135deg, #00CEC9, #00A8A4)",
+        "linear-gradient(135deg, #FF7675, #D63031)",
+        "linear-gradient(135deg, #74B9FF, #0984E3)",
+        "linear-gradient(135deg, #A29BFE, #6C5CE7)",
+        "linear-gradient(135deg, #55EFC4, #00B894)",
+        "linear-gradient(135deg, #FD79A8, #E84393)",
+        "linear-gradient(135deg, #FAB1A0, #E17055)",
+        "linear-gradient(135deg, #FFEAA7, #FDCB6E)"
     ];
-    
-    let allLevels = [];
-    for(let g=0; g<groups.length; g++) {
-        for(let m=0; m<3; m++) {
-            let mode = m;
-            let modeName = ['顺序','微乱','全乱'][m];
-            let text = mode === 0 ? orderText(groups[g].base, groups[g].repeat) : (mode === 1 ? slightShuffle(groups[g].base, groups[g].repeat) : fullShuffle(groups[g].base, groups[g].repeat));
-            allLevels.push({ id: allLevels.length, name: `${groups[g].name} ${modeName}`, text: text, groupIdx: g, modeIdx: m });
+
+    const CARD_COLOR_PALETTE = [
+        "#FF6B6B", "#4ECDC4", "#FFE66D", "#FF9F1C", "#9B59B6",
+        "#3498DB", "#E67E22", "#1ABC9C", "#E74C3C", "#F39C12",
+        "#2ECC71", "#FF69B4", "#5D9B9B", "#D35400", "#C0392B",
+        "#16A085", "#27AE60", "#2980B9", "#8E44AD", "#F1C40F",
+        "#E84393", "#6C5CE7", "#00CEC9", "#FF7675", "#74B9FF",
+        "#A29BFE", "#55EFC4", "#FD79A8", "#FAB1A0", "#FFEAA7"
+    ];
+
+    // ==================== LocalStorage 进度管理 ====================
+    function getCompletedLevels(groupCode) {
+        const key = `typing_completed_${groupCode}`;
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    function clearCompletedLevels(groupCode) {
+        const key = `typing_completed_${groupCode}`;
+        localStorage.removeItem(key);
+    }
+
+    function getGroupHeaderBackground(groupData, groupIndex) {
+        if (groupData.headerBackground && groupData.headerBackground.trim() !== '') {
+            return groupData.headerBackground;
         }
+        const seed = (groupData.id ? parseInt(groupData.id) : groupIndex) || groupIndex;
+        const index = seed % GROUP_HEADER_COLORS.length;
+        return GROUP_HEADER_COLORS[index];
     }
-    const TOTAL = allLevels.length;
-    
-    let unlocked = Array(TOTAL).fill(false);
-    let attempts = Array(TOTAL).fill(0);
-    let bestAcc = Array(TOTAL).fill(0);
-    let savedCurrentLevelId = 0;
-    
-    function saveProgress() {
-        const progress = {
-            unlocked: unlocked,
-            attempts: attempts,
-            bestAcc: bestAcc,
-            currentLevelId: currentLevelId,
-            version: 1,
-            saveTime: Date.now()
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    }
-    
-    function loadProgress() {
-        if (DEBUG) return false;
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return false;
-        try {
-            const data = JSON.parse(saved);
-            if (data.unlocked && data.unlocked.length === TOTAL) {
-                unlocked = data.unlocked;
-                attempts = data.attempts || Array(TOTAL).fill(0);
-                bestAcc = data.bestAcc || Array(TOTAL).fill(0);
-                savedCurrentLevelId = data.currentLevelId || 0;
-                return true;
+
+    function getCardBackground(levelItem, cardId, groupId) {
+        if (levelItem.background && levelItem.background.trim() !== '') {
+            let bg = levelItem.background;
+            if (!bg.includes('linear') && !bg.includes('radial') && !bg.includes('url')) {
+                bg = `linear-gradient(145deg, ${bg}, ${bg}cc)`;
             }
-        } catch(e) { console.warn("加载进度失败", e); }
-        return false;
-    }
-    
-    function resetAllProgress() {
-        if (confirm("⚠️ 确定要重置所有闯关进度吗？这将清除所有已解锁关卡和练习记录！")) {
-            unlocked = Array(TOTAL).fill(false);
-            attempts = Array(TOTAL).fill(0);
-            bestAcc = Array(TOTAL).fill(0);
-            if (!DEBUG) {
-                unlocked[0] = true;
-            } else {
-                for(let i=0;i<TOTAL;i++) unlocked[i] = true;
-            }
-            savedCurrentLevelId = 0;
-            saveProgress();
-            currentLevelId = 0;
-            currentGroupIdx = allLevels[0].groupIdx;
-            renderNav();
-            resetCurrentInternal(true, "✅ 全部进度已重置，从第一关开始！");
-            showMessage("✅ 全部进度已重置！", false);
+            return bg;
         }
+        const seed = (typeof cardId === 'number' ? cardId : parseInt(cardId) || 0) + (typeof groupId === 'string' ? groupId.charCodeAt(0) || 0 : 0);
+        const color = CARD_COLOR_PALETTE[seed % CARD_COLOR_PALETTE.length];
+        return `linear-gradient(145deg, ${color}, ${color}cc)`;
     }
-    
-    function showMessage(text, isError = true) {
-        const msgDiv = document.getElementById('msgArea');
-        msgDiv.innerHTML = text;
-        if (isError) {
-            msgDiv.classList.remove('flash-error');
-            void msgDiv.offsetWidth;
-            msgDiv.classList.add('flash-error');
-            setTimeout(() => {
-                msgDiv.classList.remove('flash-error');
-            }, 1500);
-        }
-    }
-    
-    let currentLevelId = 0, currentGroupIdx = 0;
-    let expected = [], idx = 0, total = 0, correct = 0, errors = 0, active = true;
-    let startTime = null, timer = null, seconds = 0;
-    let autoSwitchPending = false;
-    
-    const refDiv = document.getElementById('refText'), input = document.getElementById('userInput');
-    const wpmSpan = document.getElementById('wpmValue'), accSpan = document.getElementById('accuracyValue');
-    const timerSpan = document.getElementById('timerValue'), progSpan = document.getElementById('progressCount');
-    const totalSpan = document.getElementById('totalChars');
-    const majorNav = document.getElementById('majorNav'), subPanel = document.getElementById('subPanel');
-    const resetBtn = document.getElementById('resetBtn'), nextBtn = document.getElementById('nextLevelBtn');
-    const resetAllProgressBtn = document.getElementById('resetAllProgressBtn');
-    const arcadeBtn = document.getElementById('arcadeModeBtn');
-    const virtualKbd = document.getElementById('virtualKeyboard');
-    
-    const escapeHtml = s => s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-    
-    function renderVirtualKeyboard(expectedKey) {
-        if (!virtualKbd) return;
-        const rows = [
-            ['`','1','2','3','4','5','6','7','8','9','0','-','='],
-            ['q','w','e','r','t','y','u','i','o','p','[',']','\\'],
-            ['a','s','d','f','g','h','j','k','l',';','\''],
-            ['z','x','c','v','b','n','m',',','.','/']
-        ];
-        let highlightRaw = (expectedKey && expectedKey !== ' ') ? expectedKey.toLowerCase() : null;
-        let html = '';
-        for (let row of rows) {
-            let rowHtml = '<div class="key-row">';
-            for (let key of row) {
-                let isHighlight = (highlightRaw !== null && key.toLowerCase() === highlightRaw);
-                rowHtml += `<div class="key ${isHighlight ? 'highlight' : ''}">${key}</div>`;
-            }
-            rowHtml += '</div>';
-            html += rowHtml;
-        }
-        let spaceHighlight = (expectedKey === ' ') ? 'highlight' : '';
-        html += `<div class="key-row"><div class="key ${spaceHighlight}" style="flex:2; max-width:200px;">␣ Space</div></div>`;
-        virtualKbd.innerHTML = html;
-    }
-    
-    function updateRefHighlight() {
-        let full = expected.join('');
-        let prefix = full.slice(0, idx);
-        let currentChar = idx < full.length ? full[idx] : '';
-        let suffix = full.slice(idx + 1);
-        let html = `<span style="background:#2a4b6e;border-radius:6px;padding:0 3px;">${escapeHtml(prefix)}</span>`;
-        if (currentChar) html += `<span class="current-char-highlight">${escapeHtml(currentChar)}</span>`;
-        html += `<span style="opacity:0.8;">${escapeHtml(suffix)}</span>`;
-        refDiv.innerHTML = html;
-        renderVirtualKeyboard(currentChar);
-    }
-    
-    function updateStats() {
-        let minutes = seconds / 60;
-        let rawWpm = 0;
-        if (minutes > 0 && correct >= 5) {
-            rawWpm = Math.floor((correct / 5) / minutes);
-            if (rawWpm < 1 && correct >= 5) rawWpm = 1;
-        } else if (correct >= 5 && seconds >= 3) {
-            rawWpm = Math.max(1, Math.floor((correct / 5) / (seconds / 60)));
-        }
-        let totalTyped = correct + errors;
-        let accuracy = totalTyped === 0 ? 100 : Math.floor((correct / totalTyped) * 100);
-        wpmSpan.innerText = rawWpm;
-        accSpan.innerText = accuracy;
-        progSpan.innerText = idx;
-        totalSpan.innerText = total;
-        return accuracy;
-    }
-    
-    function stopTimer() { if(timer) clearInterval(timer); timer = null; }
-    function startTimerIfNeeded() { 
-        if(!startTime && active && idx > 0 && idx < total) { 
-            startTime = Date.now(); 
-            stopTimer(); 
-            timer = setInterval(() => { 
-                if(startTime && active) { 
-                    seconds = Math.floor((Date.now() - startTime) / 1000); 
-                    timerSpan.innerText = seconds; 
-                    updateStats(); 
-                } 
-            }, 500); 
-        } 
-    }
-    
-    function resetCurrentInternal(showMessageFlag = true, customMsg = null) {
-        stopTimer();
-        let lev = allLevels[currentLevelId];
-        expected = lev.text.split('');
-        total = expected.length;
-        idx = 0;
-        correct = 0;
-        errors = 0;
-        active = true;
-        startTime = null;
-        seconds = 0;
-        timerSpan.innerText = "0";
-        input.value = "";
-        input.disabled = false;
-        updateRefHighlight();
-        updateStats();
-        startTimerIfNeeded();
-        input.focus();
-        if (showMessageFlag) {
-            if (customMsg) showMessage(customMsg, false);
-            else showMessage(`🔄 重置 「${lev.name}」`, false);
-        }
-    }
-    
-    function resetCurrent() { resetCurrentInternal(true); }
-    
-    function finish(force = false) {
-        if(!force && idx < total) return;
-        if (autoSwitchPending) return;
-        active = false;
-        stopTimer();
-        let acc = (correct + errors) === 0 ? 100 : Math.floor((correct / (correct + errors)) * 100);
-        let currentLevelName = allLevels[currentLevelId].name;
-        attempts[currentLevelId]++;
-        if(acc > bestAcc[currentLevelId]) bestAcc[currentLevelId] = acc;
-        
-        saveProgress();
-        
-        let nxt = currentLevelId + 1;
-        const isQualified = acc >= 90;
-        const isExcellent = acc >= 98;
-        
-        if (DEBUG && nxt < TOTAL) {
-            if (!unlocked[nxt]) unlocked[nxt] = true;
-            let nextName = allLevels[nxt].name;
-            showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🐞 调试模式：即将进入下一关「${nextName}」`, false);
-            saveProgress();
-            autoSwitchPending = true;
-            setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1200);
-            return;
-        }
-        
-        if (nxt < TOTAL && !unlocked[nxt]) {
-            if (isExcellent) {
-                unlocked[nxt] = true;
-                let nextName = allLevels[nxt].name;
-                showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🎉 完美达标！恭喜进入下一关「${nextName}」`, false);
-                saveProgress();
-                autoSwitchPending = true;
-                setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1800);
-                return;
-            } else if (isQualified && attempts[currentLevelId] >= 3) {
-                unlocked[nxt] = true;
-                let nextName = allLevels[nxt].name;
-                showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🎉 恭喜！已完成 ${attempts[currentLevelId]} 次练习，达标解锁！即将进入「${nextName}」`, false);
-                saveProgress();
-                autoSwitchPending = true;
-                setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1800);
-                return;
-            } else if (isQualified && attempts[currentLevelId] < 3) {
-                let remain = 3 - attempts[currentLevelId];
-                showMessage(`📊 本次练习准确率：${acc}%<br>✅ 达标！还需练习 ${remain} 次才能解锁下一关。<br>💪 继续努力，即将自动重置当前关卡。`, false);
-                saveProgress();
-                setTimeout(() => { resetCurrentInternal(true, `📘 继续练习「${currentLevelName}」，还差 ${remain} 次达标解锁`); }, 2000);
-                return;
-            } else {
-                showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>⚠️ 未达标（需要 ≥90%），继续努力！即将自动重置。`, true);
-                saveProgress();
-                setTimeout(() => { resetCurrentInternal(true, `⚠️ 未达标，重新练习「${currentLevelName}」`); }, 2000);
-                return;
-            }
-        } else if (nxt < TOTAL && unlocked[nxt]) {
-            let nextName = allLevels[nxt].name;
-            showMessage(`📊 本次练习「${currentLevelName}」准确率：${acc}%<br>🎉 恭喜完成！即将进入下一关「${nextName}」`, false);
-            saveProgress();
-            autoSwitchPending = true;
-            setTimeout(() => { switchTo(nxt); autoSwitchPending = false; }, 1500);
-            return;
-        } else if (nxt >= TOTAL) {
-            showMessage(`🏆 最终练习「${currentLevelName}」准确率：${acc}%<br>🎉🎉 恭喜你完成了全部21关！`, false);
-            updateStats();
-            input.disabled = true;
-            input.value = "";
-            saveProgress();
-            return;
-        } else {
-            if (!isQualified) {
-                showMessage(`📊 练习准确率：${acc}%<br>⚠️ 未达标，即将自动重置。`, true);
-                setTimeout(() => { resetCurrentInternal(true, `⚠️ 重新练习「${currentLevelName}」`); }, 2000);
-            } else {
-                updateStats();
-                input.disabled = true;
-                input.value = "";
-            }
-            saveProgress();
-            return;
-        }
-    }
-    
-    // 稳定的输入处理函数
-    let pendingUpdate = false;
-    let lastProcessedValue = "";
-    
-    function handleInput() {
-        if (!active) return;
-        
-        if (pendingUpdate) return;
-        pendingUpdate = true;
-        
-        requestAnimationFrame(() => {
-            pendingUpdate = false;
-            
-            let currentValue = input.value;
-            let expectedStr = expected.join('');
-            
-            if (currentValue === lastProcessedValue && idx > 0) {
-                return;
-            }
-            
-            if (currentValue.length > expectedStr.length) {
-                currentValue = currentValue.slice(0, expectedStr.length);
-                input.value = currentValue;
-            }
-            
-            if (currentValue.length === 0) {
-                if (idx !== 0) {
-                    idx = 0;
-                    correct = 0;
-                    errors = 0;
-                    updateStats();
-                    updateRefHighlight();
-                    stopTimer();
-                    startTime = null;
-                    seconds = 0;
-                    timerSpan.innerText = "0";
-                }
-                lastProcessedValue = "";
-                return;
-            }
-            
-            let isMatch = true;
-            for (let i = 0; i < currentValue.length; i++) {
-                if (i >= expectedStr.length || currentValue[i] !== expectedStr[i]) {
-                    isMatch = false;
-                    break;
-                }
-            }
-            
-            if (isMatch && currentValue.length > idx) {
-                let newChar = currentValue[currentValue.length - 1];
-                let expectedChar = expectedStr[idx];
-                
-                if (newChar === expectedChar) {
-                    if (window._typingSound && window._typingSound.isAllowed()) {
-                        window._typingSound.play(false);
-                    }
-                    
-                    correct = currentValue.length;
-                    errors = 0;
-                    idx = currentValue.length;
-                    
-                    updateStats();
-                    updateRefHighlight();
-                    startTimerIfNeeded();
-                    lastProcessedValue = currentValue;
-                    
-                    if (idx === total) {
-                        finish(true);
-                    }
-                }
-            } 
-            else if (isMatch && currentValue.length === idx) {
-                lastProcessedValue = currentValue;
-            }
-            else {
-                if (currentValue.length > 0) {
-                    let errorPos = -1;
-                    for (let i = 0; i < currentValue.length; i++) {
-                        if (i >= expectedStr.length || currentValue[i] !== expectedStr[i]) {
-                            errorPos = i;
-                            break;
-                        }
-                    }
-                    
-                    if (errorPos !== -1) {
-                        if (window._typingSound && window._typingSound.isAllowed()) {
-                            window._typingSound.play(true);
-                        }
-                        
-                        let expectedChar = expectedStr[errorPos];
-                        let wrongChar = currentValue[errorPos];
-                        showMessage(`❌ 第${errorPos+1}个字符错误！ 应输入 "${expectedChar}"，您输入了 "${wrongChar}"`, true);
-                        input.style.borderColor = "#e74c3c";
-                        setTimeout(() => input.style.borderColor = "#2c7da0", 700);
-                        
-                        let correctPrefix = expectedStr.substring(0, idx);
-                        input.value = correctPrefix;
-                        lastProcessedValue = correctPrefix;
-                        updateRefHighlight();
-                    }
-                }
-            }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
     }
-    
-    function getFirstSub(groupIdx) { 
-        let f = allLevels.find(l => l.groupIdx === groupIdx && l.modeIdx === 0); 
-        return f ? f.id : allLevels.filter(l => l.groupIdx === groupIdx)[0]?.id; 
-    }
-    
-    function getFirstUnlockedSubInGroup(groupIdx) {
-        const subs = allLevels.filter(l => l.groupIdx === groupIdx);
-        for (let sub of subs) {
-            if (unlocked[sub.id]) return sub.id;
-        }
-        return null;
-    }
-    
-    function flashElement(element) {
-        if (!element) return;
-        element.classList.add('locked-flash');
+
+    function showCuteToast(message, isError = false) {
+        const oldToast = document.querySelector('.cute-toast');
+        if (oldToast) oldToast.remove();
+        const toast = document.createElement('div');
+        toast.className = 'cute-toast';
+        if (isError) toast.style.background = '#E76F51';
+        toast.innerText = message;
+        document.body.appendChild(toast);
         setTimeout(() => {
-            element.classList.remove('locked-flash');
-        }, 600);
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 300);
+        }, 3000);
     }
-    
-    function switchTo(levelId, sourceElement = null) {
-        if(!DEBUG && !unlocked[levelId]) { 
-            const levelName = allLevels[levelId].name;
-            showMessage(`🔒 关卡「${levelName}」尚未解锁！请先完成前置关卡，达到准确率≥90%且练习≥3次（或≥98%一次）即可解锁。`, true);
-            if (sourceElement) flashElement(sourceElement);
-            return; 
-        }
-        if(currentLevelId === levelId && idx > 0 && idx < total && confirm("重置当前进度?")) { resetCurrent(); return; }
-        currentLevelId = levelId;
-        currentGroupIdx = allLevels[levelId].groupIdx;
-        stopTimer();
-        let lev = allLevels[currentLevelId];
-        expected = lev.text.split('');
-        total = expected.length;
-        idx = 0; correct = 0; errors = 0; active = true; startTime = null; seconds = 0;
-        timerSpan.innerText = "0";
-        input.value = ""; input.disabled = false;
-        lastProcessedValue = "";
-        updateRefHighlight(); updateStats(); startTimerIfNeeded(); input.focus();
-        showMessage(`🔓 进入「${lev.name}」共 ${total} 字符，加油！`, false);
-        renderNav();
-        saveProgress();
+
+    function serializeKeys(keysArray) {
+        if (!keysArray || !Array.isArray(keysArray) || keysArray.length === 0) return '';
+        return keysArray.filter(k => k && k.trim() !== '').join(',');
     }
-    
-    function selectMajor(groupIdx, btnElement) {
-        if(!DEBUG && !allLevels.some(l => l.groupIdx === groupIdx && unlocked[l.id])) { 
-            const groupName = groups[groupIdx].name;
-            showMessage(`🔒 大关卡「${groupName}」尚未解锁！请先完成上一大关卡的全部小关卡并满足解锁条件。`, true);
-            if (btnElement) flashElement(btnElement);
-            return; 
-        }
-        currentGroupIdx = groupIdx;
-        renderNav();
-        const targetId = getFirstUnlockedSubInGroup(groupIdx);
-        if(targetId !== null) {
-            switchTo(targetId);
-        } else {
-            const firstSub = getFirstSub(groupIdx);
-            if(firstSub !== undefined) switchTo(firstSub);
-        }
+
+    function getFontSizeByTextLength(text) {
+        const len = text.length;
+        if (len <= 8) return '1rem';
+        if (len <= 12) return '0.85rem';
+        if (len <= 16) return '0.75rem';
+        if (len <= 20) return '0.7rem';
+        return '0.65rem';
     }
-    
-    function renderNav() {
-        majorNav.innerHTML = '';
-        for(let i = 0; i < groups.length; i++) {
-            let btn = document.createElement('button');
-            btn.innerText = groups[i].name;
-            btn.className = 'major-btn';
-            if(currentGroupIdx === i) btn.classList.add('active-major');
-            btn.onclick = (idx => () => selectMajor(idx, btn))(i);
-            majorNav.appendChild(btn);
-        }
-        if(DEBUG) { let badge = document.createElement('span'); badge.innerText = '🐞 调试'; badge.className = 'debug-badge'; majorNav.appendChild(badge); }
-        let subs = allLevels.filter(l => l.groupIdx === currentGroupIdx);
-        subPanel.innerHTML = '';
-        subs.forEach(lvl => {
-            let btn = document.createElement('button');
-            btn.innerText = lvl.name;
-            btn.className = 'sub-level-btn';
-            if(lvl.id === currentLevelId) btn.classList.add('active-sub');
-            if(!DEBUG && !unlocked[lvl.id]) btn.classList.add('locked-sub');
-            btn.onclick = (id => () => switchTo(id, btn))(lvl.id);
-            subPanel.appendChild(btn);
+
+    function renderLevelsGroup(groupData, groupIndex) {
+        const groupId = groupData.id || groupIndex;
+        const groupCode = groupData.code || 'default';
+        const groupName = groupData.name || `练习分组 ${groupId}`;
+        const groupDescription = groupData.description || '';
+        const levelsArray = groupData.levels || [];
+        const headerBg = getGroupHeaderBackground(groupData, groupIndex);
+        
+        const completedLevels = getCompletedLevels(groupCode);
+        const totalLevels = levelsArray.length;
+        const completedCount = completedLevels.filter(id => levelsArray.some(level => level.id === id)).length;
+        const progressPercent = totalLevels > 0 ? Math.round((completedCount / totalLevels) * 100) : 0;
+
+        if (!levelsArray.length) return null;
+
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'section-wrapper';
+        sectionDiv.setAttribute('data-group-id', groupId);
+        sectionDiv.setAttribute('data-group-code', groupCode);
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'section-header';
+        headerDiv.style.background = headerBg;
+        
+        const headerContent = document.createElement('div');
+        headerContent.className = 'section-header-content';
+        
+        const titleArea = document.createElement('div');
+        titleArea.className = 'section-title-area';
+        
+        const arrowSpan = document.createElement('div');
+        arrowSpan.className = 'arrow-icon';
+        arrowSpan.innerHTML = '▼';
+        
+        const titleTextDiv = document.createElement('div');
+        titleTextDiv.className = 'title-text';
+        titleTextDiv.innerHTML = `
+            <h2>${escapeHtml(groupName)} 
+                <span class="group-progress">📊 ${completedCount}/${totalLevels} (${progressPercent}%)</span>
+                <button class="reset-progress-btn" data-group-code="${groupCode}" title="重置该分组进度">🔄 重置</button>
+            </h2>
+            <span class="badge">📚 ${totalLevels} 个关卡</span>
+        `;
+        
+        titleArea.appendChild(arrowSpan);
+        titleArea.appendChild(titleTextDiv);
+        
+        const descDiv = document.createElement('div');
+        descDiv.className = 'description-text';
+        descDiv.innerHTML = escapeHtml(groupDescription) || '点击任意方块，开始练习之旅 ✨';
+        
+        headerContent.appendChild(titleArea);
+        headerContent.appendChild(descDiv);
+        headerDiv.appendChild(headerContent);
+        
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.className = 'levels-wrapper';
+        
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'levels-grid';
+        
+        // 渲染卡片
+        levelsArray.forEach((levelItem, idx) => {
+            const cardId = levelItem.id ?? (idx + 1);
+            let description = levelItem.description || `第${cardId}关练习`;
+            if (description.length > 20) description = description.substring(0, 18) + '..';
+            
+            const bgStyle = getCardBackground(levelItem, cardId, groupId);
+            
+            let keysArray = levelItem.keys;
+            if (!keysArray || !Array.isArray(keysArray)) keysArray = [];
+            
+            let levelValue = levelItem.level;
+            if (!levelValue || !LEVEL_MAP[levelValue]) levelValue = 'beginner';
+            
+            const keysParamStr = serializeKeys(keysArray);
+            const fontSize = getFontSizeByTextLength(description);
+            const numValue = levelItem.num || '';
+            
+            const isCompleted = completedLevels.includes(cardId);
+            const completedClass = isCompleted ? 'card-completed' : '';
+            
+            const card = document.createElement('div');
+            card.className = `level-card fade-in ${completedClass}`;
+            card.setAttribute('data-url-base', levelItem.url || '#');
+            card.setAttribute('data-keys-param', keysParamStr);
+            card.setAttribute('data-level', levelValue);
+            card.setAttribute('data-level-code', LEVEL_MAP[levelValue]?.code || 'beginner');
+            card.setAttribute('data-id', cardId);
+            card.setAttribute('data-description', description);
+            card.setAttribute('data-group-code', groupCode);
+            if (numValue) {
+                card.setAttribute('data-num', numValue);
+            }
+            
+            const completedBadge = isCompleted ? '<div class="completed-badge">✅</div>' : '';
+            
+            card.innerHTML = `
+                ${completedBadge}
+                <div class="card-bg-layer" style="background: ${bgStyle}; background-size: cover; background-position: center;">
+                    <div class="level-badge">🎈 第 ${cardId} 关</div>
+                    <div class="practice-content">
+                        <span class="practice-text" style="font-size: ${fontSize};">${escapeHtml(description)}</span>
+                    </div>
+                </div>
+                <div class="card-footer"></div>
+            `;
+            gridDiv.appendChild(card);
         });
+        
+        wrapperDiv.appendChild(gridDiv);
+        sectionDiv.appendChild(headerDiv);
+        sectionDiv.appendChild(wrapperDiv);
+        
+        // 折叠逻辑
+        let isCollapsed = false;
+        headerDiv.addEventListener('click', (e) => {
+            if (e.target.classList && e.target.classList.contains('reset-progress-btn')) {
+                return;
+            }
+            e.stopPropagation();
+            isCollapsed = !isCollapsed;
+            if (isCollapsed) {
+                wrapperDiv.classList.add('collapsed');
+                arrowSpan.classList.add('collapsed');
+            } else {
+                wrapperDiv.classList.remove('collapsed');
+                arrowSpan.classList.remove('collapsed');
+            }
+        });
+        
+        // 重置进度按钮事件
+        const resetBtn = titleTextDiv.querySelector('.reset-progress-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const groupCodeAttr = resetBtn.getAttribute('data-group-code');
+                if (confirm(`确定要重置「${groupName}」的所有通关进度吗？`)) {
+                    clearCompletedLevels(groupCodeAttr);
+                    showCuteToast(`🔄 已重置「${groupName}」的进度`);
+                    const newSection = renderLevelsGroup(groupData, groupIndex);
+                    if (newSection) {
+                        sectionDiv.parentNode.replaceChild(newSection, sectionDiv);
+                        bindGlobalCardClicks();
+                    }
+                }
+            });
+        }
+        
+        return sectionDiv;
     }
-    
-    function nextLevel() { 
-        let nxt = currentLevelId + 1; 
-        if(nxt < TOTAL && (DEBUG || unlocked[nxt])) switchTo(nxt); 
-        else if(nxt < TOTAL) {
-            const nextName = allLevels[nxt].name;
-            showMessage(`🔒 下一关「${nextName}」尚未解锁！需要当前关卡准确率 ≥90% 且练习 ≥3 次，或准确率 ≥98% 一次解锁。`, true);
-        } else showMessage(`🏁 已完成全部关卡`, false); 
+
+    function bindGlobalCardClicks() {
+        if (window._globalClickHandler) {
+            document.body.removeEventListener('click', window._globalClickHandler);
+        }
+        const handler = (e) => {
+            const card = e.target.closest('.level-card');
+            if (!card) return;
+            
+            const baseUrl = card.getAttribute('data-url-base');
+            const keysParam = encodeURIComponent(card.getAttribute('data-keys-param') || '');
+            const levelValue = encodeURIComponent(card.getAttribute('data-level') || 'beginner');
+            const numValue = card.getAttribute('data-num') || '';
+            const desc = card.getAttribute('data-description') || '这个关卡';
+            
+            if (!baseUrl || baseUrl === '#' || baseUrl === '') {
+                showCuteToast(`🧸 “${desc}” 暂未配置跳转地址，请在 config.json 中配置 url 字段～`, true);
+                return;
+            }
+            
+            let separator = baseUrl.includes('?') ? '&' : '?';
+            let finalUrl = `${baseUrl}${separator}keys=${keysParam}&level=${levelValue}`;
+            if (numValue) {
+                finalUrl += `&num=${numValue}`;
+            }
+            console.log(`✨ 闯关: ${desc} | keys=[${decodeURIComponent(keysParam)}] | level=${decodeURIComponent(levelValue)} | num=${numValue}`);
+            window.location.href = finalUrl;
+        };
+        document.body.addEventListener('click', handler);
+        window._globalClickHandler = handler;
     }
-    
-    arcadeBtn.addEventListener('click', () => {
-        window.location.href = 'play-to-type.html';
-    });
-    
-    let hasLoaded = false;
-    if (!DEBUG) {
-        hasLoaded = loadProgress();
+
+    function showError(message) {
+        if (container) {
+            container.innerHTML = `
+                <div class="status-message error-box">
+                    🧸 加载失败<br>
+                    <span style="font-size: 0.85rem;">${escapeHtml(message)}</span><br>
+                    <span style="font-size: 0.75rem;">请确保根目录下存在 config.json 且格式正确</span>
+                </div>
+            `;
+        }
+        showCuteToast('❌ 无法加载 config.json', true);
     }
-    
-    if (hasLoaded && savedCurrentLevelId >= 0 && savedCurrentLevelId < TOTAL) {
-        currentLevelId = savedCurrentLevelId;
-        currentGroupIdx = allLevels[currentLevelId].groupIdx;
-    } else if (!DEBUG) {
-        unlocked[0] = true;
-        currentLevelId = 0;
-        currentGroupIdx = allLevels[0].groupIdx;
-    } else {
-        for(let i=0;i<TOTAL;i++) unlocked[i] = true;
-        currentLevelId = 0;
-        currentGroupIdx = allLevels[0].groupIdx;
+
+    function loadAndRender() {
+        if (container) {
+            container.innerHTML = `<div class="status-message"><span class="loading-spinner"></span> 🍭 正在读取 config.json ...</div>`;
+        }
+        
+        fetch(CONFIG_PATH, { cache: 'no-cache', headers: { 'Cache-Control': 'no-cache' } })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                let groups = null;
+                if (data && Array.isArray(data['learn-to-type'])) {
+                    groups = data['learn-to-type'];
+                } else if (data && Array.isArray(data.levels)) {
+                    groups = [{
+                        id: "default",
+                        code: "default",
+                        name: "打字练习关卡",
+                        description: "从基础到进阶，逐步提升打字技能",
+                        levels: data.levels
+                    }];
+                } else {
+                    throw new Error('配置文件格式错误：缺少 "learn-to-type" 数组');
+                }
+                
+                if (!groups.length) {
+                    showError('配置文件中没有分组数据');
+                    return;
+                }
+                
+                container.innerHTML = '';
+                let hasAnyLevel = false;
+                groups.forEach((group, idx) => {
+                    if (group.levels && group.levels.length) {
+                        hasAnyLevel = true;
+                        const section = renderLevelsGroup(group, idx);
+                        if (section) container.appendChild(section);
+                    }
+                });
+                
+                if (!hasAnyLevel) {
+                    showError('所有分组的 levels 都为空');
+                    return;
+                }
+                
+                bindGlobalCardClicks();
+                console.log('✅ 加载成功，分组数:', groups.length);
+                showCuteToast(`✅ 加载成功，共 ${groups.length} 个分组`);
+                
+                // 调试模式下显示调试面板
+                if (isDebug) {
+                    showDebugPanel();
+                }
+            })
+            .catch(err => {
+                console.error('读取失败:', err);
+                showError(err.message);
+            });
     }
-    
-    renderNav();
-    resetCurrentInternal(true);
-    input.addEventListener('input', handleInput);
-    resetBtn.addEventListener('click', resetCurrent);
-    nextBtn.addEventListener('click', nextLevel);
-    resetAllProgressBtn.addEventListener('click', resetAllProgress);
-    
-    window.addEventListener('beforeunload', () => { saveProgress(); });
-})();
+
+    loadAndRender();
 </script>
 </body>
 </html>
