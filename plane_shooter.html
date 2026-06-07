@@ -245,7 +245,6 @@
             transform: translateY(-1px);
         }
 
-        /* 游戏消息 - 动态提示 */
         .game-msg {
             background: rgba(255, 235, 200, 0.9);
             border-radius: 16px;
@@ -469,11 +468,11 @@
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">关卡</div>
-                        <div class="stat-value" id="levelNum">1/10</div>
+                        <div class="stat-value" id="levelNum">1/21</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">剩余</div>
-                        <div class="stat-value" id="remainTargets">30</div>
+                        <div class="stat-value" id="remainTargets">30/30</div>
                     </div>
                 </div>
             </div>
@@ -536,7 +535,8 @@ let currentLevelConfig = null;
 let currentGameLevel = 1;
 
 const urlParamsInit = new URLSearchParams(window.location.search);
-let initialLevelId = parseInt(urlParamsInit.get('levelId')) || 1;
+let initialLevelId = parseInt(urlParamsInit.get('id'));
+let urlKeysParam = urlParamsInit.get('keys') || '';
 
 async function loadPlaneLevels() {
     try {
@@ -676,7 +676,6 @@ function getLevelIndexById(levelId) {
     var currentRate = null;
     var currentNum = 30;
     
-    // 消息计时器
     var msgTimer = null;
     
     // ==================== 解析 keys ====================
@@ -763,6 +762,20 @@ function getLevelIndexById(levelId) {
         updateGameMessage(msg, isError ? '再试试看~' : '继续加油！', isError);
     }
     
+    // ==================== 同步通关进度到首页 ====================
+    function syncToMainProgress(levelId) {
+        if (!levelId) return;
+        const groupCode = 'plane_shooter';
+        const key = `typing_completed_${groupCode}`;
+        let completed = JSON.parse(localStorage.getItem(key) || '[]');
+        if (!completed.includes(levelId)) {
+            completed.push(levelId);
+            completed.sort((a, b) => a - b);
+            localStorage.setItem(key, JSON.stringify(completed));
+            console.log(`✅ 同步通关进度到首页: ${groupCode} - 第${levelId}关`);
+        }
+    }
+    
     // ==================== 关卡配置初始化 ====================
     function initLevelByConfig(levelConfig) {
         if (!levelConfig) return false;
@@ -828,7 +841,7 @@ function getLevelIndexById(levelId) {
         gameLoop();
         
         var url = new URL(window.location.href);
-        url.searchParams.set('levelId', levelId);
+        url.searchParams.set('id', levelId);
         window.history.replaceState({}, '', url);
         
         showGameMessageSimple("🎮 进入第 " + levelId + " 关", false);
@@ -871,7 +884,8 @@ function getLevelIndexById(levelId) {
         document.getElementById('scoreVal').innerText = score;
         document.getElementById('comboVal').innerText = combo;
         document.getElementById('levelNum').innerText = currentGameLevel + "/" + planeLevels.length;
-        document.getElementById('remainTargets').innerText = remainingInLevel;
+        // ✅ 修改为 剩余数/总数 格式
+        document.getElementById('remainTargets').innerText = remainingInLevel + "/" + currentNum;
     }
     
     function updatePauseOverlay() {
@@ -913,7 +927,6 @@ function getLevelIndexById(levelId) {
             char: newChar, 
             active: true 
         };
-        // ✅ 新目标出现时显示提示
         showNewTarget(newChar);
         refreshNextLetter();
     }
@@ -979,6 +992,11 @@ function getLevelIndexById(levelId) {
         if (levelCompletedFlag || pendingLevelUp) return;
         levelCompletedFlag = true;
         saveProgress();
+        
+        // ✅ 同步到首页进度系统
+        if (currentLevelConfig && currentLevelConfig.id) {
+            syncToMainProgress(currentLevelConfig.id);
+        }
         
         var currentId = currentLevelConfig ? currentLevelConfig.id : 1;
         var currentIdx = getLevelIndexById(currentId);
@@ -1143,7 +1161,6 @@ function getLevelIndexById(levelId) {
                 score += add;
                 remainingInLevel--;
                 
-                // ✅ 命中目标时显示提示
                 showHitTarget(m.targetChar, add);
                 
                 explosions.push({x:m.target.x, y:m.target.y-7, life:0.5, particles:[]});
@@ -1312,7 +1329,6 @@ function getLevelIndexById(levelId) {
         
         if (currentFalling && currentFalling.char.toLowerCase() === char.toLowerCase()) {
             addMissile(plane.x, plane.y-14, currentFalling);
-            // ✅ 发射导弹时显示提示
             showFireMissile(currentFalling.char);
         } else if (currentFalling && currentFalling.char.toLowerCase() !== char.toLowerCase()) {
             if(window._missileSound) window._missileSound.error();
@@ -1336,10 +1352,68 @@ function getLevelIndexById(levelId) {
             return;
         }
         
-        var savedLevelId = loadProgress();
-        var startLevelId = savedLevelId || initialLevelId;
-        var startConfig = getLevelById(startLevelId);
-        if (!startConfig && planeLevels.length > 0) startConfig = planeLevels[0];
+        var startConfig = null;
+        
+        // ✅ 1. 优先使用 URL 中的 id 参数（从 index 点击进来时传递）
+        if (initialLevelId && !isNaN(initialLevelId)) {
+            startConfig = getLevelById(initialLevelId);
+            if (startConfig) {
+                console.log("✅ 根据 URL id 参数匹配到关卡:", startConfig.id, startConfig.description);
+            }
+        }
+        
+        // ✅ 2. 如果没有 id 参数，尝试根据 keys 参数匹配
+        if (!startConfig && urlKeysParam) {
+            let targetKeys = null;
+            try {
+                const decoded = decodeURIComponent(urlKeysParam);
+                const parsed = JSON.parse(decoded);
+                if (Array.isArray(parsed)) targetKeys = parsed;
+            } catch(e) {
+                if (urlKeysParam.includes(',')) {
+                    targetKeys = urlKeysParam.split(',').map(s => s.trim());
+                } else if (urlKeysParam.length > 0) {
+                    targetKeys = urlKeysParam.split('');
+                }
+            }
+            
+            if (targetKeys && targetKeys.length > 0) {
+                for (var i = 0; i < planeLevels.length; i++) {
+                    var level = planeLevels[i];
+                    if (level.keys && Array.isArray(level.keys) && 
+                        level.keys.length === targetKeys.length) {
+                        var match = true;
+                        for (var j = 0; j < level.keys.length; j++) {
+                            if (level.keys[j] !== targetKeys[j]) {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if (match) {
+                            startConfig = level;
+                            console.log("✅ 根据 keys 参数匹配到关卡:", startConfig.id, startConfig.description);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // ✅ 3. 最后使用保存的进度或第一关
+        if (!startConfig) {
+            var savedLevelId = loadProgress();
+            if (savedLevelId) {
+                startConfig = getLevelById(savedLevelId);
+                if (startConfig) {
+                    console.log("📌 使用保存的进度关卡:", savedLevelId, startConfig.description);
+                }
+            }
+        }
+        
+        if (!startConfig && planeLevels.length > 0) {
+            startConfig = planeLevels[0];
+            console.log("📌 使用默认第一关:", startConfig.id);
+        }
         
         if (startConfig) {
             currentLevelConfig = startConfig;
