@@ -402,17 +402,79 @@
                     "id": 1,
                     "description": "🐣 学习 · 基准键",
                     "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
-                    "url": "./basictype.html",
+                    "url": "./plane_shooter.html",
                     "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
                     "level": "beginner"
                     },
                     {
                     "id": 2,
                     "description": "🐣 练习 · 基准键",
-                    "url": "./basictype.html",
+                    "url": "./plane_shooter.html",
                     "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
                     "level": "intermediate"
-                    }
+                    },
+                    {
+                    "id": 3,
+                    "description": "🐣 学习 · 上排键",
+                    "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
+                    "url": "./plane_shooter.html",
+                    "keys": ["Q", "W","E", "R", "T", "Y", "U", "I", "O", "P"],
+                    "level": "beginner"
+                    },
+                    {
+                    "id": 4,
+                    "description": "🐣 练习 · 上排键",
+                    "url": "./plane_shooter.html",
+                    "keys": ["Q", "W","E", "R", "T", "Y", "U", "I", "O", "P"],
+                    "level": "intermediate"
+                    },
+                    {
+                    "id": 5,
+                    "description": "🐣 学习 · 下排键",
+                    "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
+                    "url": "./plane_shooter.html",
+                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", ".", "/"],
+                    "level": "beginner"
+                    },
+                    {
+                    "id": 6,
+                    "description": "🐣 练习 · 下排键",
+                    "url": "./plane_shooter.html",
+                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", ".", "/"],
+                    "level": "intermediate"
+                    },
+                    {
+                    "id": 7,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 94
+                    },
+                    {
+                    "id": 8,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 98
+                    },
+                    {
+                    "id": 9,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 102
+                    },
+                    {
+                    "id": 10,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 106
+                    }                                                                     
             ]
         },
         {

@@ -468,11 +468,9 @@
 
     // ==================== 登录验证 ====================
     (function() {
-        // 检查是否有登录凭证
         const loggedIn = localStorage.getItem('logged_in');
         const userName = localStorage.getItem('user_name');
         
-        // 调试模式下跳过登录验证
         if (!isDebug && (!loggedIn || !userName)) {
             window.location.href = 'login.html';
             return;
@@ -480,7 +478,6 @@
         
         if (isDebug) {
             console.log('🐞 调试模式已启用，跳过登录验证');
-            // 调试模式下自动设置一个测试用户
             if (!localStorage.getItem('logged_in')) {
                 localStorage.setItem('logged_in', 'true');
                 localStorage.setItem('user_name', 'Debug_User');
@@ -507,21 +504,17 @@
         `;
         document.body.appendChild(panel);
         
-        // ✅ 清除登录信息（去掉 debug 参数后跳转）
         document.getElementById('debugClearLoginBtn').addEventListener('click', () => {
             if (confirm('⚠️ 确定清除登录信息？清除后需要重新登录。')) {
                 localStorage.removeItem('logged_in');
                 localStorage.removeItem('user_name');
                 alert('已清除登录信息，即将跳转到登录页');
-                // 跳转到没有 debug 参数的页面
                 window.location.href = window.location.pathname;
             }
         });
         
-        // 清除所有进度
         document.getElementById('debugClearProgressBtn').addEventListener('click', () => {
             if (confirm('⚠️ 确定清除所有通关进度吗？此操作不可恢复！')) {
-                // 清除所有分组进度
                 const keys = Object.keys(localStorage);
                 keys.forEach(key => {
                     if (key.startsWith('typing_completed_')) {
@@ -533,10 +526,8 @@
             }
         });
         
-        // 解锁所有关卡
         document.getElementById('debugUnlockAllBtn').addEventListener('click', () => {
             if (confirm('🔓 确定解锁所有关卡吗？')) {
-                // 获取所有分组并解锁所有关卡
                 fetch(CONFIG_PATH, { cache: 'no-cache' })
                     .then(res => res.json())
                     .then(data => {
@@ -557,14 +548,13 @@
             }
         });
         
-        // 重新加载页面
         document.getElementById('debugReloadBtn').addEventListener('click', () => {
             window.location.reload();
         });
     }
 
     /**
-     * 打字练习关卡选择器 - 支持分组折叠，完成进度记录，动态num参数
+     * 打字练习关卡选择器 - 支持分组折叠，完成进度记录，动态num和rate参数
      */
     const CONFIG_PATH = './config.json';
     const container = document.getElementById('dynamicContent');
@@ -675,7 +665,7 @@
 
     function serializeKeys(keysArray) {
         if (!keysArray || !Array.isArray(keysArray) || keysArray.length === 0) return '';
-        return keysArray.filter(k => k && k.trim() !== '').join(',');
+        return encodeURIComponent(JSON.stringify(keysArray));
     }
 
     function getFontSizeByTextLength(text) {
@@ -765,6 +755,7 @@
             const keysParamStr = serializeKeys(keysArray);
             const fontSize = getFontSizeByTextLength(description);
             const numValue = levelItem.num || '';
+            const rateValue = levelItem.rate || '';  // ✅ 新增：读取 rate 参数
             
             const isCompleted = completedLevels.includes(cardId);
             const completedClass = isCompleted ? 'card-completed' : '';
@@ -780,6 +771,9 @@
             card.setAttribute('data-group-code', groupCode);
             if (numValue) {
                 card.setAttribute('data-num', numValue);
+            }
+            if (rateValue) {  // ✅ 新增：存储 rate 参数
+                card.setAttribute('data-rate', rateValue);
             }
             
             const completedBadge = isCompleted ? '<div class="completed-badge">✅</div>' : '';
@@ -851,6 +845,7 @@
             const keysParam = encodeURIComponent(card.getAttribute('data-keys-param') || '');
             const levelValue = encodeURIComponent(card.getAttribute('data-level') || 'beginner');
             const numValue = card.getAttribute('data-num') || '';
+            const rateValue = card.getAttribute('data-rate') || '';  // ✅ 新增：读取 rate
             const desc = card.getAttribute('data-description') || '这个关卡';
             
             if (!baseUrl || baseUrl === '#' || baseUrl === '') {
@@ -863,7 +858,10 @@
             if (numValue) {
                 finalUrl += `&num=${numValue}`;
             }
-            console.log(`✨ 闯关: ${desc} | keys=[${decodeURIComponent(keysParam)}] | level=${decodeURIComponent(levelValue)} | num=${numValue}`);
+            if (rateValue) {  // ✅ 新增：添加 rate 参数
+                finalUrl += `&rate=${rateValue}`;
+            }
+            console.log(`✨ 闯关: ${desc} | keys=[${decodeURIComponent(keysParam)}] | level=${decodeURIComponent(levelValue)} | num=${numValue} | rate=${rateValue}`);
             window.location.href = finalUrl;
         };
         document.body.addEventListener('click', handler);
@@ -933,7 +931,6 @@
                 console.log('✅ 加载成功，分组数:', groups.length);
                 showCuteToast(`✅ 加载成功，共 ${groups.length} 个分组`);
                 
-                // 调试模式下显示调试面板
                 if (isDebug) {
                     showDebugPanel();
                 }

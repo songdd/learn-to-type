@@ -168,7 +168,6 @@
             border: 2px solid #FFD699;
         }
 
-        /* ✅ 动态参考文本区域 */
         .reference-text {
             display: grid;
             grid-template-columns: repeat(30, minmax(28px, 1fr));
@@ -214,7 +213,6 @@
             opacity: 0.7;
         }
 
-        /* ✅ 动态输入区域 */
         .input-area {
             display: grid;
             grid-template-columns: repeat(30, 1fr);
@@ -269,7 +267,6 @@
             100% { transform: translateX(0); }
         }
 
-        /* 响应式 */
         @media (max-width: 1000px) {
             .input-area {
                 grid-template-columns: repeat(15, 1fr);
@@ -561,10 +558,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     let urlKeys = urlParams.get('keys') || "";
     let urlLevel = urlParams.get('level') || "beginner";
-    // ✅ 读取 num 参数，默认30，限制1-60
     let urlNum = parseInt(urlParams.get('num')) || 30;
     if (urlNum < 1) urlNum = 30;
-    if (urlNum > 90) urlNum = 90;  // 限制最大90个字符
+    if (urlNum > 90) urlNum = 90;
     
     const isDebug = urlParams.get('debug') === '1';
     
@@ -580,6 +576,155 @@
     let countdownTimer = null;
     let currentOverlay = null;
     
+    // ==================== 辅助函数：解析 keys 参数 ====================
+    function parseKeysParam(keysStr) {
+        if (!keysStr || keysStr === '') return null;
+        try {
+            const decoded = decodeURIComponent(keysStr);
+            const parsed = JSON.parse(decoded);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+            }
+        } catch(e) {
+            // JSON 解析失败，尝试旧格式
+            console.log('使用旧格式解析 keys 参数');
+        }
+        return null;
+    }
+    
+    // ==================== 辅助函数：将 keys 转换为可读的显示文本 ====================
+    function getKeysDisplayText(keysStr) {
+        if (!keysStr || keysStr === '') return '全键盘';
+        
+        // 尝试解析 JSON 格式
+        const parsed = parseKeysParam(keysStr);
+        if (parsed && parsed.length > 0) {
+            let display = parsed.join(' ');
+            if (display.length > 20) {
+                display = display.substring(0, 18) + '...';
+            }
+            return display;
+        }
+        
+        // 兼容旧格式：逗号分隔
+        if (keysStr.includes(',')) {
+            let display = keysStr;
+            if (display.length > 20) {
+                display = display.substring(0, 18) + '...';
+            }
+            return display;
+        }
+        
+        // 单字符或短字符串
+        let display = keysStr;
+        if (display.length > 20) {
+            display = display.substring(0, 18) + '...';
+        }
+        return display || '全键盘';
+    }
+    
+    // ==================== 辅助函数：将 keys 标准化为 JSON 字符串用于比较 ====================
+    function normalizeKeysForCompare(keys) {
+        if (!keys) return '';
+        if (Array.isArray(keys)) {
+            return JSON.stringify(keys);
+        }
+        if (typeof keys === 'string') {
+            // 尝试解析 JSON
+            try {
+                const parsed = JSON.parse(keys);
+                if (Array.isArray(parsed)) return JSON.stringify(parsed);
+            } catch(e) {}
+            // 逗号分隔
+            if (keys.includes(',')) {
+                const arr = keys.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                return JSON.stringify(arr);
+            }
+            // 单个字符串拆分为数组
+            if (keys.length > 0) {
+                return JSON.stringify(keys.split(''));
+            }
+        }
+        return '';
+    }
+    
+    // ==================== 辅助函数：获取当前 URL keys 的标准化 JSON ====================
+    function getCurrentKeysJson() {
+        let keysArray = [];
+        const parsed = parseKeysParam(urlKeys);
+        if (parsed && parsed.length > 0) {
+            keysArray = parsed;
+        } else if (urlKeys && urlKeys.includes(',')) {
+            keysArray = urlKeys.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        } else if (urlKeys) {
+            keysArray = urlKeys.split('');
+        }
+        return JSON.stringify(keysArray);
+    }
+    
+    // ==================== 获取完整键盘字符集 ====================
+    function getFullKeyboardChars() {
+        return [
+            '1','2','3','4','5','6','7','8','9','0',
+            'Q','W','E','R','T','Y','U','I','O','P',
+            'A','S','D','F','G','H','J','K','L',';',
+            'Z','X','C','V','B','N','M',',','.','/'
+        ];
+    }
+    
+    // ==================== 生成练习文本 ====================
+    function generateText(keysStr, level, targetLen) {
+        let baseChars = [];
+        
+        const parsedKeys = parseKeysParam(keysStr);
+        if (parsedKeys && parsedKeys.length > 0) {
+            baseChars = parsedKeys;
+        } 
+        else if (keysStr && keysStr.includes(',')) {
+            baseChars = keysStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            if (baseChars.length === 0) baseChars = getFullKeyboardChars();
+        } 
+        else if (keysStr && keysStr.length > 0) {
+            baseChars = keysStr.split('');
+            if (baseChars.length === 0) baseChars = getFullKeyboardChars();
+        } 
+        else {
+            baseChars = getFullKeyboardChars();
+        }
+        
+        if (baseChars.length === 0) baseChars = getFullKeyboardChars();
+        
+        let repeatCount = Math.ceil(targetLen / baseChars.length);
+        let baseList = [];
+        for (let i = 0; i < repeatCount; i++) {
+            baseList.push(...baseChars);
+        }
+        baseList = baseList.slice(0, targetLen);
+        
+        if (level === 'beginner') {
+            return baseList.join('');
+        } else if (level === 'intermediate') {
+            let arr = [...baseList];
+            let swapCount = Math.floor(arr.length * 0.3);
+            for (let i = 0; i < swapCount; i++) {
+                let p = Math.floor(Math.random() * arr.length);
+                let q = Math.floor(Math.random() * arr.length);
+                [arr[p], arr[q]] = [arr[q], arr[p]];
+            }
+            return arr.join('');
+        } else {
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+            return shuffleArray([...baseList]).join('');
+        }
+    }
+    
+    // ==================== 音频相关函数 ====================
     function initAudio() {
         if (audioCtx) return audioCtx;
         try {
@@ -680,64 +825,6 @@
     document.addEventListener('click', enableAudio);
     document.addEventListener('keydown', enableAudio);
     
-    function shuffleArray(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    }
-    
-    // ✅ 获取完整键盘字符集（40个字符）
-    function getFullKeyboardChars() {
-        return [
-            '1','2','3','4','5','6','7','8','9','0',
-            'Q','W','E','R','T','Y','U','I','O','P',
-            'A','S','D','F','G','H','J','K','L',';',
-            'Z','X','C','V','B','N','M',',','.','/'
-        ];
-    }
-    
-    // ✅ 生成练习文本（支持 targetLen 参数）
-    function generateText(keysStr, level, targetLen) {
-        // 处理 keys 为空的情况
-        let baseChars = [];
-        if (!keysStr || keysStr === '') {
-            baseChars = getFullKeyboardChars();
-        } else if (keysStr.includes(',')) {
-            baseChars = keysStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
-            if (baseChars.length === 0) baseChars = getFullKeyboardChars();
-        } else {
-            baseChars = keysStr.split('');
-            if (baseChars.length === 0) baseChars = getFullKeyboardChars();
-        }
-        
-        if (baseChars.length === 0) baseChars = getFullKeyboardChars();
-        
-        // 生成足够长的列表
-        let repeatCount = Math.ceil(targetLen / baseChars.length);
-        let baseList = [];
-        for (let i = 0; i < repeatCount; i++) {
-            baseList.push(...baseChars);
-        }
-        baseList = baseList.slice(0, targetLen);
-        
-        if (level === 'beginner') {
-            return baseList.join('');
-        } else if (level === 'intermediate') {
-            let arr = [...baseList];
-            let swapCount = Math.floor(arr.length * 0.3);
-            for (let i = 0; i < swapCount; i++) {
-                let p = Math.floor(Math.random() * arr.length);
-                let q = Math.floor(Math.random() * arr.length);
-                [arr[p], arr[q]] = [arr[q], arr[p]];
-            }
-            return arr.join('');
-        } else {
-            return shuffleArray([...baseList]).join('');
-        }
-    }
-    
     const levelNames = {
         'beginner': '🎈 顺序',
         'intermediate': '🎵 微乱',
@@ -745,7 +832,7 @@
     };
     
     let expected = [];
-    let total = urlNum;  // ✅ 使用动态数量
+    let total = urlNum;
     let currentIndex = 0;
     let correctCount = 0;
     let errorCount = 0;
@@ -822,16 +909,14 @@
         virtualKbd.innerHTML = html;
     }
     
-    // ✅ 动态设置 refText 的 grid 列数（每行最多30个）
     function updateRefGridLayout() {
         const colsPerRow = 30;
-        refDiv.style.gridTemplateColumns = `repeat(${colsPerRow}, minmax(28px, 1fr))`;  // ✅ 固定30列，自动换行
+        refDiv.style.gridTemplateColumns = `repeat(${colsPerRow}, minmax(28px, 1fr))`;
     }
     
-    // ✅ 动态设置 inputArea 的 grid 列数
     function updateInputGridLayout() {
         const colsPerRow = 30;
-        inputArea.style.gridTemplateColumns = `repeat(${colsPerRow}, 1fr)`;  // ✅ 固定30列，自动换行
+        inputArea.style.gridTemplateColumns = `repeat(${colsPerRow}, 1fr)`;
     }
     
     function updateRefHighlight() {
@@ -861,21 +946,6 @@
         renderVirtualKeyboard(currentChar);
     }
     
-    function updateInputsDisplay() {
-        for (let i = 0; i < total; i++) {
-            if (inputCorrect[i]) {
-                const slot = inputArea.children[i];
-                if (slot) {
-                    const input = slot.querySelector('input');
-                    if (input.value !== inputValues[i]) {
-                        input.value = inputValues[i];
-                    }
-                    input.classList.add('correct-input');
-                }
-            }
-        }
-    }
-    
     function focusCurrentSlot() {
         if (currentIndex < total && active) {
             const slot = inputArea.children[currentIndex];
@@ -901,6 +971,20 @@
                 }
             }, 500);
         }
+    }
+    
+    function updateStats() {
+        let totalTyped = correctCount + errorCount;
+        let accuracy = totalTyped === 0 ? 100 : Math.floor((correctCount / totalTyped) * 100);
+        accSpan.innerText = accuracy;
+        progSpan.innerText = currentIndex;
+        totalSpan.innerText = total;
+        return accuracy;
+    }
+    
+    function isCharMatch(inputChar, expectedChar) {
+        if (!inputChar || !expectedChar) return false;
+        return inputChar.toLowerCase() === expectedChar.toLowerCase();
     }
     
     function processCharacterInput(char, index, inputElement) {
@@ -1040,33 +1124,20 @@
         });
     }
     
-    function updateStats() {
-        let totalTyped = correctCount + errorCount;
-        let accuracy = totalTyped === 0 ? 100 : Math.floor((correctCount / totalTyped) * 100);
-        accSpan.innerText = accuracy;
-        progSpan.innerText = currentIndex;
-        totalSpan.innerText = total;
-        return accuracy;
-    }
-    
-    function isCharMatch(inputChar, expectedChar) {
-        if (!inputChar || !expectedChar) return false;
-        return inputChar.toLowerCase() === expectedChar.toLowerCase();
-    }
-    
+    // ==================== 获取下一关信息（使用标准化 JSON 比较） ====================
     function getNextLevelInfo() {
         if (basictypeLevels.length === 0) return null;
         
         let currentIdx = -1;
+        const currentKeysJson = getCurrentKeysJson();
         
         // 第一步：完全匹配（keys + level + num）
         for (let i = 0; i < basictypeLevels.length; i++) {
             const level = basictypeLevels[i];
-            let levelKeys = Array.isArray(level.keys) ? level.keys.join(',') : level.keys;
-            if (!levelKeys) levelKeys = '';  // ✅ 关键修复
+            const levelKeysJson = normalizeKeysForCompare(level.keys);
             const levelNum = level.num || 30;
             
-            if (levelKeys === urlKeys && level.level === urlLevel && levelNum === urlNum) {
+            if (levelKeysJson === currentKeysJson && level.level === urlLevel && levelNum === urlNum) {
                 currentIdx = i;
                 break;
             }
@@ -1076,10 +1147,9 @@
         if (currentIdx === -1) {
             for (let i = 0; i < basictypeLevels.length; i++) {
                 const level = basictypeLevels[i];
-                let levelKeys = Array.isArray(level.keys) ? level.keys.join(',') : level.keys;
-                if (!levelKeys) levelKeys = '';  // ✅ 关键修复
+                const levelKeysJson = normalizeKeysForCompare(level.keys);
                 
-                if (levelKeys === urlKeys && level.level === urlLevel) {
+                if (levelKeysJson === currentKeysJson && level.level === urlLevel) {
                     currentIdx = i;
                     break;
                 }
@@ -1249,8 +1319,8 @@
         if (nextLevel && !nextLevel.isLast && nextLevel.levelData) {
             currentLevelIndex = nextLevel.index;
             currentLevelData = nextLevel.levelData;
-            let newKeys = Array.isArray(currentLevelData.keys) ? currentLevelData.keys.join(',') : currentLevelData.keys;
-            urlKeys = (newKeys === undefined || newKeys === null) ? '' : newKeys;
+            let newKeys = Array.isArray(currentLevelData.keys) ? JSON.stringify(currentLevelData.keys) : (currentLevelData.keys || '');
+            urlKeys = encodeURIComponent(newKeys);
             urlLevel = currentLevelData.level;
             urlNum = currentLevelData.num || 30;
             if (urlNum < 1) urlNum = 30;
@@ -1381,7 +1451,8 @@
         
         navCenterMsg.classList.remove('error-msg', 'success-msg');
         let displayMode = levelNames[urlLevel] || urlLevel;
-        let keysDisplay = urlKeys.length > 20 ? urlKeys.substring(0, 20) + '...' : (urlKeys || '全键盘');
+        // ✅ 使用 getKeysDisplayText 函数显示可读的 keys 文本
+        let keysDisplay = getKeysDisplayText(urlKeys);
         showNavMessage(`🎈 ${displayMode} · 练习: ${keysDisplay} · 共${total}字符`, false);
     }
     
@@ -1401,8 +1472,8 @@
         if (currentLevelIndex > 0) {
             currentLevelIndex--;
             currentLevelData = basictypeLevels[currentLevelIndex];
-            let newKeys = Array.isArray(currentLevelData.keys) ? currentLevelData.keys.join(',') : currentLevelData.keys;
-            urlKeys = (newKeys === undefined || newKeys === null) ? '' : newKeys;
+            let newKeys = Array.isArray(currentLevelData.keys) ? JSON.stringify(currentLevelData.keys) : (currentLevelData.keys || '');
+            urlKeys = encodeURIComponent(newKeys);
             urlLevel = currentLevelData.level;
             urlNum = currentLevelData.num || 30;
             if (urlNum < 1) urlNum = 30;
@@ -1423,8 +1494,8 @@
         if (currentLevelIndex < basictypeLevels.length - 1) {
             currentLevelIndex++;
             currentLevelData = basictypeLevels[currentLevelIndex];
-            let newKeys = Array.isArray(currentLevelData.keys) ? currentLevelData.keys.join(',') : currentLevelData.keys;
-            urlKeys = (newKeys === undefined || newKeys === null) ? '' : newKeys;
+            let newKeys = Array.isArray(currentLevelData.keys) ? JSON.stringify(currentLevelData.keys) : (currentLevelData.keys || '');
+            urlKeys = encodeURIComponent(newKeys);
             urlLevel = currentLevelData.level;
             urlNum = currentLevelData.num || 30;
             if (urlNum < 1) urlNum = 30;
@@ -1441,6 +1512,7 @@
         window.location.href = 'index.html';
     }
     
+    // ==================== 加载配置并初始化（使用标准化 JSON 比较） ====================
     function loadConfigAndInit() {
         fetch(CONFIG_PATH, { cache: 'no-cache' })
             .then(res => {
@@ -1471,14 +1543,14 @@
                 }
                 
                 let foundIndex = -1;
+                const currentKeysJson = getCurrentKeysJson();
+                
                 for (let i = 0; i < basictypeLevels.length; i++) {
                     const level = basictypeLevels[i];
-                    let levelKeys = Array.isArray(level.keys) ? level.keys.join(',') : level.keys;
-                    // ✅ 修复：如果 keys 不存在或为空，视为空字符串
-                    if (!levelKeys) levelKeys = '';
+                    const levelKeysJson = normalizeKeysForCompare(level.keys);
                     const levelNum = level.num || 30;
-                    // ✅ 修复：比较时都转为字符串
-                    if (String(levelKeys) === String(urlKeys) && level.level === urlLevel && levelNum === urlNum) {
+                    
+                    if (levelKeysJson === currentKeysJson && level.level === urlLevel && levelNum === urlNum) {
                         foundIndex = i;
                         break;
                     }
@@ -1490,11 +1562,10 @@
                     // 没找到匹配的关卡时，尝试只用 keys 和 level 匹配（忽略 num）
                     for (let i = 0; i < basictypeLevels.length; i++) {
                         const level = basictypeLevels[i];
-                        let levelKeys = Array.isArray(level.keys) ? level.keys.join(',') : level.keys;
-                        if (!levelKeys) levelKeys = '';
-                        if (String(levelKeys) === String(urlKeys) && level.level === urlLevel) {
+                        const levelKeysJson = normalizeKeysForCompare(level.keys);
+                        
+                        if (levelKeysJson === currentKeysJson && level.level === urlLevel) {
                             foundIndex = i;
-                            // 使用配置文件的 num 覆盖 URL 参数
                             urlNum = level.num || 30;
                             break;
                         }
@@ -1505,8 +1576,8 @@
                     } else {
                         currentLevelIndex = 0;
                         const firstLevel = basictypeLevels[0];
-                        urlKeys = Array.isArray(firstLevel.keys) ? firstLevel.keys.join(',') : firstLevel.keys;
-                        if (!urlKeys) urlKeys = '';
+                        const newKeys = Array.isArray(firstLevel.keys) ? JSON.stringify(firstLevel.keys) : (firstLevel.keys || '');
+                        urlKeys = encodeURIComponent(newKeys);
                         urlLevel = firstLevel.level;
                         urlNum = firstLevel.num || 30;
                     }
@@ -1514,8 +1585,8 @@
                 
                 currentLevelData = basictypeLevels[currentLevelIndex];
                 if (currentLevelData) {
-                    urlKeys = Array.isArray(currentLevelData.keys) ? currentLevelData.keys.join(',') : currentLevelData.keys;
-                    if (!urlKeys) urlKeys = '';
+                    const newKeys = Array.isArray(currentLevelData.keys) ? JSON.stringify(currentLevelData.keys) : (currentLevelData.keys || '');
+                    urlKeys = encodeURIComponent(newKeys);
                     urlLevel = currentLevelData.level;
                     urlNum = currentLevelData.num || 30;
                 }
