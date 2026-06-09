@@ -29,33 +29,51 @@
 
         .header {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
             margin-bottom: 8px;
             padding: 0 4px;
-            flex-wrap: wrap;
-            gap: 6px;
             flex-shrink: 0;
+            flex-wrap: nowrap;
+            gap: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .header::-webkit-scrollbar {
+            display: none;
         }
 
         .header-left {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 8px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 22px;
+            flex-shrink: 0;
         }
 
         h1 {
-            font-size: 16px;
+            font-size: 15px;
             background: linear-gradient(135deg, #FF6B35, #FF4757);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             font-weight: 700;
+            flex-shrink: 0;
         }
 
         .level-badge {
@@ -65,15 +83,93 @@
             padding: 2px 10px;
             border-radius: 20px;
             font-weight: 600;
-            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .subtitle {
-            color: rgba(100, 50, 20, 0.6);
-            font-size: 10px;
-            background: rgba(255,255,200,0.5);
-            padding: 2px 8px;
+        .max-combo-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #4A2A00;
+            padding: 2px 10px;
             border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .max-combo-badge span {
+            font-size: 12px;
+            font-weight: 800;
+            color: #FF4757;
+            background: white;
+            padding: 0 5px;
+            border-radius: 12px;
+            margin-left: 4px;
+        }
+
+        .tips-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.12);
+            padding: 2px 12px;
+            border-radius: 25px;
+            flex-shrink: 0;
+        }
+        .tip-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tip-key {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 9px;
+            color: #FFE0A3;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .tip-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 8px;
+        }
+        .tip-separator {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 9px;
+        }
+        .shoot-hint {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            padding: 2px 10px;
+            border-radius: 25px;
+            font-size: 9px;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 4px;
+        }
+
+        .history-btn {
+            background: linear-gradient(135deg, #4ECDC4, #2C8F8F);
+            color: white;
+            border: none;
+            padding: 3px 10px;
+            border-radius: 25px;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+        .history-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .game-layout {
@@ -172,24 +268,29 @@
         .next-card {
             background: rgba(255, 235, 200, 0.8);
             border-radius: 16px;
-            padding: 8px;
-            text-align: center;
+            padding: 8px 12px;
             border: 1px solid #FFB347;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
         .next-label {
-            font-size: 10px;
-            color: #B85C1A;
+            font-size: 12px;
             font-weight: 600;
+            color: #B85C1A;
         }
-
         .next-char {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 800;
             font-family: monospace;
             color: #33AA33;
             text-shadow: 0 2px 4px rgba(0,100,0,0.2);
             line-height: 1;
+            min-width: 60px;
+            text-align: center;
+            background: rgba(255,255,200,0.6);
+            border-radius: 16px;
+            padding: 4px 0;
         }
 
         .btn-bar {
@@ -301,7 +402,8 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(180deg, #87CEEB 0%, #6BB5D9 100%);
-            cursor: none;
+            /* 初始显示鼠标，通过 JS 动态控制 */
+            cursor: default;
         }
 
         .pause-overlay {
@@ -317,6 +419,7 @@
             align-items: center;
             border-radius: 16px;
             z-index: 10;
+            pointer-events: none;
         }
 
         .pause-text {
@@ -328,6 +431,7 @@
             border-radius: 40px;
             border: 2px solid #FFB347;
             font-family: inherit;
+            pointer-events: none;
         }
 
         .congrats-overlay {
@@ -388,6 +492,145 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        .history-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+        }
+        .history-card {
+            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 2px solid #FFB347;
+            animation: bounceIn 0.3s ease;
+        }
+        .history-header {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .history-header h3 {
+            font-size: 16px;
+            margin: 0;
+        }
+        .history-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 18px;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+        .history-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+        .history-content {
+            padding: 16px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .history-stats {
+            background: #FFF0E0;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            padding: 12px;
+        }
+        .history-stats h4 {
+            color: #FF8C42;
+            font-size: 13px;
+            margin-bottom: 8px;
+            border-left: 3px solid #FF8C42;
+            padding-left: 8px;
+        }
+        .history-summary {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .summary-item {
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            flex: 1;
+            margin: 0 4px;
+        }
+        .summary-label {
+            font-size: 10px;
+            color: #8B6914;
+        }
+        .summary-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FF6B35;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .history-table th,
+        .history-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border-bottom: 1px solid #FFD699;
+        }
+        .history-table th {
+            background: #FFE0A3;
+            color: #4A2A00;
+            font-weight: bold;
+        }
+        .history-table tr:hover {
+            background: #FFF5E6;
+        }
+        .best-row {
+            background: #FFF0C0;
+            font-weight: bold;
+        }
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+        .clear-history-btn {
+            background: #E74C3C;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            width: 100%;
+        }
+        .clear-history-btn:hover {
+            background: #C0392B;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .info-panel::-webkit-scrollbar {
             width: 4px;
         }
@@ -408,14 +651,20 @@
             .info-panel .card { flex: 1; min-width: 140px; }
             .container { height: auto; min-height: 100vh; }
             .btn-nav { flex: 1; }
-            .header-left { gap: 4px; }
             .level-badge { font-size: 9px; padding: 1px 6px; }
+            .max-combo-badge { font-size: 9px; padding: 1px 6px; }
+            .max-combo-badge span { font-size: 10px; }
             .game-msg { min-height: 44px; }
             .game-msg .main-msg { font-size: 10px; }
-        }
-
-        @media (max-width: 500px) {
-            .info-panel .card { min-width: 100%; }
+            .next-char { font-size: 28px; min-width: 50px; }
+            .next-label { font-size: 10px; }
+            .tips-area { gap: 4px; padding: 1px 8px; }
+            .tip-key { font-size: 7px; padding: 0px 4px; }
+            .tip-desc { font-size: 7px; }
+            .shoot-hint { font-size: 7px; padding: 1px 6px; }
+            .history-btn { font-size: 9px; padding: 2px 8px; }
+            h1 { font-size: 13px; }
+            .logo { font-size: 18px; }
         }
 
         .toast {
@@ -447,9 +696,20 @@
     <div class="header">
         <div class="header-left">
             <span class="logo">✈️</span>
-            <h1>小飞机射击 · 打字练习</h1>
-            <span class="level-badge" id="headerLevelInfo">第1关 · 基准键练习</span>
-            <span class="subtitle">敲对字母 → 发射导弹</span>
+            <h1>小飞机射击·打字练习</h1>
+            <span class="level-badge" id="headerLevelInfo">第1关·基准键</span>
+            <span class="max-combo-badge">🏆最大连击:<span id="maxComboValue">0</span></span>
+        </div>
+        <div class="header-right">
+            <div class="tips-area">
+                <div class="tip-badge"><span class="tip-key">␣空格</span><span class="tip-desc">暂停</span></div>
+                <span class="tip-separator">|</span>
+                <div class="tip-badge"><span class="tip-key">🖱️双击</span><span class="tip-desc">全屏</span></div>
+                <span class="tip-separator">|</span>
+                <div class="tip-badge"><span class="tip-key">Alt↵Enter</span><span class="tip-desc">全屏</span></div>
+                <div class="shoot-hint"><span>🎯</span> 敲字母→发射</div>
+            </div>
+            <button class="history-btn" id="historyBtn">📜历史记录</button>
         </div>
     </div>
 
@@ -458,56 +718,39 @@
             <div class="card">
                 <div class="card-title">📊 游戏数据</div>
                 <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label">得分</div>
-                        <div class="stat-value" id="scoreVal">0</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">连击</div>
-                        <div class="stat-value" id="comboVal">0</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">关卡</div>
-                        <div class="stat-value" id="levelNum">1/21</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">剩余</div>
-                        <div class="stat-value" id="remainTargets">30/30</div>
-                    </div>
+                    <div class="stat-item"><div class="stat-label">得分</div><div class="stat-value" id="scoreVal">0</div></div>
+                    <div class="stat-item"><div class="stat-label">连击</div><div class="stat-value" id="comboVal">0</div></div>
+                    <div class="stat-item"><div class="stat-label">关卡</div><div class="stat-value" id="levelNum">1/21</div></div>
+                    <div class="stat-item"><div class="stat-label">剩余</div><div class="stat-value" id="remainTargets">30/30</div></div>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-title">🎨 战机皮肤</div>
                 <div class="skin-selector" id="skinSelector">
-                    <span class="skin-option" data-skin="1" title="科幻战机">✈️</span>
-                    <span class="skin-option" data-skin="2" title="Q版卡通">🐻</span>
-                    <span class="skin-option" data-skin="3" title="F-22隐身">🛩️</span>
-                    <span class="skin-option" data-skin="4" title="像素风格">👾</span>
-                    <span class="skin-option" data-skin="5" title="极简几何">🔷</span>
+                    <span class="skin-option" data-skin="1">✈️</span>
+                    <span class="skin-option" data-skin="2">🐻</span>
+                    <span class="skin-option" data-skin="3">🛩️</span>
+                    <span class="skin-option" data-skin="4">👾</span>
+                    <span class="skin-option" data-skin="5">🔷</span>
                 </div>
             </div>
-
             <div class="next-card">
-                <div class="next-label">🎯 下一个字母</div>
-                <div class="next-char" id="nextLetterSpan">?</div>
-            </div>
-
-            <div class="btn-bar">
-                <button class="btn btn-nav" id="prevLevelBtn">◀ 上一关</button>
-                <button class="btn btn-primary" id="backToMenuBtn">🏠 返回</button>
-                <button class="btn btn-nav" id="nextLevelBtn">下一关 ▶</button>
+                <span class="next-label">🎯 下一个字母</span>
+                <span class="next-char" id="nextLetterSpan">?</span>
             </div>
             <div class="btn-bar">
-                <button class="btn btn-secondary" id="resetLevelBtn">🔄 重玩本关</button>
+                <button class="btn btn-nav" id="prevLevelBtn">◀上一关</button>
+                <button class="btn btn-primary" id="backToMenuBtn">🏠返回</button>
+                <button class="btn btn-nav" id="nextLevelBtn">下一关▶</button>
             </div>
-
+            <div class="btn-bar">
+                <button class="btn btn-secondary" id="resetLevelBtn">🔄重玩本关</button>
+            </div>
             <div class="game-msg" id="gameMsg">
                 <span class="main-msg">💡 敲对字母发射导弹</span>
                 <span class="sub-msg">等待字母出现...</span>
             </div>
         </div>
-
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
         </div>
@@ -521,11 +764,42 @@
     const userName = localStorage.getItem('user_name');
     const urlParams = new URLSearchParams(window.location.search);
     const isDebug = urlParams.get('debug') === '1';
-    
     if (!isDebug && (!loggedIn || !userName)) {
         window.location.href = 'login.html';
         return;
     }
+})();
+
+// ==================== 鼠标自动隐藏功能 ====================
+(function setupAutoHideCursor() {
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas) return;
+    
+    let hideCursorTimer = null;
+    
+    // 显示鼠标的函数
+    function showCursor() {
+        if (canvas) {
+            canvas.style.cursor = 'default';
+        }
+        // 重置定时器
+        if (hideCursorTimer) {
+            clearTimeout(hideCursorTimer);
+        }
+        // 3秒后隐藏鼠标
+        hideCursorTimer = setTimeout(() => {
+            if (canvas) {
+                canvas.style.cursor = 'none';
+            }
+        }, 3000);
+    }
+    
+    // 监听鼠标移动事件
+    canvas.addEventListener('mousemove', showCursor);
+    // 鼠标进入画布时也显示
+    canvas.addEventListener('mouseenter', showCursor);
+    // 初始状态：显示鼠标，3秒后隐藏
+    showCursor();
 })();
 
 // ==================== 加载关卡配置 ====================
@@ -533,7 +807,6 @@ const CONFIG_PATH = './config.json';
 let planeLevels = [];
 let currentLevelConfig = null;
 let currentGameLevel = 1;
-
 const urlParamsInit = new URLSearchParams(window.location.search);
 let initialLevelId = parseInt(urlParamsInit.get('id'));
 let urlKeysParam = urlParamsInit.get('keys') || '';
@@ -564,25 +837,110 @@ function getLevelIndexById(levelId) {
     return planeLevels.findIndex(level => level.id === levelId);
 }
 
+// ==================== 历史记录存储 ====================
+const HISTORY_KEY = 'plane_shooter_history';
+
+function getHistory() {
+    const saved = localStorage.getItem(HISTORY_KEY);
+    if (saved) {
+        try { return JSON.parse(saved); } catch(e) {}
+    }
+    return {};
+}
+
+function saveLevelRecord(levelId, scoreVal, maxComboVal, timeSeconds) {
+    const history = getHistory();
+    const levelKey = String(levelId);
+    const level = getLevelById(levelId);
+    const description = level ? level.description : `第${levelId}关`;
+    const newRecord = {
+        id: levelId, description: description, score: scoreVal, maxCombo: maxComboVal,
+        time: timeSeconds, date: new Date().toISOString(), formattedDate: new Date().toLocaleString()
+    };
+    if (history[levelKey]) {
+        if (scoreVal > history[levelKey].score) {
+            history[levelKey] = newRecord;
+            console.log(`🏆 第${levelId}关新纪录！${scoreVal}分`);
+        }
+    } else {
+        history[levelKey] = newRecord;
+    }
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function getTotalStats() {
+    const history = getHistory();
+    let totalScore = 0, completedCount = 0, bestCombo = 0;
+    for (const key in history) {
+        const record = history[key];
+        totalScore += record.score;
+        completedCount++;
+        if (record.maxCombo > bestCombo) bestCombo = record.maxCombo;
+    }
+    return { totalScore, completedCount, bestCombo };
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+}
+
+function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+}
+
+function showHistoryModal() {
+    const history = getHistory();
+    const { totalScore, completedCount, bestCombo } = getTotalStats();
+    const records = Object.values(history).sort((a, b) => a.id - b.id);
+    let tableRows = '', bestRowId = '', bestScore = 0;
+    records.forEach(record => { if (record.score > bestScore) { bestScore = record.score; bestRowId = record.id; } });
+    records.forEach(record => {
+        const isBest = record.id === bestRowId && bestScore > 0;
+        tableRows += `<tr class="${isBest ? 'best-row' : ''}">`;
+        tableRows += `<td>${record.id}</td>`;
+        tableRows += `<td style="max-width:120px; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(record.description)}</td>`;
+        tableRows += `<td style="color:#FF6B35; font-weight:bold;">${record.score}</td>`;
+        tableRows += `<td style="color:#2D6A2D;">${record.maxCombo}</td>`;
+        tableRows += `<td>${record.time}秒</td>`;
+        tableRows += `</tr>`;
+    });
+    const modal = document.createElement('div');
+    modal.className = 'history-modal';
+    modal.innerHTML = `<div class="history-card"><div class="history-header"><h3>📊 通关战绩</h3><button class="history-close">✕</button></div><div class="history-content"><div class="history-stats"><h4>🏆 总战绩</h4><div class="history-summary"><div class="summary-item"><div class="summary-label">通关数</div><div class="summary-value">${completedCount}/${planeLevels.length}</div></div><div class="summary-item"><div class="summary-label">总分</div><div class="summary-value">${totalScore}</div></div><div class="summary-item"><div class="summary-label">最高连击</div><div class="summary-value">${bestCombo}</div></div></div></div><h4 style="font-size:12px; color:#8B6914; margin-bottom:8px;">📋 详细记录</h4><table class="history-table"><thead><tr><th>关卡</th><th>名称</th><th>得分</th><th>最大连击</th><th>用时</th></tr></thead><tbody>${tableRows || '<tr><td colspan="5" class="no-data">暂无通关记录，快去闯关吧！</td></tr>'}</tbody></table><button class="clear-history-btn" id="clearHistoryBtn">🗑️ 清空所有记录</button></div></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('.history-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    const clearBtn = modal.querySelector('#clearHistoryBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if (confirm('⚠️ 确定清空所有通关记录吗？')) {
+                localStorage.removeItem(HISTORY_KEY);
+                modal.remove();
+                showToast('🗑️ 历史记录已清空');
+            }
+        });
+    }
+}
+
 // ==================== 音效系统 ====================
 (function() {
-    var audioCtx = null;
-    var hitSoundBuffer = null;
-    var errorSoundBuffer = null;
-    
+    var audioCtx = null, hitSoundBuffer = null, errorSoundBuffer = null;
     function initAudio() {
         if (audioCtx) return audioCtx;
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            var silentGain = audioCtx.createGain();
-            silentGain.gain.value = 0;
-            silentGain.connect(audioCtx.destination);
             audioCtx.resume().catch(function() {});
             generateSounds();
         } catch(e) {}
         return audioCtx;
     }
-    
     function generateSounds() {
         if (!audioCtx) return;
         try {
@@ -595,7 +953,6 @@ function getLevelIndexById(levelId) {
                 sample += Math.sin(2 * Math.PI * (80 - t * 120) * t) * Math.exp(-t * 8) * 0.4;
                 hitData[i] = Math.max(-0.7, Math.min(0.7, sample));
             }
-            
             errorSoundBuffer = audioCtx.createBuffer(1, sampleRate * 0.15, sampleRate);
             var errData = errorSoundBuffer.getChannelData(0);
             for (var i = 0; i < sampleRate * 0.15; i++) {
@@ -605,7 +962,6 @@ function getLevelIndexById(levelId) {
             }
         } catch(e) {}
     }
-    
     function playHit() {
         if (!audioCtx || !hitSoundBuffer) return;
         if (audioCtx.state !== 'running') { audioCtx.resume(); return; }
@@ -619,7 +975,6 @@ function getLevelIndexById(levelId) {
             source.start();
         } catch(e) {}
     }
-    
     function playError() {
         if (!audioCtx || !errorSoundBuffer) return;
         if (audioCtx.state !== 'running') { audioCtx.resume(); return; }
@@ -633,11 +988,9 @@ function getLevelIndexById(levelId) {
             source.start();
         } catch(e) {}
     }
-    
     initAudio();
     document.addEventListener('click', function() { if (audioCtx && audioCtx.state !== 'running') audioCtx.resume(); });
     document.addEventListener('keydown', function() { if (audioCtx && audioCtx.state !== 'running') audioCtx.resume(); });
-    
     window._missileSound = { hit: playHit, error: playError };
 })();
 
@@ -646,248 +999,120 @@ function getLevelIndexById(levelId) {
     var canvas = document.getElementById('gameCanvas');
     var ctx = canvas.getContext('2d');
     var gameContainer = document.getElementById('gameContainer');
-    
-    var W = 800, H = 450;
-    var scale = 1;
-    var gameRunning = true;
-    var frameRequest = null;
-    var pendingLevelUp = false;
-    var isPaused = false;
-    var pauseOverlay = null;
-    
-    var score = 0, combo = 0, maxCombo = 0;
-    var remainingInLevel = 30;
-    var levelCompletedFlag = false;
-    var currentFalling = null;
-    var missiles = [];
-    var explosions = [];
-    var floatingTexts = [];
-    var plane = { x: 400, y: 410 };
-    var nextLetterChar = '?';
-    var levelStartScore = 0;
-    
+    var W = 800, H = 450, scale = 1;
+    var gameRunning = true, frameRequest = null, pendingLevelUp = false, isPaused = false, pauseOverlay = null;
+    var score = 0, combo = 0, maxCombo = 0, remainingInLevel = 30, levelCompletedFlag = false;
+    var currentFalling = null, missiles = [], explosions = [], floatingTexts = [];
+    var plane = { x: 400, y: 410 }, nextLetterChar = '?';
+    var levelStartTime = null, isTiming = false;
     var VALID_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
-    
-    var SKIN_KEY = 'missile_game_skin';
-    var currentSkin = localStorage.getItem(SKIN_KEY) || '1';
-    var STORAGE_KEY = 'missile_game_progress';
-    
-    var currentCharSet = null;
-    var currentRate = null;
-    var currentNum = 30;
-    
-    var msgTimer = null;
-    
-    // ==================== 解析 keys ====================
+    var SKIN_KEY = 'missile_game_skin', currentSkin = localStorage.getItem(SKIN_KEY) || '1', STORAGE_KEY = 'missile_game_progress';
+    var currentCharSet = null, currentRate = null, currentNum = 30, msgTimer = null;
+
+    function updateMaxComboDisplay() {
+        const span = document.getElementById('maxComboValue');
+        if (span) span.innerText = maxCombo;
+    }
+    function startTiming() { levelStartTime = Date.now(); isTiming = true; }
+    function endTimingAndSave() {
+        if (!isTiming) return;
+        const elapsedSeconds = Math.floor((Date.now() - levelStartTime) / 1000);
+        isTiming = false;
+        if (currentLevelConfig && currentLevelConfig.id) {
+            saveLevelRecord(currentLevelConfig.id, score, maxCombo, elapsedSeconds);
+        }
+    }
     function parseKeysParam(keysStr) {
-        if (!keysStr || keysStr === '') return null;
+        if (!keysStr) return null;
         try {
             const decoded = decodeURIComponent(keysStr);
             const parsed = JSON.parse(decoded);
             if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         } catch(e) {
-            if (keysStr.includes(',')) {
-                return keysStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
-            }
+            if (keysStr.includes(',')) return keysStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
             if (keysStr.length > 0) return keysStr.split('');
         }
         return null;
     }
-    
     function getRandomChar() {
         if (currentCharSet && currentCharSet.length > 0) {
             return currentCharSet[Math.floor(Math.random() * currentCharSet.length)];
         }
-        const defaultChars = "abcdefghijklmnopqrstuvwxyz";
-        return defaultChars[Math.floor(Math.random() * defaultChars.length)];
+        return "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
     }
-    
-    function getActualSpeed() {
-        var baseSpeed = (currentRate && currentRate > 0) ? currentRate : 90;
-        return baseSpeed * (H / 450);
-    }
-    
-    // ==================== 消息显示函数 ====================
+    function getActualSpeed() { return ((currentRate && currentRate > 0) ? currentRate : 90) * (H / 450); }
     function updateGameMessage(mainMsg, subMsg, isError) {
         var msgDiv = document.getElementById('gameMsg');
         if (!msgDiv) return;
-        
         if (msgTimer) clearTimeout(msgTimer);
-        
         msgDiv.innerHTML = `<span class="main-msg">${mainMsg}</span><span class="sub-msg">${subMsg || ' '}</span>`;
-        
         if (isError) {
             msgDiv.classList.add('error');
-            msgTimer = setTimeout(function() {
-                if (msgDiv) msgDiv.classList.remove('error');
-            }, 800);
+            msgTimer = setTimeout(() => msgDiv.classList.remove('error'), 800);
         } else {
             msgDiv.classList.remove('error');
         }
     }
-    
-    function showNewTarget(targetChar) {
-        updateGameMessage(`🎯 新目标出现！`, `快按 [ ${targetChar} ] 键发射导弹`, false);
-    }
-    
-    function showFireMissile(targetChar) {
-        updateGameMessage(`🚀 发射导弹！`, `目标: ${targetChar}`, false);
-    }
-    
-    function showHitTarget(targetChar, addScore) {
-        updateGameMessage(`💥 命中目标！`, `击中 [${targetChar}] +${addScore}分`, false);
-    }
-    
-    function showMissedTarget() {
-        updateGameMessage(`⚠️ 字母坠落了！`, `连击中断`, true);
-    }
-    
-    function showWrongKey(wrongChar, targetChar) {
-        updateGameMessage(`❌ 按错了！`, `你按了 [${wrongChar}]，目标应该是 [${targetChar}]`, true);
-    }
-    
-    function showNoTarget() {
-        updateGameMessage(`⚠️ 没有目标`, `等字母出现后再按键`, true);
-    }
-    
-    function showInvalidChar() {
-        updateGameMessage(`⚠️ 无效字符`, `只能按字母/数字/标点`, true);
-    }
-    
-    function showLevelClear() {
-        updateGameMessage(`🎉 通关啦！`, `准备进入下一关`, false);
-    }
-    
-    function showGameMessageSimple(msg, isError) {
-        updateGameMessage(msg, isError ? '再试试看~' : '继续加油！', isError);
-    }
-    
-    // ==================== 同步通关进度到首页 ====================
+    function showGameMessageSimple(msg, isError) { updateGameMessage(msg, isError ? '再试试看~' : '继续加油！', isError); }
     function syncToMainProgress(levelId) {
         if (!levelId) return;
-        const groupCode = 'plane_shooter';
-        const key = `typing_completed_${groupCode}`;
+        const key = `typing_completed_plane_shooter`;
         let completed = JSON.parse(localStorage.getItem(key) || '[]');
-        if (!completed.includes(levelId)) {
-            completed.push(levelId);
-            completed.sort((a, b) => a - b);
-            localStorage.setItem(key, JSON.stringify(completed));
-            console.log(`✅ 同步通关进度到首页: ${groupCode} - 第${levelId}关`);
-        }
+        if (!completed.includes(levelId)) { completed.push(levelId); completed.sort((a,b)=>a-b); localStorage.setItem(key, JSON.stringify(completed)); }
     }
-    
-    // ==================== 关卡配置初始化 ====================
     function initLevelByConfig(levelConfig) {
         if (!levelConfig) return false;
-        
-        if (levelConfig.keys && levelConfig.keys.length > 0) {
-            currentCharSet = levelConfig.keys;
-        } else {
-            currentCharSet = null;
-        }
+        currentCharSet = (levelConfig.keys && levelConfig.keys.length > 0) ? levelConfig.keys : null;
         currentRate = levelConfig.rate || null;
         currentNum = levelConfig.num || 30;
-        
         updateHeaderLevelInfo(levelConfig);
         return true;
     }
-    
     function updateHeaderLevelInfo(levelConfig) {
         var headerInfo = document.getElementById('headerLevelInfo');
         if (headerInfo && levelConfig) {
-            var keysText = currentCharSet ? currentCharSet.join('') : "全键盘";
-            if (keysText.length > 12) keysText = keysText.substring(0, 10) + '..';
-            var speedText = currentRate ? currentRate + "px" : "默认";
-            headerInfo.innerHTML = `第${levelConfig.id}关 · ${levelConfig.description} <span style="font-size:9px; opacity:0.7;">🎯${keysText} ⚡${speedText}</span>`;
+            headerInfo.innerHTML = `第${levelConfig.id}关·${levelConfig.description.substring(0,12)}`;
         }
         document.getElementById('levelNum').innerText = currentGameLevel + "/" + planeLevels.length;
     }
-    
-    // ==================== 关卡切换 ====================
     function switchToLevel(levelId) {
         if (frameRequest) { cancelAnimationFrame(frameRequest); frameRequest = null; }
-        
-        gameRunning = true;
-        pendingLevelUp = false;
-        levelCompletedFlag = false;
-        currentFalling = null;
-        missiles = [];
-        explosions = [];
-        floatingTexts = [];
-        combo = 0;
-        score = 0;
-        maxCombo = 0;
-        remainingInLevel = currentNum;
-        levelStartScore = 0;
-        isPaused = false;
-        updatePauseOverlay();
-        
+        if (isTiming) endTimingAndSave();
+        gameRunning = true; pendingLevelUp = false; levelCompletedFlag = false;
+        currentFalling = null; missiles = []; explosions = []; floatingTexts = [];
+        score = 0; combo = 0; maxCombo = 0; updateMaxComboDisplay();
+        remainingInLevel = currentNum; isPaused = false; updatePauseOverlay();
+        isTiming = false; levelStartTime = null;
         var newConfig = getLevelById(levelId);
-        if (newConfig) {
-            currentLevelConfig = newConfig;
-            currentGameLevel = newConfig.id;
-            initLevelByConfig(newConfig);
-            remainingInLevel = currentNum;
-        }
-        
-        updateUI();
-        refreshNextLetter();
-        
-        setTimeout(function() {
-            if (currentFalling === null && gameRunning) spawnEnemy();
-        }, 50);
-        
-        lastTime = 0;
-        gameLoop();
-        
+        if (newConfig) { currentLevelConfig = newConfig; currentGameLevel = newConfig.id; initLevelByConfig(newConfig); remainingInLevel = currentNum; }
+        updateUI(); refreshNextLetter();
+        setTimeout(() => { if (currentFalling === null && gameRunning) spawnEnemy(); }, 50);
+        lastTime = 0; gameLoop();
         var url = new URL(window.location.href);
         url.searchParams.set('id', levelId);
         window.history.replaceState({}, '', url);
-        
         showGameMessageSimple("🎮 进入第 " + levelId + " 关", false);
     }
-    
     function goPrevLevel() {
         if (!planeLevels.length) return;
         var currentId = currentLevelConfig ? currentLevelConfig.id : 1;
         var currentIdx = getLevelIndexById(currentId);
-        if (currentIdx > 0) {
-            switchToLevel(planeLevels[currentIdx - 1].id);
-        } else {
-            showGameMessageSimple("🎈 已经是第一关了！", true);
-        }
+        if (currentIdx > 0) switchToLevel(planeLevels[currentIdx - 1].id);
+        else showGameMessageSimple("🎈 已经是第一关了！", true);
     }
-    
     function goNextLevel() {
         if (!planeLevels.length) return;
         var currentId = currentLevelConfig ? currentLevelConfig.id : 1;
         var currentIdx = getLevelIndexById(currentId);
-        if (currentIdx < planeLevels.length - 1) {
-            switchToLevel(planeLevels[currentIdx + 1].id);
-        } else {
-            showGameMessageSimple("🎉 已经是最后一关了！", false);
-        }
+        if (currentIdx < planeLevels.length - 1) switchToLevel(planeLevels[currentIdx + 1].id);
+        else showGameMessageSimple("🎉 已经是最后一关了！", false);
     }
-    
-    // ==================== 辅助函数 ====================
-    function showToast(msg) {
-        var existing = document.querySelector('.toast');
-        if (existing) existing.remove();
-        var toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = msg;
-        document.body.appendChild(toast);
-        setTimeout(function() { if (toast) toast.remove(); }, 2000);
-    }
-    
     function updateUI() {
         document.getElementById('scoreVal').innerText = score;
         document.getElementById('comboVal').innerText = combo;
         document.getElementById('levelNum').innerText = currentGameLevel + "/" + planeLevels.length;
-        // ✅ 修改为 剩余数/总数 格式
         document.getElementById('remainTargets').innerText = remainingInLevel + "/" + currentNum;
     }
-    
     function updatePauseOverlay() {
         if (isPaused && gameRunning && !pendingLevelUp) {
             if (!pauseOverlay) {
@@ -900,167 +1125,85 @@ function getLevelIndexById(levelId) {
             if (pauseOverlay && pauseOverlay.parentNode) { pauseOverlay.remove(); pauseOverlay = null; }
         }
     }
-    
     function togglePause() {
         if (!gameRunning || pendingLevelUp) return;
         isPaused = !isPaused;
         updatePauseOverlay();
-        if (isPaused) {
-            updateGameMessage("⏸ 游戏已暂停", "按空格键继续", false);
-        } else {
-            updateGameMessage("▶ 游戏继续", "加油！", false);
-        }
+        updateGameMessage(isPaused ? "⏸ 游戏已暂停" : "▶ 游戏继续", isPaused ? "按空格键继续" : "加油！", false);
     }
-    
     function refreshNextLetter() {
         if (!gameRunning || pendingLevelUp) return;
         nextLetterChar = getRandomChar();
         document.getElementById('nextLetterSpan').innerText = nextLetterChar;
     }
-    
     function spawnEnemy() {
         if (!gameRunning || pendingLevelUp || currentFalling) return;
-        var newChar = nextLetterChar;
-        currentFalling = { 
-            x: 35 + Math.random() * (W - 70), 
-            y: -35, 
-            char: newChar, 
-            active: true 
-        };
-        showNewTarget(newChar);
+        if (!isTiming && !levelCompletedFlag && remainingInLevel === currentNum) startTiming();
+        currentFalling = { x: 35 + Math.random() * (W - 70), y: -35, char: nextLetterChar, active: true };
+        updateGameMessage(`🎯 新目标出现！`, `快按 [ ${nextLetterChar} ] 键发射导弹`, false);
         refreshNextLetter();
     }
-    
-    function addMissile(x, y, target) {
-        missiles.push({ 
-            x: x, y: y, target: target, 
-            targetChar: target.char, active: true, trail: [] 
-        });
-    }
-    
-    function saveProgress() {
-        var progress = { 
-            currentLevelId: currentLevelConfig ? currentLevelConfig.id : 1, 
-            score: score, 
-            maxCombo: maxCombo, 
-            version: 2 
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    }
-    
+    function addMissile(x, y, target) { missiles.push({ x: x, y: y, target: target, targetChar: target.char, active: true, trail: [] }); }
+    function saveProgress() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentLevelId: currentLevelConfig ? currentLevelConfig.id : 1, score: score, maxCombo: maxCombo, version: 2 })); }
     function loadProgress() {
         var saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                var data = JSON.parse(saved);
-                if (data.currentLevelId && data.currentLevelId >= 1) return data.currentLevelId;
-            } catch(e) {}
-        }
+        if (saved) { try { var data = JSON.parse(saved); if (data.currentLevelId && data.currentLevelId >= 1) return data.currentLevelId; } catch(e) {} }
         return null;
     }
-    
     function resetCurrentLevel() {
         if (pendingLevelUp) return;
-        remainingInLevel = currentNum;
-        levelCompletedFlag = false;
-        pendingLevelUp = false;
-        currentFalling = null;
-        missiles = [];
-        explosions = [];
-        floatingTexts = [];
-        combo = 0;
-        updateUI();
-        refreshNextLetter();
-        spawnEnemy();
+        if (isTiming) isTiming = false;
+        remainingInLevel = currentNum; levelCompletedFlag = false; pendingLevelUp = false;
+        currentFalling = null; missiles = []; explosions = []; floatingTexts = [];
+        score = 0; combo = 0; maxCombo = 0; updateMaxComboDisplay();
+        updateUI(); refreshNextLetter();
+        isTiming = false;
+        setTimeout(() => { if (!isTiming && !levelCompletedFlag && currentFalling === null) spawnEnemy(); }, 50);
         showGameMessageSimple("🔄 重玩第 " + currentGameLevel + " 关", false);
     }
-    
     function nextLevel() {
         if (!planeLevels.length) return;
         var currentId = currentLevelConfig ? currentLevelConfig.id : 1;
         var currentIdx = getLevelIndexById(currentId);
-        if (currentIdx < planeLevels.length - 1) {
-            switchToLevel(planeLevels[currentIdx + 1].id);
-        } else {
-            gameRunning = false;
-            if (frameRequest) cancelAnimationFrame(frameRequest);
-            showCompleteDialog();
-        }
+        if (currentIdx < planeLevels.length - 1) switchToLevel(planeLevels[currentIdx + 1].id);
+        else { gameRunning = false; if (frameRequest) cancelAnimationFrame(frameRequest); showCompleteDialog(); }
     }
-    
     function completeLevel() {
         if (levelCompletedFlag || pendingLevelUp) return;
         levelCompletedFlag = true;
-        saveProgress();
-        
-        // ✅ 同步到首页进度系统
-        if (currentLevelConfig && currentLevelConfig.id) {
-            syncToMainProgress(currentLevelConfig.id);
-        }
-        
-        var currentId = currentLevelConfig ? currentLevelConfig.id : 1;
-        var currentIdx = getLevelIndexById(currentId);
-        
-        if (currentIdx < planeLevels.length - 1) {
-            showLevelDialog();
-        } else {
-            gameRunning = false;
-            if (frameRequest) cancelAnimationFrame(frameRequest);
-            showCompleteDialog();
-        }
+        endTimingAndSave(); saveProgress();
+        if (currentLevelConfig && currentLevelConfig.id) syncToMainProgress(currentLevelConfig.id);
+        var currentIdx = getLevelIndexById(currentLevelConfig ? currentLevelConfig.id : 1);
+        if (currentIdx < planeLevels.length - 1) showLevelDialog();
+        else { gameRunning = false; if (frameRequest) cancelAnimationFrame(frameRequest); showCompleteDialog(); }
     }
-    
     function showLevelDialog() {
         pendingLevelUp = true;
-        currentFalling = null;
-        missiles = [];
+        currentFalling = null; missiles = [];
         var overlay = document.createElement('div');
         overlay.className = 'congrats-overlay';
-        var gain = score - levelStartScore;
-        overlay.innerHTML = '<div class="congrats-card"><h2>🎉 过关啦！ 🎉</h2><p>第 ' + currentGameLevel + ' 关完成</p><p>本关得分: ' + gain + '</p><div id="autoTimer" style="font-size:11px;color:#FF8C42;">5秒后自动继续...</div><button id="nextBtn">下一关 →</button></div>';
+        overlay.innerHTML = `<div class="congrats-card"><h2>🎉 过关啦！ 🎉</h2><p>第 ${currentGameLevel} 关完成</p><p>本关得分: ${score}</p><div id="autoTimer" style="font-size:11px;color:#FF8C42;">5秒后自动继续...</div><button id="nextBtn">下一关 →</button></div>`;
         gameContainer.appendChild(overlay);
-        var timer = 5;
-        var timerDiv = overlay.querySelector('#autoTimer');
-        var interval = setInterval(function() {
+        var timer = 5, timerDiv = overlay.querySelector('#autoTimer');
+        var interval = setInterval(() => {
             timer--;
             if (timerDiv) timerDiv.innerText = timer + "秒后自动继续...";
-            if (timer <= 0) {
-                clearInterval(interval);
-                overlay.remove();
-                nextLevel();
-            }
+            if (timer <= 0) { clearInterval(interval); overlay.remove(); nextLevel(); }
         }, 1000);
-        overlay.querySelector('#nextBtn').addEventListener('click', function() {
-            clearInterval(interval);
-            overlay.remove();
-            nextLevel();
-        });
-        showLevelClear();
+        overlay.querySelector('#nextBtn').addEventListener('click', () => { clearInterval(interval); overlay.remove(); nextLevel(); });
     }
-    
     function showCompleteDialog() {
         var overlay = document.createElement('div');
         overlay.className = 'congrats-overlay';
-        overlay.innerHTML = '<div class="congrats-card"><h2>🏆 全关制霸 🏆</h2><p>最终得分: ' + score + '</p><p>最高连击: ' + maxCombo + '</p><button id="restartBtn">🔄 重新开始</button><button id="backBtn">🏠 返回首页</button></div>';
+        overlay.innerHTML = `<div class="congrats-card"><h2>🏆 全关制霸 🏆</h2><p>恭喜完成所有关卡！</p><button id="restartBtn">🔄 重新开始</button><button id="backBtn">🏠 返回首页</button></div>`;
         gameContainer.appendChild(overlay);
-        document.getElementById('restartBtn').addEventListener('click', function() { overlay.remove(); restartGame(); });
-        document.getElementById('backBtn').addEventListener('click', function() { window.location.href = 'index.html'; });
+        document.getElementById('restartBtn').addEventListener('click', () => { overlay.remove(); restartGame(); });
+        document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'index.html'; });
     }
-    
-    function restartGame() {
-        if (planeLevels.length > 0) {
-            switchToLevel(planeLevels[0].id);
-        } else {
-            location.reload();
-        }
-    }
-    
-    // ==================== 皮肤绘制 ====================
+    function restartGame() { if (planeLevels.length > 0) switchToLevel(planeLevels[0].id); else location.reload(); }
     function drawPlane() {
         var px = plane.x, py = plane.y;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.scale(scale, scale);
+        ctx.save(); ctx.translate(px, py); ctx.scale(scale, scale);
         if (currentSkin === '1') {
             ctx.beginPath(); ctx.moveTo(0,-14); ctx.lineTo(-8,-3); ctx.lineTo(-12,3); ctx.lineTo(-5,1); ctx.lineTo(-5,10); ctx.lineTo(0,14); ctx.lineTo(5,10); ctx.lineTo(5,1); ctx.lineTo(12,3); ctx.lineTo(8,-3); ctx.fillStyle="#3a7ca5"; ctx.fill();
             ctx.beginPath(); ctx.arc(0,-7,4,0,Math.PI*2); ctx.fillStyle="#5fb4e8"; ctx.fill();
@@ -1083,393 +1226,214 @@ function getLevelIndexById(levelId) {
         }
         ctx.restore();
     }
-    
-    // ==================== 画布自适应 ====================
     function resizeCanvas() {
         var container = canvas.parentElement;
         if (!container) return;
-        var w = container.clientWidth - 4;
-        var h = container.clientHeight - 4;
-        canvas.width = w;
-        canvas.height = h;
-        W = canvas.width;
-        H = canvas.height;
-        plane.x = W / 2;
-        plane.y = H - 40;
+        var w = container.clientWidth - 4, h = container.clientHeight - 4;
+        canvas.width = w; canvas.height = h;
+        W = canvas.width; H = canvas.height;
+        plane.x = W / 2; plane.y = H - 40;
         scale = Math.max(0.5, Math.min(1.2, W / 800));
         draw();
     }
-    
-    // ==================== 游戏主循环 ====================
     var lastTime = 0;
-    
     function updateGame(now) {
         if (!gameRunning || pendingLevelUp) return;
         if (!lastTime) { lastTime = now; return; }
-        
         var dt = Math.min(0.033, (now - lastTime) / 1000);
         lastTime = now;
         if (isPaused) return;
-        
         if (currentFalling) {
-            var speed = getActualSpeed();
-            currentFalling.y += speed * dt;
+            currentFalling.y += getActualSpeed() * dt;
             if (currentFalling.y + 40 > H) {
                 currentFalling = null;
-                if (combo !== 0) { 
-                    combo = 0; 
-                    updateUI(); 
-                    showMissedTarget();
-                }
+                if (combo !== 0) { combo = 0; updateUI(); updateGameMessage(`⚠️ 字母坠落了！`, `连击中断`, true); }
                 if (remainingInLevel > 0 && !levelCompletedFlag) spawnEnemy();
                 else if (remainingInLevel <= 0 && !levelCompletedFlag) completeLevel();
             }
         }
-        
         for (var i = missiles.length-1; i >= 0; i--) {
             var m = missiles[i];
             var valid = m.target && m.target.active && m.target.char === m.targetChar;
-            if (!valid && currentFalling && currentFalling.char === m.targetChar) { 
-                m.target = currentFalling; 
-                valid = true; 
-            }
-            if (!valid) { 
-                missiles.splice(i,1); 
-                continue; 
-            }
-            
+            if (!valid && currentFalling && currentFalling.char === m.targetChar) { m.target = currentFalling; valid = true; }
+            if (!valid) { missiles.splice(i,1); continue; }
             if (!m.trail) m.trail = [];
             m.trail.push({x:m.x,y:m.y});
             if (m.trail.length > 5) m.trail.shift();
-            
-            var tx = m.target.x, ty = m.target.y - 7;
-            var dx = tx - m.x, dy = ty - m.y;
-            var len = Math.hypot(dx, dy);
-            if (len > 0.01) {
-                var move = 450 * dt;
-                m.x += (dx/len) * move;
-                m.y += (dy/len) * move;
-            }
-            
+            var tx = m.target.x, ty = m.target.y - 7, dx = tx - m.x, dy = ty - m.y, len = Math.hypot(dx, dy);
+            if (len > 0.01) { var move = 450 * dt; m.x += (dx/len) * move; m.y += (dy/len) * move; }
             if (Math.hypot(m.x-tx, m.y-ty) < 25) {
                 if (window._missileSound) window._missileSound.hit();
                 var add = 10;
                 combo++;
-                if (combo > maxCombo) maxCombo = combo;
+                if (combo > maxCombo) { maxCombo = combo; updateMaxComboDisplay(); }
                 if (combo >= 5) add = 15;
                 if (combo >= 10) add = 25;
-                score += add;
-                remainingInLevel--;
-                
-                showHitTarget(m.targetChar, add);
-                
+                score += add; remainingInLevel--;
+                updateGameMessage(`💥 命中目标！`, `击中 [${m.targetChar}] +${add}分`, false);
                 explosions.push({x:m.target.x, y:m.target.y-7, life:0.5, particles:[]});
                 for (var j=0;j<8;j++) {
-                    explosions[explosions.length-1].particles.push({
-                        x:m.target.x, y:m.target.y-7,
-                        vx:(Math.random()-0.5)*3, vy:(Math.random()-0.5)*3-1,
-                        life:0.5+Math.random()*0.3
-                    });
+                    explosions[explosions.length-1].particles.push({ x:m.target.x, y:m.target.y-7, vx:(Math.random()-0.5)*3, vy:(Math.random()-0.5)*3-1, life:0.5+Math.random()*0.3 });
                 }
                 floatingTexts.push({x:m.target.x, y:m.target.y-10, text:"+"+add, life:0.8, vx:(Math.random()-0.5)*0.3, vy:-0.8});
                 if (m.target) m.target.active = false;
                 currentFalling = null;
                 updateUI();
-                
-                if (remainingInLevel <= 0 && !levelCompletedFlag && !pendingLevelUp) { 
-                    completeLevel(); 
-                    return; 
-                }
+                if (remainingInLevel <= 0 && !levelCompletedFlag && !pendingLevelUp) { completeLevel(); return; }
                 if (!currentFalling && gameRunning && !levelCompletedFlag && !pendingLevelUp) spawnEnemy();
                 missiles.splice(i,1);
             }
         }
-        
         for (var i=explosions.length-1; i>=0; i--) {
             var e = explosions[i];
             e.life -= dt * 1.5;
             for (var j=0; j<e.particles.length; j++) {
                 var p = e.particles[j];
-                p.x += p.vx * dt * 60;
-                p.y += p.vy * dt * 60;
-                p.life -= dt * 2;
+                p.x += p.vx * dt * 60; p.y += p.vy * dt * 60; p.life -= dt * 2;
             }
             if (e.life <= 0) explosions.splice(i,1);
         }
-        
         for (var i=floatingTexts.length-1; i>=0; i--) {
             var t = floatingTexts[i];
             t.life -= dt * 1.5;
-            t.x += t.vx * dt * 60;
-            t.y += t.vy * dt * 60;
+            t.x += t.vx * dt * 60; t.y += t.vy * dt * 60;
             if (t.life <= 0) floatingTexts.splice(i,1);
         }
     }
-    
     function draw() {
         if (!ctx) return;
         ctx.clearRect(0,0,W,H);
-        
         var grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#87CEEB');
-        grad.addColorStop(1, '#6BB5D9');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0,0,W,H);
-        
+        grad.addColorStop(0, '#87CEEB'); grad.addColorStop(1, '#6BB5D9');
+        ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
         if (currentFalling && !pendingLevelUp) {
             var fs = Math.max(32, Math.min(70, Math.floor(W/20)));
             ctx.font = "bold " + fs + "px 'Comic Neue', monospace";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.shadowBlur = 5;
-            ctx.shadowColor = "#004400";
-            ctx.fillStyle = "#33CC33";
-            ctx.fillText(currentFalling.char, currentFalling.x, currentFalling.y);
-            ctx.fillStyle = "#228822";
-            ctx.fillText(currentFalling.char, currentFalling.x-1, currentFalling.y-1);
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.shadowBlur = 5; ctx.shadowColor = "#004400";
+            ctx.fillStyle = "#33CC33"; ctx.fillText(currentFalling.char, currentFalling.x, currentFalling.y);
+            ctx.fillStyle = "#228822"; ctx.fillText(currentFalling.char, currentFalling.x-1, currentFalling.y-1);
             ctx.shadowBlur = 0;
         }
-        
         for (var i=0;i<missiles.length;i++) {
             var m = missiles[i];
             if (m.trail) {
                 for (var t=0;t<m.trail.length;t++) {
-                    ctx.beginPath();
-                    ctx.arc(m.trail[t].x, m.trail[t].y, 2.5, 0, Math.PI*2);
-                    ctx.fillStyle = "rgba(255,100,50," + ((t+1)/m.trail.length*0.4) + ")";
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(m.trail[t].x, m.trail[t].y, 2.5, 0, Math.PI*2);
+                    ctx.fillStyle = "rgba(255,100,50," + ((t+1)/m.trail.length*0.4) + ")"; ctx.fill();
                 }
             }
-            ctx.beginPath();
-            ctx.moveTo(m.x+5,m.y); ctx.lineTo(m.x,m.y-3.5); ctx.lineTo(m.x-5,m.y); ctx.lineTo(m.x,m.y+3.5);
-            ctx.fillStyle = "#FF5500";
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(m.x,m.y,2.5,0,Math.PI*2);
-            ctx.fillStyle = "#FFAA44";
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(m.x,m.y,1.2,0,Math.PI*2);
-            ctx.fillStyle = "#FFFFAA";
-            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(m.x+5,m.y); ctx.lineTo(m.x,m.y-3.5); ctx.lineTo(m.x-5,m.y); ctx.lineTo(m.x,m.y+3.5);
+            ctx.fillStyle = "#FF5500"; ctx.fill();
+            ctx.beginPath(); ctx.arc(m.x,m.y,2.5,0,Math.PI*2); ctx.fillStyle = "#FFAA44"; ctx.fill();
+            ctx.beginPath(); ctx.arc(m.x,m.y,1.2,0,Math.PI*2); ctx.fillStyle = "#FFFFAA"; ctx.fill();
         }
-        
         for (var i=0;i<explosions.length;i++) {
             for (var j=0;j<explosions[i].particles.length;j++) {
                 var p = explosions[i].particles[j];
-                ctx.beginPath();
-                ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
-                ctx.fillStyle = "rgba(255,80,30," + (p.life*0.8) + ")";
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(p.x-1,p.y-1,1.2,0,Math.PI*2);
-                ctx.fillStyle = "rgba(255,200,80," + p.life + ")";
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+                ctx.fillStyle = "rgba(255,80,30," + (p.life*0.8) + ")"; ctx.fill();
+                ctx.beginPath(); ctx.arc(p.x-1,p.y-1,1.2,0,Math.PI*2);
+                ctx.fillStyle = "rgba(255,200,80," + p.life + ")"; ctx.fill();
             }
         }
-        
         for (var i=0;i<floatingTexts.length;i++) {
             var t = floatingTexts[i];
             ctx.font = "bold 12px 'Comic Neue', monospace";
             ctx.fillStyle = "rgba(255,150,50," + t.life + ")";
             ctx.fillText(t.text, t.x-6, t.y-6);
         }
-        
         drawPlane();
-        
-        ctx.beginPath();
-        ctx.arc(plane.x, plane.y-8, 9*scale, 0, Math.PI*2);
-        ctx.strokeStyle = "#FFB347";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4,5]);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(plane.x, plane.y-8, 9*scale, 0, Math.PI*2);
+        ctx.strokeStyle = "#FFB347"; ctx.lineWidth = 1.5; ctx.setLineDash([4,5]); ctx.stroke(); ctx.setLineDash([]);
     }
-    
     function gameLoop(ts) {
-        if (!gameRunning && document.querySelector('.congrats-overlay')) {
-            if (frameRequest) cancelAnimationFrame(frameRequest);
-            return;
-        }
-        updateGame(ts);
-        draw();
+        if (!gameRunning && document.querySelector('.congrats-overlay')) { if (frameRequest) cancelAnimationFrame(frameRequest); return; }
+        updateGame(ts); draw();
         frameRequest = requestAnimationFrame(gameLoop);
     }
-    
-    // ==================== 键盘事件 ====================
     function onKeyDown(e) {
-        if (e.key === ' ' || e.key === 'Space') {
-            e.preventDefault();
-            if (gameRunning && !pendingLevelUp) togglePause();
-            return;
-        }
-        
+        if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); if (gameRunning && !pendingLevelUp) togglePause(); return; }
         if (!gameRunning || pendingLevelUp || isPaused) return;
-        
-        var key = e.key;
-        var char = key.length === 1 ? key : null;
-        
-        var specialMap = {
-            ';': ';', ':': ':', "'": "'", '"': '"', ',': ',', '.': '.', '/': '/',
-            '\\': '\\', '`': '`', '~': '~', '!': '!', '@': '@', '#': '#', '$': '$',
-            '%': '%', '^': '^', '&': '&', '*': '*', '(': '(', ')': ')', '-': '-',
-            '_': '_', '=': '=', '+': '+', '[': '[', ']': ']', '{': '{', '}': '}', '|': '|'
-        };
+        var key = e.key, char = key.length === 1 ? key : null;
+        var specialMap = { ';':';', ':':':', "'":"'", '"':'"', ',':',', '.':'.', '/':'/', '\\':'\\', '`':'`', '~':'~', '!':'!', '@':'@', '#':'#', '$':'$', '%':'%', '^':'^', '&':'&', '*':'*', '(':'(', ')':')', '-':'-', '_':'_', '=':'=', '+':'+', '[':'[', ']':']', '{':'{', '}':'}', '|':'|' };
         if (specialMap[key]) char = specialMap[key];
-        
         if (!char || !VALID_CHARS.includes(char)) {
-            if (char && char !== ' ') { 
-                if(window._missileSound) window._missileSound.error(); 
-                combo = 0; 
-                updateUI(); 
-                showInvalidChar();
-            }
+            if (char && char !== ' ') { if(window._missileSound) window._missileSound.error(); combo = 0; updateUI(); updateGameMessage(`⚠️ 无效字符`, `只能按字母/数字/标点`, true); }
             return;
         }
-        
         if (currentFalling && currentFalling.char.toLowerCase() === char.toLowerCase()) {
             addMissile(plane.x, plane.y-14, currentFalling);
-            showFireMissile(currentFalling.char);
+            updateGameMessage(`🚀 发射导弹！`, `目标: ${currentFalling.char}`, false);
         } else if (currentFalling && currentFalling.char.toLowerCase() !== char.toLowerCase()) {
             if(window._missileSound) window._missileSound.error();
-            combo = 0;
-            updateUI();
-            showWrongKey(char, currentFalling.char);
+            combo = 0; updateUI();
+            updateGameMessage(`❌ 按错了！`, `你按了 [${char}]，目标应该是 [${currentFalling.char}]`, true);
         } else if (!currentFalling) {
             if(window._missileSound) window._missileSound.error();
-            combo = 0;
-            updateUI();
-            showNoTarget();
+            combo = 0; updateUI();
+            updateGameMessage(`⚠️ 没有目标`, `等字母出现后再按键`, true);
         }
     }
-    
-    // ==================== 初始化 ====================
     async function init() {
         var loaded = await loadPlaneLevels();
         if (!loaded || planeLevels.length === 0) {
-            console.error("无法加载小飞机关卡配置");
             updateGameMessage("❌ 加载关卡配置失败", "请检查 config.json", true);
             return;
         }
-        
         var startConfig = null;
-        
-        // ✅ 1. 优先使用 URL 中的 id 参数（从 index 点击进来时传递）
-        if (initialLevelId && !isNaN(initialLevelId)) {
-            startConfig = getLevelById(initialLevelId);
-            if (startConfig) {
-                console.log("✅ 根据 URL id 参数匹配到关卡:", startConfig.id, startConfig.description);
-            }
-        }
-        
-        // ✅ 2. 如果没有 id 参数，尝试根据 keys 参数匹配
+        if (initialLevelId && !isNaN(initialLevelId)) startConfig = getLevelById(initialLevelId);
         if (!startConfig && urlKeysParam) {
             let targetKeys = null;
-            try {
-                const decoded = decodeURIComponent(urlKeysParam);
-                const parsed = JSON.parse(decoded);
-                if (Array.isArray(parsed)) targetKeys = parsed;
-            } catch(e) {
-                if (urlKeysParam.includes(',')) {
-                    targetKeys = urlKeysParam.split(',').map(s => s.trim());
-                } else if (urlKeysParam.length > 0) {
-                    targetKeys = urlKeysParam.split('');
-                }
+            try { const decoded = decodeURIComponent(urlKeysParam); const parsed = JSON.parse(decoded); if (Array.isArray(parsed)) targetKeys = parsed; } catch(e) {
+                if (urlKeysParam.includes(',')) targetKeys = urlKeysParam.split(',').map(s => s.trim());
+                else if (urlKeysParam.length > 0) targetKeys = urlKeysParam.split('');
             }
-            
             if (targetKeys && targetKeys.length > 0) {
                 for (var i = 0; i < planeLevels.length; i++) {
                     var level = planeLevels[i];
-                    if (level.keys && Array.isArray(level.keys) && 
-                        level.keys.length === targetKeys.length) {
+                    if (level.keys && Array.isArray(level.keys) && level.keys.length === targetKeys.length) {
                         var match = true;
-                        for (var j = 0; j < level.keys.length; j++) {
-                            if (level.keys[j] !== targetKeys[j]) {
-                                match = false;
-                                break;
-                            }
-                        }
-                        if (match) {
-                            startConfig = level;
-                            console.log("✅ 根据 keys 参数匹配到关卡:", startConfig.id, startConfig.description);
-                            break;
-                        }
+                        for (var j = 0; j < level.keys.length; j++) { if (level.keys[j] !== targetKeys[j]) { match = false; break; } }
+                        if (match) { startConfig = level; break; }
                     }
                 }
             }
         }
-        
-        // ✅ 3. 最后使用保存的进度或第一关
-        if (!startConfig) {
-            var savedLevelId = loadProgress();
-            if (savedLevelId) {
-                startConfig = getLevelById(savedLevelId);
-                if (startConfig) {
-                    console.log("📌 使用保存的进度关卡:", savedLevelId, startConfig.description);
-                }
-            }
-        }
-        
-        if (!startConfig && planeLevels.length > 0) {
-            startConfig = planeLevels[0];
-            console.log("📌 使用默认第一关:", startConfig.id);
-        }
-        
+        if (!startConfig) { var savedLevelId = loadProgress(); if (savedLevelId) startConfig = getLevelById(savedLevelId); }
+        if (!startConfig && planeLevels.length > 0) startConfig = planeLevels[0];
         if (startConfig) {
             currentLevelConfig = startConfig;
             currentGameLevel = startConfig.id;
             initLevelByConfig(startConfig);
             remainingInLevel = currentNum;
         }
-        
-        setTimeout(function() { resizeCanvas(); }, 100);
-        window.addEventListener('resize', function() { resizeCanvas(); });
-        
-        levelStartScore = score;
-        plane.x = W/2;
-        updateUI();
-        refreshNextLetter();
-        spawnEnemy();
-        
+        setTimeout(() => resizeCanvas(), 100);
+        window.addEventListener('resize', () => resizeCanvas());
+        plane.x = W/2; updateUI(); refreshNextLetter(); spawnEnemy();
         window.addEventListener('keydown', onKeyDown);
         canvas.setAttribute('tabindex', '0');
-        canvas.addEventListener('click', function() { canvas.focus(); });
-        
-        document.getElementById('backToMenuBtn').addEventListener('click', function() { 
-            window.location.href = 'index.html'; 
-        });
-        document.getElementById('resetLevelBtn').addEventListener('click', function() { 
-            resetCurrentLevel(); 
-        });
-        document.getElementById('prevLevelBtn').addEventListener('click', function() { 
-            goPrevLevel(); 
-        });
-        document.getElementById('nextLevelBtn').addEventListener('click', function() { 
-            goNextLevel(); 
-        });
-        
-        document.querySelectorAll('.skin-option').forEach(function(opt) {
+        canvas.addEventListener('click', () => canvas.focus());
+        document.getElementById('backToMenuBtn').addEventListener('click', () => window.location.href = 'index.html');
+        document.getElementById('resetLevelBtn').addEventListener('click', () => resetCurrentLevel());
+        document.getElementById('prevLevelBtn').addEventListener('click', () => goPrevLevel());
+        document.getElementById('nextLevelBtn').addEventListener('click', () => goNextLevel());
+        document.getElementById('historyBtn').addEventListener('click', () => showHistoryModal());
+        document.querySelectorAll('.skin-option').forEach(opt => {
             if (opt.dataset.skin === currentSkin) opt.classList.add('active-skin');
             opt.addEventListener('click', function() {
                 currentSkin = this.dataset.skin;
                 localStorage.setItem(SKIN_KEY, currentSkin);
-                document.querySelectorAll('.skin-option').forEach(function(o) { 
-                    o.classList.remove('active-skin'); 
-                });
+                document.querySelectorAll('.skin-option').forEach(o => o.classList.remove('active-skin'));
                 this.classList.add('active-skin');
                 updateGameMessage("🎨 皮肤已切换", "战机外观已更换", false);
             });
         });
-        
-        canvas.addEventListener('dblclick', function() {
-            if (!document.fullscreenElement) gameContainer.requestFullscreen();
-            else document.exitFullscreen();
-        });
-        
+        canvas.addEventListener('dblclick', () => { if (!document.fullscreenElement) gameContainer.requestFullscreen(); else document.exitFullscreen(); });
+        document.addEventListener('keydown', function(e) { if (e.altKey && e.key === 'Enter') { e.preventDefault(); if (!document.fullscreenElement) gameContainer.requestFullscreen(); else document.exitFullscreen(); } });
         gameLoop();
         console.log("游戏已启动，总关卡数: " + planeLevels.length);
     }
-    
     init();
 })();
 </script>
