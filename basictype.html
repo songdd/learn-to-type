@@ -1402,6 +1402,8 @@
     }
     
     function initPractice() {
+        total = urlNum;
+        
         if (completionTimer) {
             clearTimeout(completionTimer);
             completionTimer = null;
@@ -1514,6 +1516,10 @@
     
     // ==================== 加载配置并初始化（使用标准化 JSON 比较） ====================
     function loadConfigAndInit() {
+        // 获取 URL 中的 id 参数
+        const urlIdParam = urlParams.get('id');
+        let targetLevelId = urlIdParam ? parseInt(urlIdParam) : null;
+        
         fetch(CONFIG_PATH, { cache: 'no-cache' })
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1542,24 +1548,38 @@
                     return;
                 }
                 
+                // ✅ 优先使用 URL 中的 id 参数匹配关卡
                 let foundIndex = -1;
-                const currentKeysJson = getCurrentKeysJson();
                 
-                for (let i = 0; i < basictypeLevels.length; i++) {
-                    const level = basictypeLevels[i];
-                    const levelKeysJson = normalizeKeysForCompare(level.keys);
-                    const levelNum = level.num || 30;
-                    
-                    if (levelKeysJson === currentKeysJson && level.level === urlLevel && levelNum === urlNum) {
-                        foundIndex = i;
-                        break;
+                if (targetLevelId && !isNaN(targetLevelId)) {
+                    // 根据 id 查找关卡
+                    for (let i = 0; i < basictypeLevels.length; i++) {
+                        if (basictypeLevels[i].id === targetLevelId) {
+                            foundIndex = i;
+                            console.log(`✅ 根据 id=${targetLevelId} 定位到关卡索引: ${i}`);
+                            break;
+                        }
                     }
                 }
                 
-                if (foundIndex !== -1) {
-                    currentLevelIndex = foundIndex;
-                } else if (basictypeLevels.length > 0) {
-                    // 没找到匹配的关卡时，尝试只用 keys 和 level 匹配（忽略 num）
+                // 如果没有通过 id 找到，再使用 keys + level + num 匹配
+                if (foundIndex === -1) {
+                    const currentKeysJson = getCurrentKeysJson();
+                    for (let i = 0; i < basictypeLevels.length; i++) {
+                        const level = basictypeLevels[i];
+                        const levelKeysJson = normalizeKeysForCompare(level.keys);
+                        const levelNum = level.num || 30;
+                        
+                        if (levelKeysJson === currentKeysJson && level.level === urlLevel && levelNum === urlNum) {
+                            foundIndex = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // 如果还是没有找到，尝试只用 keys + level 匹配（忽略 num）
+                if (foundIndex === -1 && basictypeLevels.length > 0) {
+                    const currentKeysJson = getCurrentKeysJson();
                     for (let i = 0; i < basictypeLevels.length; i++) {
                         const level = basictypeLevels[i];
                         const levelKeysJson = normalizeKeysForCompare(level.keys);
@@ -1570,17 +1590,18 @@
                             break;
                         }
                     }
-                    
-                    if (foundIndex !== -1) {
-                        currentLevelIndex = foundIndex;
-                    } else {
-                        currentLevelIndex = 0;
-                        const firstLevel = basictypeLevels[0];
-                        const newKeys = Array.isArray(firstLevel.keys) ? JSON.stringify(firstLevel.keys) : (firstLevel.keys || '');
-                        urlKeys = encodeURIComponent(newKeys);
-                        urlLevel = firstLevel.level;
-                        urlNum = firstLevel.num || 30;
-                    }
+                }
+                
+                // 最终如果还没找到，使用第一关
+                if (foundIndex !== -1) {
+                    currentLevelIndex = foundIndex;
+                } else if (basictypeLevels.length > 0) {
+                    currentLevelIndex = 0;
+                    const firstLevel = basictypeLevels[0];
+                    const newKeys = Array.isArray(firstLevel.keys) ? JSON.stringify(firstLevel.keys) : (firstLevel.keys || '');
+                    urlKeys = encodeURIComponent(newKeys);
+                    urlLevel = firstLevel.level;
+                    urlNum = firstLevel.num || 30;
                 }
                 
                 currentLevelData = basictypeLevels[currentLevelIndex];
@@ -1596,6 +1617,11 @@
                 updateUrlParams();
                 initPractice();
                 updatePageTitle();
+                
+                // 显示当前关卡信息
+                if (currentLevelData) {
+                    showNavMessage(`🎯 第 ${currentLevelData.id} 关：${currentLevelData.description || '开始练习'}`, false);
+                }
             })
             .catch(err => {
                 console.error('加载 config.json 失败:', err);
@@ -1604,7 +1630,6 @@
                 updateUrlParams();
             });
     }
-
     function initFromUrlParams() {
         initPractice();
         updatePageTitle();
