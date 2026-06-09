@@ -562,6 +562,78 @@
                     "level": "intermediate",
                     "num": 90 ,
                     "rate": 148  
+                    },
+                    {
+                    "id": 22,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 152  
+                    },
+                    {
+                    "id": 23,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 156  
+                    },
+                    {
+                    "id": 24,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 160  
+                    },
+                    {
+                    "id": 25,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 164  
+                    },
+                    {
+                    "id": 26,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 168  
+                    },
+                    {
+                    "id": 27,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 172  
+                    },
+                    {
+                    "id": 28,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 176  
+                    },
+                    {
+                    "id": 29,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 180  
+                    },
+                    {
+                    "id": 30,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./plane_shooter.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 184  
                     }
 
             ]
