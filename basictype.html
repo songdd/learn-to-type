@@ -773,8 +773,9 @@
     
     function playSound(buffer, volume = 0.5) {
         if (!audioCtx || !isAudioAllowed || !buffer) return;
+        // ★★★ 添加：如果不在运行状态，不播放（由调用方处理 resume）★★★
+        if (audioCtx.state !== 'running') return;
         try {
-            if (audioCtx.state !== 'running') return;
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
             const gainNode = audioCtx.createGain();
@@ -792,18 +793,20 @@
         lastPlayTime = now;
         if (!audioCtx) initAudio();
         if (!isAudioAllowed) return;
+        
+        // ★★★ 修改：定义播放函数 ★★★
+        const doPlay = () => {
+            if (isError) playSound(errorSoundBuffer, 0.45);
+            else playSound(correctSoundBuffer, 0.55);
+        };
+        
         if (audioCtx && audioCtx.state !== 'running') {
             audioCtx.resume().then(() => {
-                if (isError) playSound(errorSoundBuffer, 0.45);
-                else playSound(correctSoundBuffer, 0.55);
+                doPlay();
             }).catch(e => console.log("音频启动失败"));
             return;
         }
-        if (isError) {
-            playSound(errorSoundBuffer, 0.45);
-        } else {
-            playSound(correctSoundBuffer, 0.55);
-        }
+        doPlay();
     }
     
     let hasEnabled = false;

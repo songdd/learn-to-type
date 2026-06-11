@@ -964,29 +964,47 @@ function showHistoryModal() {
     }
     function playHit() {
         if (!audioCtx || !hitSoundBuffer) return;
-        if (audioCtx.state !== 'running') { audioCtx.resume(); return; }
-        try {
-            var source = audioCtx.createBufferSource();
-            source.buffer = hitSoundBuffer;
-            var gain = audioCtx.createGain();
-            gain.gain.value = 0.4;
-            source.connect(gain);
-            gain.connect(audioCtx.destination);
-            source.start();
-        } catch(e) {}
+        
+        // ★★★ 定义播放函数 ★★★
+        const doPlay = () => {
+            try {
+                const source = audioCtx.createBufferSource();
+                source.buffer = hitSoundBuffer;
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0.4;
+                source.connect(gain);
+                gain.connect(audioCtx.destination);
+                source.start();
+            } catch(e) {}
+        };
+        
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(doPlay).catch(() => {});
+            return;
+        }
+        doPlay();
     }
+
     function playError() {
         if (!audioCtx || !errorSoundBuffer) return;
-        if (audioCtx.state !== 'running') { audioCtx.resume(); return; }
-        try {
-            var source = audioCtx.createBufferSource();
-            source.buffer = errorSoundBuffer;
-            var gain = audioCtx.createGain();
-            gain.gain.value = 0.35;
-            source.connect(gain);
-            gain.connect(audioCtx.destination);
-            source.start();
-        } catch(e) {}
+        
+        const doPlay = () => {
+            try {
+                const source = audioCtx.createBufferSource();
+                source.buffer = errorSoundBuffer;
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0.35;
+                source.connect(gain);
+                gain.connect(audioCtx.destination);
+                source.start();
+            } catch(e) {}
+        };
+        
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(doPlay).catch(() => {});
+            return;
+        }
+        doPlay();
     }
     initAudio();
     document.addEventListener('click', function() { if (audioCtx && audioCtx.state !== 'running') audioCtx.resume(); });

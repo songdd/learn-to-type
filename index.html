@@ -24,6 +24,131 @@
             margin: 0 auto;
         }
 
+        /* ==================== 加载进度条样式 ==================== */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 24px;
+        }
+        
+        .loading-animation {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+        
+        .loading-animation .circle {
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(255, 200, 100, 0.3);
+            border-top-color: #FF8C42;
+            border-right-color: #FFB347;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-animation .inner-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .loading-bar-container {
+            width: 280px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #FF8C42, #FFB347, #FFD700);
+            border-radius: 20px;
+            animation: loadingProgress 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.3), 
+                transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            30% { width: 40%; }
+            60% { width: 75%; }
+            85% { width: 90%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .loading-text {
+            font-size: 14px;
+            color: #8B6914;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+        
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: #FF8C42;
+            border-radius: 50%;
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+        
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dotPulse {
+            0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+            30% { opacity: 1; transform: scale(1.2); }
+        }
+
         /* 调试面板样式 */
         .debug-panel {
             position: fixed;
@@ -86,17 +211,37 @@
             transition: all 0.3s ease;
             box-shadow: 0 6px 14px rgba(0,0,0,0.12);
             position: relative;
+            overflow: hidden;
         }
         .section-header:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 22px rgba(0,0,0,0.18);
         }
+        
+        /* 分组卡片背景大图标 */
+        .section-header-bg-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 80px;
+            opacity: 0.15;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .section-header:hover .section-header-bg-icon {
+            opacity: 0.25;
+            transform: translateY(-50%) scale(1.05);
+        }
+
         .section-header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 12px;
+            position: relative;
+            z-index: 2;
         }
         .section-title-area {
             display: flex;
@@ -201,6 +346,10 @@
             .debug-btn {
                 padding: 4px 8px;
                 font-size: 0.6rem;
+            }
+            .section-header-bg-icon {
+                font-size: 60px;
+                right: 10px;
             }
         }
 
@@ -396,22 +545,6 @@
             font-size: 1.2rem;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255,215,150,0.6);
-            border-radius: 50%;
-            border-top-color: #F4A261;
-            animation: spin 0.8s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         .error-box {
             background: #E9C46A;
             border-left: 6px solid #E76F51;
@@ -456,8 +589,20 @@
 <body>
 <div class="container">
     <div id="dynamicContent">
-        <div class="status-message" style="grid-column: 1/-1;">
-            <span class="loading-spinner"></span> 正在加载 config.json ...
+        <div class="loading-container">
+            <div class="loading-animation">
+                <div class="circle"></div>
+                <div class="inner-icon">🎮</div>
+            </div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-text">
+                <span>加载游戏中</span>
+                <div class="loading-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -570,7 +715,6 @@
 
     /**
      * 打字练习关卡选择器 - 支持分组折叠，完成进度记录，动态num和rate参数
-     * 新增功能：记住每个分组的展开/折叠状态
      */
     const CONFIG_PATH = './config.json';
     const container = document.getElementById('dynamicContent');
@@ -578,28 +722,16 @@
     // ==================== 折叠状态管理 ====================
     const COLLAPSE_STORAGE_PREFIX = 'group_collapsed_';
     
-    // 保存分组折叠状态
     function saveGroupCollapsedState(groupCode, isCollapsed) {
         const key = COLLAPSE_STORAGE_PREFIX + groupCode;
         localStorage.setItem(key, isCollapsed ? 'true' : 'false');
     }
     
-    // 读取分组折叠状态（默认展开，即 false）
     function loadGroupCollapsedState(groupCode) {
         const key = COLLAPSE_STORAGE_PREFIX + groupCode;
         const saved = localStorage.getItem(key);
-        if (saved === null) return false; // 默认展开
+        if (saved === null) return false;
         return saved === 'true';
-    }
-    
-    // 重置所有分组折叠状态（调试用）
-    function resetAllCollapseStates() {
-        const keys = Object.keys(localStorage);
-        keys.forEach(key => {
-            if (key.startsWith(COLLAPSE_STORAGE_PREFIX)) {
-                localStorage.removeItem(key);
-            }
-        });
     }
 
     const LEVEL_MAP = {
@@ -644,6 +776,16 @@
         "#E84393", "#6C5CE7", "#00CEC9", "#FF7675", "#74B9FF",
         "#A29BFE", "#55EFC4", "#FD79A8", "#FAB1A0", "#FFEAA7"
     ];
+
+    // ==================== 获取分组背景图标 ====================
+    function getGroupBgIcon(groupCode) {
+        switch(groupCode) {
+            case 'basictype': return '⌨️';
+            case 'plane_shooter': return '✈️';
+            case 'whackamole': return '🐭';
+            default: return '🎮';
+        }
+    }
 
     // ==================== LocalStorage 进度管理 ====================
     function getCompletedLevels(groupCode) {
@@ -727,6 +869,7 @@
         const groupDescription = groupData.description || '';
         const levelsArray = groupData.levels || [];
         const headerBg = getGroupHeaderBackground(groupData, groupIndex);
+        const bgIcon = getGroupBgIcon(groupCode);
         
         const completedLevels = getCompletedLevels(groupCode);
         const totalLevels = levelsArray.length;
@@ -743,6 +886,12 @@
         const headerDiv = document.createElement('div');
         headerDiv.className = 'section-header';
         headerDiv.style.background = headerBg;
+        
+        // 背景大图标
+        const bgIconDiv = document.createElement('div');
+        bgIconDiv.className = 'section-header-bg-icon';
+        bgIconDiv.textContent = bgIcon;
+        headerDiv.appendChild(bgIconDiv);
         
         const headerContent = document.createElement('div');
         headerContent.className = 'section-header-content';
@@ -812,7 +961,6 @@
             card.setAttribute('data-id', cardId);
             card.setAttribute('data-description', description);
             card.setAttribute('data-group-code', groupCode);
-            // ✅ 新增：存储关卡ID用于跳转
             card.setAttribute('data-level-id', levelItem.id);
             if (numValue) {
                 card.setAttribute('data-num', numValue);
@@ -840,20 +988,16 @@
         sectionDiv.appendChild(headerDiv);
         sectionDiv.appendChild(wrapperDiv);
         
-        // ==================== 折叠逻辑（带状态保存） ====================
-        // 读取保存的折叠状态
+        // 折叠逻辑
         const savedCollapsed = loadGroupCollapsedState(groupCode);
         let isCollapsed = savedCollapsed;
         
-        // 应用初始状态
         if (isCollapsed) {
             wrapperDiv.classList.add('collapsed');
             arrowSpan.classList.add('collapsed');
         }
         
-        // 点击事件：切换折叠状态并保存
         headerDiv.addEventListener('click', (e) => {
-            // 如果点击的是重置按钮，不触发展开/折叠
             if (e.target.classList && e.target.classList.contains('reset-progress-btn')) {
                 return;
             }
@@ -868,11 +1012,9 @@
                 arrowSpan.classList.remove('collapsed');
             }
             
-            // ✅ 保存折叠状态到 localStorage
             saveGroupCollapsedState(groupCode, isCollapsed);
         });
         
-        // 重置进度按钮事件
         const resetBtn = titleTextDiv.querySelector('.reset-progress-btn');
         if (resetBtn) {
             resetBtn.addEventListener('click', (e) => {
@@ -906,7 +1048,7 @@
             const levelValue = encodeURIComponent(card.getAttribute('data-level') || 'beginner');
             const numValue = card.getAttribute('data-num') || '';
             const rateValue = card.getAttribute('data-rate') || '';
-            const levelId = card.getAttribute('data-level-id') || '';  // ✅ 新增：读取关卡ID
+            const levelId = card.getAttribute('data-level-id') || '';
             const desc = card.getAttribute('data-description') || '这个关卡';
             
             if (!baseUrl || baseUrl === '#' || baseUrl === '') {
@@ -922,7 +1064,6 @@
             if (rateValue) {
                 finalUrl += `&rate=${rateValue}`;
             }
-            // ✅ 新增：添加 id 参数
             if (levelId) {
                 finalUrl += `&id=${levelId}`;
             }
@@ -948,7 +1089,23 @@
 
     function loadAndRender() {
         if (container) {
-            container.innerHTML = `<div class="status-message"><span class="loading-spinner"></span> 🍭 正在读取 config.json ...</div>`;
+            container.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-animation">
+                        <div class="circle"></div>
+                        <div class="inner-icon">🎮</div>
+                    </div>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar"></div>
+                    </div>
+                    <div class="loading-text">
+                        <span>加载游戏中</span>
+                        <div class="loading-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
         
         fetch(CONFIG_PATH, { cache: 'no-cache', headers: { 'Cache-Control': 'no-cache' } })

@@ -68,7 +68,6 @@
             white-space: nowrap;
         }
 
-        /* 最大连击样式 */
         .max-combo-badge {
             background: linear-gradient(135deg, #FFD700, #FFA500);
             color: #4A2A00;
@@ -303,11 +302,6 @@
             position: relative;
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 16px;
         }
 
         .hole {
@@ -321,15 +315,8 @@
             cursor: pointer;
         }
 
-        .hole:nth-child(1) { transform: translateY(-6px); }
-        .hole:nth-child(2) { transform: translateY(3px); }
-        .hole:nth-child(3) { transform: translateY(-3px); }
-        .hole:nth-child(4) { transform: translateY(8px); }
-        .hole:nth-child(5) { transform: translateY(-8px); }
-        .hole:nth-child(6) { transform: translateY(0px); }
-
-        .hole::before { content: "🌿"; position: absolute; bottom: -6px; left: -10px; font-size: 18px; opacity: 0.6; pointer-events: none; }
-        .hole::after { content: "🌱"; position: absolute; bottom: -4px; right: -8px; font-size: 16px; opacity: 0.5; pointer-events: none; }
+        .hole::before { content: "🌿"; position: absolute; bottom: -6px; left: -10px; font-size: 18px; opacity: 0.6; pointer-events: none; z-index: 1; }
+        .hole::after { content: "🌱"; position: absolute; bottom: -4px; right: -8px; font-size: 16px; opacity: 0.5; pointer-events: none; z-index: 1; }
 
         .mole-container {
             position: absolute;
@@ -378,6 +365,7 @@
             border: 2px solid #FFD700;
             box-shadow: 0 2px 0 #D4A76A;
             white-space: nowrap;
+            z-index: 2;
         }
         .mole-letter-sign span {
             font-size: 18px;
@@ -419,46 +407,6 @@
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(0.8); }
             100% { opacity: 0; transform: translateY(-40px) scale(1.2); }
-        }
-
-        .game-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-        .game-card {
-            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
-            border-radius: 40px;
-            padding: 20px 28px;
-            text-align: center;
-            border: 3px solid #FFB347;
-            animation: bounceIn 0.3s ease;
-        }
-        .game-card h2 { font-size: 22px; color: #FF8C42; margin-bottom: 10px; }
-        .game-card .final-score { font-size: 38px; font-weight: bold; color: #FF4757; margin: 10px 0; }
-        .game-card .auto-tip { font-size: 11px; color: #FF8C42; margin: 8px 0; }
-        .game-card button {
-            background: linear-gradient(135deg, #FF8C42, #FF6B35);
-            border: none;
-            border-radius: 40px;
-            padding: 6px 16px;
-            font-size: 13px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            margin: 5px;
-        }
-        @keyframes bounceIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
         }
 
         .pause-overlay {
@@ -566,6 +514,25 @@
             margin-top: 10px;
             width: 100%;
         }
+        .clear-history-btn:hover {
+            background: #C0392B;
+        }
+
+        /* 过关弹框样式 - 与小飞机页面保持一致，添加到 gameArea 内部使用 absolute 定位 */
+        .congrats-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 40px;
+        }
 
         @media (max-width: 800px) {
             .info-panel { width: 200px; }
@@ -575,6 +542,7 @@
             .mole-letter-sign { top: -16px; padding: 1px 8px; }
             .max-combo-badge { font-size: 9px; padding: 1px 8px; }
             .max-combo-badge span { font-size: 12px; padding: 0 5px; }
+            .holes-grid { gap: 20px 30px !important; }
         }
         @media (max-width: 650px) {
             .game-layout { flex-direction: column; }
@@ -583,13 +551,13 @@
             .skin-section { flex: 1; }
             .btn-section { flex: 1; }
             .hole { width: 80px; height: 80px; }
-            .holes-grid { gap: 10px; }
             .mole-emoji { font-size: 30px; }
             .mole-letter-sign span { font-size: 12px; }
             .game-title h1 { font-size: 14px; }
             .level-badge { font-size: 9px; }
             .max-combo-badge { font-size: 8px; padding: 1px 6px; }
             .max-combo-badge span { font-size: 10px; }
+            .holes-grid { gap: 15px 25px !important; }
         }
         @media (max-width: 480px) {
             .hole { width: 65px; height: 65px; }
@@ -599,6 +567,7 @@
             .mole-letter-sign { top: -14px; padding: 1px 5px; }
             .skin-option { width: 38px; height: 38px; font-size: 20px; }
             .max-combo-badge { display: none; }
+            .holes-grid { gap: 10px 15px !important; }
         }
     </style>
 </head>
@@ -687,7 +656,6 @@
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             generateSounds();
-            audioCtx.resume();
         } catch(e) {
             console.log("Web Audio API 不支持");
         }
@@ -699,7 +667,6 @@
         try {
             const sampleRate = audioCtx.sampleRate;
             
-            // 打中音效
             hitBuffer = audioCtx.createBuffer(1, sampleRate * 0.25, sampleRate);
             const hitData = hitBuffer.getChannelData(0);
             for (let i = 0; i < sampleRate * 0.25; i++) {
@@ -710,7 +677,6 @@
                 hitData[i] = Math.max(-0.6, Math.min(0.6, sample));
             }
             
-            // 未打中音效
             missBuffer = audioCtx.createBuffer(1, sampleRate * 0.2, sampleRate);
             const missData = missBuffer.getChannelData(0);
             for (let i = 0; i < sampleRate * 0.2; i++) {
@@ -726,36 +692,42 @@
     
     function playHit() {
         if (!audioCtx || !hitBuffer) return;
+        const doPlay = () => {
+            try {
+                const source = audioCtx.createBufferSource();
+                source.buffer = hitBuffer;
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0.35;
+                source.connect(gain);
+                gain.connect(audioCtx.destination);
+                source.start();
+            } catch(e) {}
+        };
         if (audioCtx.state !== 'running') {
-            audioCtx.resume();
+            audioCtx.resume().then(doPlay).catch(() => {});
             return;
         }
-        try {
-            const source = audioCtx.createBufferSource();
-            source.buffer = hitBuffer;
-            const gain = audioCtx.createGain();
-            gain.gain.value = 0.35;
-            source.connect(gain);
-            gain.connect(audioCtx.destination);
-            source.start();
-        } catch(e) {}
+        doPlay();
     }
     
     function playMiss() {
         if (!audioCtx || !missBuffer) return;
+        const doPlay = () => {
+            try {
+                const source = audioCtx.createBufferSource();
+                source.buffer = missBuffer;
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0.3;
+                source.connect(gain);
+                gain.connect(audioCtx.destination);
+                source.start();
+            } catch(e) {}
+        };
         if (audioCtx.state !== 'running') {
-            audioCtx.resume();
+            audioCtx.resume().then(doPlay).catch(() => {});
             return;
         }
-        try {
-            const source = audioCtx.createBufferSource();
-            source.buffer = missBuffer;
-            const gain = audioCtx.createGain();
-            gain.gain.value = 0.3;
-            source.connect(gain);
-            gain.connect(audioCtx.destination);
-            source.start();
-        } catch(e) {}
+        doPlay();
     }
     
     function enableAudio() {
@@ -766,7 +738,7 @@
     document.addEventListener('click', enableAudio);
     document.addEventListener('keydown', enableAudio);
     
-    window._whackSound = { hit: playHit, miss: playMiss, init: initAudio };
+    window._whackSound = { hit: playHit, miss: playMiss };
 })();
 
 // ==================== URL 参数解析 ====================
@@ -793,6 +765,88 @@ function getMoleHTML(letter, skinEmoji = currentSkin) {
             <div class="mole-emoji">${skinEmoji}</div>
         </div>
     `;
+}
+
+// ==================== 洞位布局配置（8种不同布局，按关卡ID循环） ====================
+const HOLE_LAYOUTS = [
+    // 布局0: 上面2个 + 中间1个 + 下面3个
+    [
+        { row: 1, col: 1 },  // 洞1
+        { row: 1, col: 3 },  // 洞2
+        { row: 2, col: 2 },  // 洞3
+        { row: 3, col: 1 },  // 洞4
+        { row: 3, col: 2 },  // 洞5
+        { row: 3, col: 3 }   // 洞6
+    ],
+    // 布局1: 上面3个 + 中间1个 + 下面2个
+    [
+        { row: 1, col: 1 },  // 洞1
+        { row: 1, col: 2 },  // 洞2
+        { row: 1, col: 3 },  // 洞3
+        { row: 2, col: 2 },  // 洞4
+        { row: 3, col: 1 },  // 洞5
+        { row: 3, col: 3 }   // 洞6
+    ],
+    // 布局2: 上面1个 + 中间3个 + 下面2个
+    [
+        { row: 1, col: 2 },  // 洞1
+        { row: 2, col: 1 },  // 洞2
+        { row: 2, col: 2 },  // 洞3
+        { row: 2, col: 3 },  // 洞4
+        { row: 3, col: 1 },  // 洞5
+        { row: 3, col: 3 }   // 洞6
+    ],
+    // 布局3: 上面2个 + 中间2个 + 下面2个（梅花形）
+    [
+        { row: 1, col: 1 },  // 洞1
+        { row: 1, col: 3 },  // 洞2
+        { row: 2, col: 1 },  // 洞3
+        { row: 2, col: 3 },  // 洞4
+        { row: 3, col: 1 },  // 洞5
+        { row: 3, col: 3 }   // 洞6
+    ],
+    // 布局4: 上面2个 + 中间2个 + 下面2个（X形 + 中心）
+    [
+        { row: 1, col: 1 },  // 洞1
+        { row: 1, col: 3 },  // 洞2
+        { row: 2, col: 2 },  // 洞3
+        { row: 3, col: 1 },  // 洞4
+        { row: 3, col: 2 },  // 洞5
+        { row: 3, col: 3 }   // 洞6
+    ],
+    // 布局5: 上面2个 + 中间3个 + 下面1个
+    [
+        { row: 1, col: 1 },  // 洞1
+        { row: 1, col: 3 },  // 洞2
+        { row: 2, col: 1 },  // 洞3
+        { row: 2, col: 2 },  // 洞4
+        { row: 2, col: 3 },  // 洞5
+        { row: 3, col: 2 }   // 洞6
+    ],
+    // 布局6: 全部随机分散
+    [
+        { row: 1, col: 2 },  // 洞1
+        { row: 1, col: 1 },  // 洞2
+        { row: 2, col: 3 },  // 洞3
+        { row: 2, col: 1 },  // 洞4
+        { row: 3, col: 2 },  // 洞5
+        { row: 3, col: 3 }   // 洞6
+    ],
+    // 布局7: 三角形分布
+    [
+        { row: 1, col: 2 },  // 洞1（顶部）
+        { row: 2, col: 1 },  // 洞2（左中）
+        { row: 2, col: 2 },  // 洞3（中中）
+        { row: 2, col: 3 },  // 洞4（右中）
+        { row: 3, col: 1 },  // 洞5（左下）
+        { row: 3, col: 3 }   // 洞6（右下）
+    ]
+];
+
+// 根据关卡ID获取固定布局（同一关卡每次重玩布局相同）
+function getLayoutForLevel(levelId) {
+    const layoutIndex = (levelId - 1) % HOLE_LAYOUTS.length;
+    return HOLE_LAYOUTS[layoutIndex];
 }
 
 // ==================== 加载关卡配置 ====================
@@ -913,6 +967,19 @@ function saveLevelRecord(levelId, scoreVal, maxComboVal, timeSeconds) {
     return isNewRecord;
 }
 
+// 同步通关进度到主页面
+function syncCompletedToMain(levelId) {
+    if (!levelId) return;
+    const key = `typing_completed_whackamole`;
+    let completed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!completed.includes(levelId)) {
+        completed.push(levelId);
+        completed.sort((a, b) => a - b);
+        localStorage.setItem(key, JSON.stringify(completed));
+        console.log(`✅ 保存完成关卡: whackamole - ${levelId}`);
+    }
+}
+
 function getTotalStats() {
     const history = getHistory();
     let totalScore = 0, completedCount = 0, bestCombo = 0;
@@ -933,7 +1000,7 @@ function showHistoryModal() {
     records.forEach(r => { if (r.score > bestScore) { bestScore = r.score; bestRowId = r.id; } });
     records.forEach(r => {
         tableRows += `<tr class="${r.id === bestRowId ? 'best-row' : ''}">`;
-        tableRows += `<td>${r.id}</td><td style="max-width:80px; overflow:hidden;">${r.description.substring(0, 10)}...</td>`;
+        tableRows += `<td>${r.id}</td><td style="max-width:80px; overflow:hidden;">${(r.description || '').substring(0, 10)}...</td>`;
         tableRows += `<td style="color:#FF6B35;">${r.score}</td><td style="color:#2D6A2D;">${r.maxCombo}</td><td style="font-size:9px;">${r.time}秒</td>`;
         tableRows += `<tr>`;
     });
@@ -948,7 +1015,7 @@ function showHistoryModal() {
                     <div class="summary-item"><div class="summary-label">总分</div><div class="summary-value">${totalScore}</div></div>
                     <div class="summary-item"><div class="summary-label">最高连击</div><div class="summary-value">${bestCombo}</div></div>
                 </div></div>
-                <table class="history-table"><thead><tr><th>关卡</th><th>名称</th><th>得分</th><th>连击</th><th>用时</th><tr></thead>
+                <table class="history-table"><thead><tr><th>关卡</th><th>名称</th><th>得分</th><th>连击</th><th>用时</th></table></thead>
                 <tbody>${tableRows || '<tr><td colspan="5" class="no-data">暂无记录</td>'}</tbody>
             </table>
                 <button class="clear-history-btn" id="clearHistoryBtn">🗑️ 清空所有记录</button>
@@ -1023,7 +1090,7 @@ function updateUI() {
 
 function startTiming() { levelStartTime = Date.now(); }
 
-function endTimingAndSave() {
+function endTimingAndSave(isComplete = true) {
     if (!levelStartTime) return;
     const elapsedSeconds = Math.floor((Date.now() - levelStartTime) / 1000);
     if (currentLevelConfig && currentLevelConfig.id) {
@@ -1093,6 +1160,49 @@ function toggleFullscreen() {
     }
 }
 
+// ==================== 创建洞（根据关卡应用不同布局） ====================
+function createHoles() {
+    holesGrid.innerHTML = '';
+    holes = [];
+    
+    const levelId = currentLevelConfig ? currentLevelConfig.id : 1;
+    const layout = getLayoutForLevel(levelId);
+    
+    holesGrid.style.display = 'grid';
+    holesGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    holesGrid.style.gridTemplateRows = 'repeat(3, auto)';
+    holesGrid.style.gap = '30px 50px';
+    holesGrid.style.justifyItems = 'center';
+    holesGrid.style.alignItems = 'center';
+    holesGrid.style.height = '100%';
+    
+    for (let i = 0; i < HOLE_COUNT; i++) {
+        const holeDiv = document.createElement('div');
+        holeDiv.className = 'hole';
+        
+        const pos = layout[i];
+        if (pos) {
+            holeDiv.style.gridColumn = `${pos.col} / ${pos.col + 1}`;
+            holeDiv.style.gridRow = `${pos.row} / ${pos.row + 1}`;
+        } else {
+            const defaultCol = (i % 3) + 1;
+            const defaultRow = Math.floor(i / 3) + 1;
+            holeDiv.style.gridColumn = `${defaultCol} / ${defaultCol + 1}`;
+            holeDiv.style.gridRow = `${defaultRow} / ${defaultRow + 1}`;
+        }
+        
+        holeDiv.style.transform = 'translateY(0)';
+        
+        const moleContainer = document.createElement('div');
+        moleContainer.className = 'mole-container';
+        moleContainer.style.display = 'none';
+        moleContainer.innerHTML = getMoleHTML('A', currentSkin);
+        holeDiv.appendChild(moleContainer);
+        holesGrid.appendChild(holeDiv);
+        holes.push({ element: holeDiv, moleContainer, isActive: false, currentLetter: '' });
+    }
+}
+
 // ==================== 切换关卡 ====================
 function switchToLevel(levelConfig) {
     if (!levelConfig) return;
@@ -1121,6 +1231,9 @@ function switchToLevel(levelConfig) {
     
     updateLetterSet();
     updateDifficultyByConfig();
+    
+    createHoles();
+    
     updateUI();
     
     const url = new URL(window.location.href);
@@ -1213,11 +1326,7 @@ function hitMole(hole, letter) {
     if (!gameActive || isPaused) return false;
     if (!hole.isActive || hole.currentLetter !== letter) return false;
     
-    // 播放打中音效
-    if (window._whackSound) {
-        window._whackSound.init();
-        window._whackSound.hit();
-    }
+    if (window._whackSound) window._whackSound.hit();
     
     let addScore = 10;
     combo++;
@@ -1278,11 +1387,7 @@ function onKeyPress(e) {
             hitMole(targetMole, matchChar);
         });
     } else {
-        // 未打中，播放未打中音效
-        if (window._whackSound) {
-            window._whackSound.init();
-            window._whackSound.miss();
-        }
+        if (window._whackSound) window._whackSound.miss();
         if (combo > 0) {
             combo = 0;
             updateUI();
@@ -1292,22 +1397,6 @@ function onKeyPress(e) {
 }
 
 // ==================== 地鼠管理 ====================
-function createHoles() {
-    holesGrid.innerHTML = '';
-    holes = [];
-    for (let i = 0; i < HOLE_COUNT; i++) {
-        const holeDiv = document.createElement('div');
-        holeDiv.className = 'hole';
-        const moleContainer = document.createElement('div');
-        moleContainer.className = 'mole-container';
-        moleContainer.style.display = 'none';
-        moleContainer.innerHTML = getMoleHTML('A', currentSkin);
-        holeDiv.appendChild(moleContainer);
-        holesGrid.appendChild(holeDiv);
-        holes.push({ element: holeDiv, moleContainer, isActive: false, currentLetter: '' });
-    }
-}
-
 function showMole(hole, letter) {
     if (!gameActive || isPaused || hole.isActive) return;
     hole.isActive = true;
@@ -1363,6 +1452,7 @@ function startSpawning() {
     }, currentSpawnInterval);
 }
 
+// ==================== 过关弹框（与小飞机页面相同的实现方式） ====================
 function endGame(isComplete = false) {
     if (!gameActive) return;
     gameActive = false;
@@ -1371,38 +1461,57 @@ function endGame(isComplete = false) {
     if (spawnInterval) clearInterval(spawnInterval);
     for (const hole of holes) if (hole.isActive) hideMole(hole, false);
     for (const item of hideTimeouts) clearTimeout(item.timeout);
-    endTimingAndSave();
     
-    const overlay = document.createElement('div');
-    overlay.className = 'game-overlay';
+    endTimingAndSave(true);
+    
+    if (currentLevelConfig && currentLevelConfig.id) {
+        syncCompletedToMain(currentLevelConfig.id);
+        console.log(`🎉 打地鼠第${currentGameLevel}关通关，已保存到主页进度`);
+    }
+    
     const hasNext = currentLevelIndex < whackLevels.length - 1;
+    
+    // 创建弹框 - 参照小飞机页面，添加到 gameArea 内部，使用 absolute 定位
+    const overlay = document.createElement('div');
+    overlay.className = 'congrats-overlay';
+    
     overlay.innerHTML = `
-        <div class="game-card">
-            <h2>🎉 通关成功！ 🎉</h2>
-            <div class="final-score">${score}</div>
-            <p>🔥 最高连击: ${maxCombo}</p>
-            <p>📋 本关目标: ${totalTargets}</p>
-            ${hasNext ? '<div class="auto-tip" id="countdownTip">⏰ <span id="countdownNumber">5</span> 秒后自动进入下一关 ⏰</div>' : '<div class="auto-tip">🎊 恭喜完成所有关卡！ 🎊</div>'}
-            <div>
-                <button id="restartBtnOverlay">🔄 再玩一次</button>
-                ${hasNext ? '<button id="nextLevelBtnOverlay">➡️ 下一关</button>' : ''}
-                <button id="backBtnOverlay">🏠 返回首页</button>
+        <div class="game-card" style="background: linear-gradient(145deg, #FFF8F0, #FFEFD5); border-radius: 40px; padding: 20px 28px; text-align: center; border: 3px solid #FFB347;">
+            <h2 style="font-size: 22px; color: #FF8C42; margin-bottom: 10px;">🎉 通关成功！ 🎉</h2>
+            <div class="final-score" style="font-size: 38px; font-weight: bold; color: #FF4757; margin: 10px 0;">${score}</div>
+            <p style="color: #8B4513; margin: 5px 0;">🔥 最高连击: ${maxCombo}</p>
+            <p style="color: #8B4513; margin: 5px 0;">📋 本关目标: ${totalTargets}</p>
+            ${hasNext ? '<div class="auto-tip" style="font-size: 11px; color: #FF8C42; margin: 8px 0;">⏰ <span id="countdownNumber">5</span> 秒后自动进入下一关 ⏰</div>' : '<div class="auto-tip" style="font-size: 11px; color: #FF8C42; margin: 8px 0;">🎊 恭喜完成所有关卡！ 🎊</div>'}
+            <div style="margin-top: 10px;">
+                <button id="restartBtnOverlay" style="background: linear-gradient(135deg, #FF8C42, #FF6B35); border: none; border-radius: 40px; padding: 6px 16px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; margin: 5px;">🔄 再玩一次</button>
+                ${hasNext ? '<button id="nextLevelBtnOverlay" style="background: linear-gradient(135deg, #FF8C42, #FF6B35); border: none; border-radius: 40px; padding: 6px 16px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; margin: 5px;">➡️ 下一关</button>' : ''}
+                <button id="backBtnOverlay" style="background: linear-gradient(135deg, #FF8C42, #FF6B35); border: none; border-radius: 40px; padding: 6px 16px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; margin: 5px;">🏠 返回首页</button>
             </div>
         </div>
     `;
-    document.body.appendChild(overlay);
     
-    document.getElementById('restartBtnOverlay').addEventListener('click', () => {
-        if (autoNextTimer) clearTimeout(autoNextTimer);
-        overlay.remove();
-        resetGame();
-    });
-    if (hasNext) {
-        document.getElementById('nextLevelBtnOverlay').addEventListener('click', () => {
+    // 关键：添加到 gameArea 内部（不是 body）
+    gameArea.appendChild(overlay);
+    
+    const restartBtn = document.getElementById('restartBtnOverlay');
+    const nextBtn = document.getElementById('nextLevelBtnOverlay');
+    const backBtn = document.getElementById('backBtnOverlay');
+    
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            if (autoNextTimer) clearTimeout(autoNextTimer);
+            overlay.remove();
+            resetGame();
+        });
+    }
+    
+    if (nextBtn && hasNext) {
+        nextBtn.addEventListener('click', () => {
             if (autoNextTimer) clearTimeout(autoNextTimer);
             overlay.remove();
             goNextLevel();
         });
+        
         let countdown = 5;
         const countdownSpan = overlay.querySelector('#countdownNumber');
         autoNextTimer = setInterval(() => {
@@ -1415,9 +1524,20 @@ function endGame(isComplete = false) {
             }
         }, 1000);
     }
-    document.getElementById('backBtnOverlay').addEventListener('click', () => {
-        if (autoNextTimer) clearTimeout(autoNextTimer);
-        window.location.href = 'index.html';
+    
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            if (autoNextTimer) clearTimeout(autoNextTimer);
+            window.location.href = 'index.html';
+        });
+    }
+    
+    // 点击遮罩层关闭
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            if (autoNextTimer) clearTimeout(autoNextTimer);
+            overlay.remove();
+        }
     });
 }
 
@@ -1498,6 +1618,7 @@ async function initGame() {
         remainingTargets = totalTargets;
         updateLetterSet();
         updateDifficultyByConfig();
+        createHoles();
         updateUI();
     }
     
