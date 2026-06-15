@@ -884,9 +884,9 @@
             ]
         },
         {
-        "id": "3",
+        "id": "4",
         "code": "catch_thief",
-        "name": "警察抓小偷",
+        "name": "警察抓小偷",       
         "description": "警察抓小偷",
         "levels": [
                     {
@@ -897,7 +897,7 @@
                         "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
                         "level": "beginner",
                         "num": 50,
-                        "maxDistance": 15
+                        "maxDistance": 20
                     },
                     {
                     "id": 2,
@@ -906,8 +906,262 @@
                     "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
                     "level": "intermediate",
                     "num": 50,
-                    "maxDistance": 15                    
-                    }
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 3,
+                    "description": "🐣 学习 · 上排键",
+                    "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
+                    "url": "./catch_thief.html",
+                    "keys": ["Q", "W","E", "R", "T", "Y", "U", "I", "O", "P"],
+                    "level": "beginner",
+                    "num": 50,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 4,
+                    "description": "🐣 练习 · 上排键",
+                    "url": "./catch_thief.html",
+                    "keys": ["Q", "W","E", "R", "T", "Y", "U", "I", "O", "P"],
+                    "level": "intermediate",
+                    "num": 50,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 5,
+                    "description": "🐣 学习 · 下排键",
+                    "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
+                    "url": "./catch_thief.html",
+                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", ".", "/"],
+                    "level": "beginner",
+                    "num": 50,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 6,
+                    "description": "🐣 练习 · 下排键",
+                    "url": "./catch_thief.html",
+                    "keys": ["Z", "X", "C", "V", "B", "N","M", ",", ".", "/"],
+                    "level": "intermediate",
+                    "num": 50,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 7,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 94,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 8,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 98,
+                    "maxDistance": 20
+                },
+                    {
+                    "id": 9,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 102,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 10,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 106,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 11,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 110,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 12,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 114,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 13,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 118,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 14,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 122,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 15,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 126,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 16,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 130,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 17,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 134,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 18,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 140,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 19,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 144,
+                    "maxDistance": 20
+                    },
+                    {
+                    "id": 20,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 60 ,
+                    "rate": 148,
+                    "maxDistance": 15
+                    },
+                    {
+                    "id": 21,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 148,
+                    "maxDistance": 15
+                    },
+                    {
+                    "id": 22,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 152,
+                    "maxDistance": 15
+                    },
+                    {
+                    "id": 23,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 156,
+                    "maxDistance": 15
+                    },
+                    {
+                    "id": 24,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 160,
+                    "maxDistance": 12
+                    },
+                    {
+                    "id": 25,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 164,
+                    "maxDistance": 12
+                    },
+                    {
+                    "id": 26,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 168,
+                    "maxDistance": 12
+                    },
+                    {
+                    "id": 27,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 172,
+                    "maxDistance": 10
+                    },
+                    {
+                    "id": 28,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 176,
+                    "maxDistance": 10
+                    },
+                    {
+                    "id": 29,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 180,
+                    "maxDistance": 10
+                    },
+                    {
+                    "id": 30,
+                    "description": "🐣 综合练习 · 全键盘",
+                    "url": "./catch_thief.html",
+                    "level": "intermediate",
+                    "num": 90 ,
+                    "rate": 184,
+                    "maxDistance": 10
+                    }                    
             ]
         }      
     ]
