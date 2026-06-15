@@ -783,6 +783,7 @@
             case 'basictype': return '⌨️';
             case 'plane_shooter': return '✈️';
             case 'whackamole': return '🐭';
+            case 'catch_thief': return '🚓';
             default: return '🎮';
         }
     }
@@ -948,6 +949,7 @@
             const fontSize = getFontSizeByTextLength(description);
             const numValue = levelItem.num || '';
             const rateValue = levelItem.rate || '';
+            const maxDistanceValue = levelItem.maxDistance || '';
             
             const isCompleted = completedLevels.includes(cardId);
             const completedClass = isCompleted ? 'card-completed' : '';
@@ -967,6 +969,9 @@
             }
             if (rateValue) {
                 card.setAttribute('data-rate', rateValue);
+            }
+            if (maxDistanceValue) {
+                card.setAttribute('data-max-distance', maxDistanceValue);
             }
             
             const completedBadge = isCompleted ? '<div class="completed-badge">✅</div>' : '';
@@ -1049,6 +1054,7 @@
             const numValue = card.getAttribute('data-num') || '';
             const rateValue = card.getAttribute('data-rate') || '';
             const levelId = card.getAttribute('data-level-id') || '';
+            const maxDistanceValue = card.getAttribute('data-max-distance') || '';
             const desc = card.getAttribute('data-description') || '这个关卡';
             
             if (!baseUrl || baseUrl === '#' || baseUrl === '') {
@@ -1067,7 +1073,10 @@
             if (levelId) {
                 finalUrl += `&id=${levelId}`;
             }
-            console.log(`✨ 闯关: ${desc} | id=${levelId} | keys=[${decodeURIComponent(keysParam)}] | level=${decodeURIComponent(levelValue)} | num=${numValue} | rate=${rateValue}`);
+            if (maxDistanceValue) {
+                finalUrl += `&maxDistance=${maxDistanceValue}`;
+            }
+            console.log(`✨ 闯关: ${desc} | id=${levelId} | keys=[${decodeURIComponent(keysParam)}] | level=${decodeURIComponent(levelValue)} | num=${numValue} | rate=${rateValue} | maxDistance=${maxDistanceValue}`);
             window.location.href = finalUrl;
         };
         document.body.addEventListener('click', handler);

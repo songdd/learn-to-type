@@ -890,19 +890,23 @@
         "description": "警察抓小偷",
         "levels": [
                     {
-                    "id": 1,
-                    "description": "🐣 学习 · 基准键",
-                    "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
-                    "url": "./catch_thief.html",
-                    "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
-                    "level": "beginner"
+                        "id": 1,
+                        "description": "🐣 学习 · 基准键",
+                        "background": "linear-gradient(125deg, #F9D56E, #F8C471)",
+                        "url": "./catch_thief.html",
+                        "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
+                        "level": "beginner",
+                        "num": 50,
+                        "maxDistance": 15
                     },
                     {
                     "id": 2,
                     "description": "🐣 练习 · 基准键",
                     "url": "./catch_thief.html",
                     "keys": ["A", "S","D", "F", "J", "K", "L", ";"],
-                    "level": "intermediate"
+                    "level": "intermediate",
+                    "num": 50,
+                    "maxDistance": 15                    
                     }
             ]
         }      

@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🚓 抓小偷 · 打字追逃</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FFE8B5 0%, #FFD4A0 50%, #FFB882 100%);
+            font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Comic Sans MS', cursive, sans-serif;
+            padding: 12px;
+            cursor: default;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: calc(100vh - 24px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-header {
+            background: rgba(255, 248, 225, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 4px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 12px;
+            border: 2px solid #FFB347;
+            box-shadow: 0 3px 0 #E69500;
+            flex-shrink: 0;
+            overflow-x: auto;
+        }
+        .game-header::-webkit-scrollbar { display: none; }
+
+        .game-title {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .game-title h1 {
+            font-size: 18px;
+            color: #D45A1E;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #FFE0A3;
+        }
+        .level-badge {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            border-radius: 30px;
+            padding: 2px 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            box-shadow: 0 2px 0 #B85C1A;
+            white-space: nowrap;
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .max-combo-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #4A2A00;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .max-combo-badge span {
+            font-size: 14px;
+            font-weight: 800;
+            color: #FF4757;
+            background: white;
+            padding: 0 8px;
+            border-radius: 20px;
+        }
+
+        .distance-badge {
+            background: linear-gradient(135deg, #4ECDC4, #2C8F8F);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .distance-badge span {
+            font-size: 16px;
+            font-weight: 800;
+            background: white;
+            color: #2C8F8F;
+            padding: 0 8px;
+            border-radius: 20px;
+            margin-left: 4px;
+        }
+        .distance-badge .max-distance {
+            font-size: 9px;
+            background: rgba(0,0,0,0.3);
+            padding: 0 6px;
+            border-radius: 20px;
+            margin-left: 6px;
+            color: #FFE0A3;
+        }
+
+        .shortcut-tips {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 10px;
+            border-radius: 25px;
+            flex-shrink: 0;
+        }
+        .tip-item { display: flex; align-items: center; gap: 3px; }
+        .tip-key {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 1px 5px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 8px;
+            color: #FFE0A3;
+        }
+        .tip-desc { color: rgba(255, 255, 255, 0.7); font-size: 8px; }
+
+        .history-header-btn {
+            background: linear-gradient(135deg, #4ECDC4, #2C8F8F);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #1A6A6A;
+            flex-shrink: 0;
+        }
+        .history-header-btn:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #5DDFD5, #3DAF9F);
+        }
+
+        .game-layout {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .info-panel {
+            width: 210px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: visible;
+        }
+
+        .card {
+            background: rgba(255, 248, 225, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 6px 10px;
+            border: 2px solid #FFB347;
+            box-shadow: 0 2px 0 #E69500;
+        }
+
+        .card-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #D45A1E;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-left: 3px solid #FF8C42;
+            padding-left: 6px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+
+        .stat-item {
+            background: #FFB347;
+            border-radius: 12px;
+            padding: 3px;
+            text-align: center;
+            box-shadow: 0 1px 0 #E69500;
+        }
+        .stat-label { font-size: 7px; font-weight: bold; color: #FFF0D4; }
+        .stat-value { font-size: 14px; font-weight: bold; color: white; text-shadow: 1px 1px 0 #E69500; }
+
+        .skin-section {
+            background: rgba(255, 248, 225, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 6px 10px;
+            border: 2px solid #FFB347;
+            box-shadow: 0 2px 0 #E69500;
+        }
+        .skin-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #D45A1E;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-left: 3px solid #FF8C42;
+            padding-left: 6px;
+        }
+        .skin-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+        .skin-row:last-child {
+            margin-bottom: 0;
+        }
+        .skin-option {
+            background: rgba(255, 220, 150, 0.8);
+            border: 2px solid #FFB347;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .skin-option:hover { transform: scale(1.05); background: #FFD700; }
+        .skin-option.active-skin {
+            border-color: #FF4757;
+            box-shadow: 0 0 0 2px #FFD700;
+            transform: scale(1.02);
+        }
+
+        .btn-section {
+            background: rgba(255, 248, 225, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 6px 10px;
+            border: 2px solid #FFB347;
+            box-shadow: 0 2px 0 #E69500;
+        }
+        .btn-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #D45A1E;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-left: 3px solid #FF8C42;
+            padding-left: 6px;
+        }
+        .btn-row {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .btn-row:last-child { margin-bottom: 0; }
+        .btn {
+            padding: 4px 6px;
+            border: none;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #FF9F4A;
+            color: #4A2A00;
+            box-shadow: 0 1px 0 #E69500;
+            transition: 0.2s;
+            font-family: inherit;
+            flex: 1;
+            text-align: center;
+        }
+        .btn-primary { background: #FF8C42; color: white; }
+        .btn:hover { transform: translateY(-1px); background: #FFB366; }
+        .btn-primary:hover { background: #FFA05E; }
+
+        .hint-card {
+            background: rgba(255, 248, 225, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 6px 10px;
+            border: 2px solid #FFB347;
+            box-shadow: 0 2px 0 #E69500;
+        }
+        .hint-card-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #D45A1E;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-left: 3px solid #FF8C42;
+            padding-left: 6px;
+        }
+        .hint-content {
+            text-align: center;
+            padding: 4px 0;
+        }
+        .hint-text {
+            font-size: 10px;
+            color: #8B4513;
+            margin-bottom: 4px;
+        }
+        .hint-key {
+            background: #FFB347;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            box-shadow: 0 1px 0 #E69500;
+            display: inline-block;
+        }
+
+        .game-area {
+            flex: 1;
+            background: linear-gradient(135deg, #87CEEB 0%, #6BB5D9 100%);
+            border-radius: 40px;
+            border: 3px solid #FFB347;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .pause-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 40px;
+            z-index: 200;
+            pointer-events: none;
+        }
+        .pause-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #FFB347;
+        }
+
+        .history-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .history-card {
+            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 480px;
+            max-height: 80vh;
+            overflow: hidden;
+            border: 2px solid #FFB347;
+        }
+        .history-header {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .history-header h3 { font-size: 15px; }
+        .history-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+        }
+        .history-content { padding: 12px; max-height: 60vh; overflow-y: auto; }
+        .history-stats {
+            background: #FFF0E0;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            padding: 10px;
+        }
+        .history-summary { display: flex; justify-content: space-around; text-align: center; gap: 8px; }
+        .summary-item {
+            background: white;
+            border-radius: 10px;
+            padding: 6px;
+            flex: 1;
+        }
+        .summary-label { font-size: 9px; color: #8B6914; }
+        .summary-value { font-size: 18px; font-weight: bold; color: #FF6B35; }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .history-table th, .history-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border-bottom: 1px solid #FFD699;
+        }
+        .history-table th { background: #FFE0A3; color: #4A2A00; }
+        .best-row { background: #FFF0C0; font-weight: bold; }
+        .clear-history-btn {
+            background: #E74C3C;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .congrats-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 40px;
+        }
+        .game-card {
+            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
+            border-radius: 40px;
+            padding: 20px 28px;
+            text-align: center;
+            border: 3px solid #FFB347;
+            animation: bounceIn 0.3s ease;
+        }
+        .game-card h2 { font-size: 22px; color: #FF8C42; margin-bottom: 10px; }
+        .game-card .final-score { font-size: 38px; font-weight: bold; color: #FF4757; margin: 10px 0; }
+        .game-card button {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            border: none;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .game-card button:hover {
+            transform: scale(1.02);
+            transition: 0.2s;
+        }
+        @keyframes bounceIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 650px) {
+            .game-layout { flex-direction: column; }
+            .info-panel { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 6px; }
+            .info-panel .card { flex: 1; min-width: 120px; }
+            .skin-section { flex: 1; }
+            .btn-section { flex: 1; }
+            .hint-card { flex: 1; }
+            .stats-row { gap: 6px; }
+            .max-combo-badge { font-size: 9px; padding: 1px 8px; }
+            .distance-badge { font-size: 9px; padding: 1px 8px; }
+            .max-combo-badge span, .distance-badge span { font-size: 12px; padding: 0 4px; }
+            .skin-option { width: 32px; height: 32px; font-size: 18px; }
+        }
+        
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+        }
+        .floating-score {
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="game-header">
+        <div class="game-title">
+            <h1>🚓 抓小偷 · 打字追逃</h1>
+            <span class="level-badge" id="headerLevelBadge">第1关</span>
+        </div>
+        <div class="stats-row">
+            <div class="max-combo-badge">
+                🏆 最大连击: <span id="maxComboValue">0</span>
+            </div>
+            <div class="distance-badge">
+                📏 距离小偷: <span id="headerDistanceValue">0</span> 格
+                <span class="max-distance" id="maxDistanceHint">最大20格</span>
+            </div>
+        </div>
+        <div class="shortcut-tips">
+            <div class="tip-item"><span class="tip-key">␣空格</span><span class="tip-desc">暂停</span></div>
+            <div class="tip-item"><span class="tip-key">🖱️双击</span><span class="tip-desc">全屏</span></div>
+            <div class="tip-item"><span class="tip-key">Alt↵Enter</span><span class="tip-desc">全屏</span></div>
+        </div>
+        <button class="history-header-btn" id="historyHeaderBtn">📜 历史记录</button>
+    </div>
+
+    <div class="game-layout">
+        <div class="info-panel">
+            <div class="card">
+                <div class="card-title">📊 游戏数据</div>
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-label">得分</div><div class="stat-value" id="scoreValue">0</div></div>
+                    <div class="stat-item"><div class="stat-label">连击</div><div class="stat-value" id="comboValue">0</div></div>
+                    <div class="stat-item"><div class="stat-label">关卡</div><div class="stat-value" id="levelNum">1/1</div></div>
+                    <div class="stat-item"><div class="stat-label">进度</div><div class="stat-value" id="progressValue">0/50</div></div>
+                </div>
+            </div>
+
+            <div class="skin-section">
+                <div class="skin-title">🎨 角色皮肤</div>
+                <div class="skin-row">
+                    <div class="skin-option" data-skin-police="🚓">🚓</div>
+                    <div class="skin-option" data-skin-police="👮">👮</div>
+                    <div class="skin-option" data-skin-police="🏍️">🏍️</div>
+                </div>
+                <div class="skin-row">
+                    <div class="skin-option" data-skin-thief="🦹">🦹</div>
+                    <div class="skin-option" data-skin-thief="👤">👤</div>
+                    <div class="skin-option" data-skin-thief="😈">😈</div>
+                </div>
+            </div>
+
+            <div class="btn-section">
+                <div class="btn-title">🎮 游戏控制</div>
+                <div class="btn-row">
+                    <button class="btn" id="prevLevelBtn">◀ 上一关</button>
+                    <button class="btn" id="backBtn">🏠 返回</button>
+                    <button class="btn btn-primary" id="nextLevelBtn">下一关 ▶</button>
+                </div>
+                <div class="btn-row">
+                    <button class="btn" id="resetBtn">🔄 重玩本关</button>
+                </div>
+            </div>
+
+            <div class="hint-card">
+                <div class="hint-card-title">💡 游戏提示</div>
+                <div class="hint-content">
+                    <div class="hint-text">
+                        敲对字母 <kbd id="currentHintKeyDisplay" class="hint-key">A</kbd> 让警察前进
+                    </div>
+                    <div class="hint-text" style="font-size:9px; margin-top:4px;">
+                        小偷右上角显示他脚下的字母
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== 登录验证 ====================
+(function() {
+    const loggedIn = localStorage.getItem('logged_in');
+    const userName = localStorage.getItem('user_name');
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDebug = urlParams.get('debug') === '1';
+    if (!isDebug && (!loggedIn || !userName)) {
+        window.location.href = 'login.html';
+        return;
+    }
+})();
+
+// ==================== 音效系统 ====================
+(function() {
+    let audioCtx = null;
+    let moveBuffer = null;
+    let catchBuffer = null;
+    
+    function initAudio() {
+        if (audioCtx) return audioCtx;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            generateSounds();
+            audioCtx.resume();
+        } catch(e) {}
+        return audioCtx;
+    }
+    
+    function generateSounds() {
+        if (!audioCtx) return;
+        try {
+            const sampleRate = audioCtx.sampleRate;
+            
+            moveBuffer = audioCtx.createBuffer(1, sampleRate * 0.15, sampleRate);
+            const moveData = moveBuffer.getChannelData(0);
+            for (let i = 0; i < sampleRate * 0.15; i++) {
+                const t = i / sampleRate;
+                let sample = Math.sin(2 * Math.PI * (600 - t * 300) * t) * Math.exp(-t * 12);
+                sample += (Math.random() * 2 - 1) * 0.2 * Math.exp(-t * 20);
+                moveData[i] = Math.max(-0.4, Math.min(0.4, sample));
+            }
+            
+            catchBuffer = audioCtx.createBuffer(1, sampleRate * 0.3, sampleRate);
+            const catchData = catchBuffer.getChannelData(0);
+            for (let i = 0; i < sampleRate * 0.3; i++) {
+                const t = i / sampleRate;
+                let sample = Math.sin(2 * Math.PI * (800 - t * 400) * t) * Math.exp(-t * 10);
+                sample += Math.sin(2 * Math.PI * 200 * t) * Math.exp(-t * 15) * 0.5;
+                sample += (Math.random() * 2 - 1) * 0.15 * Math.exp(-t * 25);
+                catchData[i] = Math.max(-0.6, Math.min(0.6, sample));
+            }
+        } catch(e) {}
+    }
+    
+    function playMove() {
+        if (!audioCtx || !moveBuffer) return;
+        const doPlay = () => {
+            try {
+                const source = audioCtx.createBufferSource();
+                source.buffer = moveBuffer;
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0.3;
+                source.connect(gain);
+                gain.connect(audioCtx.destination);
+                source.start();
+            } catch(e) {}
+        };
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(doPlay).catch(() => {});
+            return;
+        }
+        doPlay();
+    }
+
+    function playCatch() {
+        if (!audioCtx || !catchBuffer) return;
+        const doPlay = () => {
+            try {
+                const source = audioCtx.createBufferSource();
+                source.buffer = catchBuffer;
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0.4;
+                source.connect(gain);
+                gain.connect(audioCtx.destination);
+                source.start();
+            } catch(e) {}
+        };
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(doPlay).catch(() => {});
+            return;
+        }
+        doPlay();
+    }
+    
+    function enableAudio() {
+        initAudio();
+        document.removeEventListener('click', enableAudio);
+        document.removeEventListener('keydown', enableAudio);
+    }
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('keydown', enableAudio);
+    
+    window._thiefSound = { move: playMove, catch: playCatch };
+})();
+
+// ==================== URL 参数解析 ====================
+const urlParamsInit = new URLSearchParams(window.location.search);
+let initialLevelId = parseInt(urlParamsInit.get('id'));
+let urlKeysParam = urlParamsInit.get('keys') || '';
+let urlLevel = urlParamsInit.get('level') || 'beginner';
+let urlNum = parseInt(urlParamsInit.get('num')) || 50;
+let urlRate = parseFloat(urlParamsInit.get('rate'));
+let urlMaxDistance = parseInt(urlParamsInit.get('maxDistance')) || 20;
+
+// ==================== 皮肤存储 ====================
+const POLICE_SKIN_KEY = 'catch_thief_police_skin';
+const THIEF_SKIN_KEY = 'catch_thief_thief_skin';
+let currentPoliceSkin = localStorage.getItem(POLICE_SKIN_KEY) || '🚓';
+let currentThiefSkin = localStorage.getItem(THIEF_SKIN_KEY) || '🦹';
+
+// ==================== 加载关卡配置 ====================
+const CONFIG_PATH = './config.json';
+let thiefLevels = [];
+let currentLevelIndex = 0;
+let currentLevelConfig = null;
+let currentGameLevel = 1;
+let currentCharSet = null;
+let currentThiefInterval = 3000;
+let currentStoneCount = 50;
+let currentMaxDistance = 20;
+
+async function loadThiefLevels() {
+    try {
+        const res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+        const data = await res.json();
+        const groups = data['learn-to-type'] || [];
+        const thiefGroup = groups.find(g => g.code === 'catch_thief');
+        if (thiefGroup && thiefGroup.levels) {
+            thiefLevels = thiefGroup.levels;
+            console.log("✅ 加载抓小偷关卡配置，共 " + thiefLevels.length + " 关");
+            return true;
+        }
+        return false;
+    } catch(e) {
+        console.error("加载配置失败:", e);
+        return false;
+    }
+}
+
+function getLevelById(levelId) {
+    return thiefLevels.find(level => level.id === levelId);
+}
+
+function getLevelIndexById(levelId) {
+    return thiefLevels.findIndex(level => level.id === levelId);
+}
+
+function parseKeysParam(keysStr) {
+    if (!keysStr || keysStr === '') return null;
+    try {
+        const decoded = decodeURIComponent(keysStr);
+        const parsed = JSON.parse(decoded);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch(e) {
+        if (keysStr.includes(',')) return keysStr.split(',').map(s => s.trim());
+        if (keysStr.length > 0) return keysStr.split('');
+    }
+    return null;
+}
+
+function calculateThiefInterval(rate) {
+    if (!rate || isNaN(rate)) return 3000;
+    let time = 3000 - ((rate - 90) / 4) * 200;
+    return Math.max(800, Math.min(5000, Math.round(time)));
+}
+
+function getRateByLevel(levelId) {
+    return Math.min(200, 90 + (levelId - 1) * 2);
+}
+
+// ==================== 历史记录 ====================
+const HISTORY_KEY = 'catch_thief_history';
+
+function getHistory() {
+    const saved = localStorage.getItem(HISTORY_KEY);
+    if (saved) try { return JSON.parse(saved); } catch(e) {}
+    return {};
+}
+
+function saveLevelRecord(levelId, correctVal, maxComboVal, timeSeconds, isWin) {
+    if (!isWin) return false;
+    const history = getHistory();
+    const levelKey = String(levelId);
+    const level = getLevelById(levelId);
+    const description = level ? level.description : `第${levelId}关`;
+    const newRecord = {
+        id: levelId, description: description, score: correctVal, maxCombo: maxComboVal,
+        time: timeSeconds, date: new Date().toISOString(), formattedDate: new Date().toLocaleString()
+    };
+    let isNewRecord = false;
+    if (history[levelKey]) {
+        if (correctVal > history[levelKey].score) {
+            history[levelKey] = newRecord;
+            isNewRecord = true;
+        }
+    } else {
+        history[levelKey] = newRecord;
+        isNewRecord = true;
+    }
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    return isNewRecord;
+}
+
+function getTotalStats() {
+    const history = getHistory();
+    let totalScore = 0, completedCount = 0, bestCombo = 0;
+    for (const key in history) {
+        const record = history[key];
+        totalScore += record.score;
+        completedCount++;
+        if (record.maxCombo > bestCombo) bestCombo = record.maxCombo;
+    }
+    return { totalScore, completedCount, bestCombo };
+}
+
+function showHistoryModal() {
+    const history = getHistory();
+    const { totalScore, completedCount, bestCombo } = getTotalStats();
+    const records = Object.values(history).sort((a, b) => a.id - b.id);
+    let tableRows = '', bestRowId = '', bestScore = 0;
+    records.forEach(r => { if (r.score > bestScore) { bestScore = r.score; bestRowId = r.id; } });
+    records.forEach(r => {
+        tableRows += `<tr class="${r.id === bestRowId ? 'best-row' : ''}">`;
+        tableRows += `<td>${r.id}</td><td style="max-width:80px; overflow:hidden;">${r.description.substring(0, 10)}...</td>`;
+        tableRows += `<td style="color:#FF6B35;">${r.score}</td><td style="color:#2D6A2D;">${r.maxCombo}</td><td style="font-size:9px;">${r.time}秒</td>`;
+        tableRows += `</tr>`;
+    });
+    const modal = document.createElement('div');
+    modal.className = 'history-modal';
+    modal.innerHTML = `
+        <div class="history-card">
+            <div class="history-header"><h3>📊 追捕战绩</h3><button class="history-close">✕</button></div>
+            <div class="history-content">
+                <div class="history-stats"><div class="history-summary">
+                    <div class="summary-item"><div class="summary-label">通关数</div><div class="summary-value">${completedCount}/${thiefLevels.length}</div></div>
+                    <div class="summary-item"><div class="summary-label">总分</div><div class="summary-value">${totalScore}</div></div>
+                    <div class="summary-item"><div class="summary-label">最高连击</div><div class="summary-value">${bestCombo}</div></div>
+                </div></div>
+                <table class="history-table"><thead><tr><th>关卡</th><th>名称</th><th>正确数</th><th>连击</th><th>用时</th></tr></thead>
+                <tbody>${tableRows || '<tr><td colspan="5" class="no-data">暂无记录</td>'}</tbody>
+            </table>
+                <button class="clear-history-btn" id="clearHistoryBtn">🗑️ 清空所有记录</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.querySelector('.history-close').addEventListener('click', () => modal.remove());
+    modal.querySelector('#clearHistoryBtn').addEventListener('click', () => {
+        if (confirm('清空所有记录？')) { localStorage.removeItem(HISTORY_KEY); modal.remove(); showFloatingScore('已清空', gameArea); }
+    });
+}
+
+// ==================== 同步通关进度到主页面 ====================
+function syncCompletedToMain(levelId) {
+    if (!levelId) return;
+    const key = `typing_completed_catch_thief`;
+    let completed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!completed.includes(levelId)) {
+        completed.push(levelId);
+        completed.sort((a, b) => a - b);
+        localStorage.setItem(key, JSON.stringify(completed));
+        console.log(`✅ 保存完成关卡: catch_thief - ${levelId}`);
+    }
+}
+
+// ==================== 辅助函数 ====================
+function showFloatingScore(text, element, color = '#FFD700') {
+    const rect = element.getBoundingClientRect();
+    const floatingDiv = document.createElement('div');
+    floatingDiv.className = 'floating-score';
+    floatingDiv.textContent = text;
+    floatingDiv.style.color = color;
+    floatingDiv.style.left = (rect.left + rect.width / 2 - 15) + 'px';
+    floatingDiv.style.top = (rect.top - 15) + 'px';
+    floatingDiv.style.background = 'rgba(0,0,0,0.7)';
+    floatingDiv.style.padding = '8px 20px';
+    floatingDiv.style.borderRadius = '30px';
+    floatingDiv.style.fontSize = '18px';
+    floatingDiv.style.fontWeight = 'bold';
+    floatingDiv.style.position = 'fixed';
+    document.body.appendChild(floatingDiv);
+    setTimeout(() => floatingDiv.remove(), 800);
+}
+
+// ==================== Canvas 游戏类 ====================
+class ThiefGame {
+    constructor(canvas, width, height) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.width = width;
+        this.height = height;
+        
+        this.stoneCount = 50;
+        this.stones = [];
+        this.policeIndex = 0;
+        this.thiefIndex = 6;
+        this.score = 0;
+        this.combo = 0;
+        this.maxCombo = 0;
+        this.gameActive = true;
+        this.isPaused = false;
+        this.levelStartTime = null;
+        this.currentTargetLetter = 'A';
+        
+        this.pathPoints = [];
+        this.stoneRadius = 28;
+        this.stoneSpacing = 70;
+        
+        this.animationId = null;
+        this._pauseOverlay = null;
+        
+        this.stoneShapes = ['circle', 'oval'];
+        this.stoneShapeParams = [];
+        
+        this.lastPoliceIndex = 0;
+        this.lastThiefIndex = 6;
+    }
+    
+    generateSnakePath() {
+        this.pathPoints = [];
+        
+        const startX = 100;
+        const startY = 80;
+        const stepX = this.stoneSpacing;
+        const stepY = this.stoneSpacing;
+        
+        const stonesPerRow = Math.floor((this.width - 150) / stepX);
+        const totalRows = Math.ceil(this.stoneCount / stonesPerRow);
+        
+        for (let row = 0; row < totalRows; row++) {
+            const y = startY + row * stepY;
+            if (row % 2 === 0) {
+                for (let col = 0; col < stonesPerRow; col++) {
+                    const x = startX + col * stepX;
+                    if (this.pathPoints.length < this.stoneCount) {
+                        this.pathPoints.push({ x, y, row, col });
+                    }
+                }
+            } else {
+                for (let col = stonesPerRow - 1; col >= 0; col--) {
+                    const x = startX + col * stepX;
+                    if (this.pathPoints.length < this.stoneCount) {
+                        this.pathPoints.push({ x, y, row, col });
+                    }
+                }
+            }
+        }
+    }
+    
+    generateStones() {
+        this.stones = [];
+        const allChars = currentCharSet && currentCharSet.length > 0 ? currentCharSet : 
+            ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+        for (let i = 0; i < this.stoneCount; i++) {
+            const randomChar = allChars[Math.floor(Math.random() * allChars.length)];
+            this.stones.push(randomChar);
+        }
+        this.updateTargetLetter();
+    }
+    
+    generateStoneShapeParams() {
+        this.stoneShapeParams = [];
+        for (let i = 0; i < this.stoneCount; i++) {
+            const params = {
+                type: this.stoneShapes[i % this.stoneShapes.length],
+                ovalRatioX: 0.9 + Math.random() * 0.2,
+                ovalRatioY: 0.8 + Math.random() * 0.2
+            };
+            this.stoneShapeParams.push(params);
+        }
+    }
+    
+    getStoneColor(index) {
+        const colors = ['#5a5a5a', '#4a4a4a', '#606060', '#555555', '#505050', '#484848', '#585858', '#454545', '#5e5e5e', '#525252'];
+        return colors[index % colors.length];
+    }
+    
+    getDisplaySkin(skin, direction) {
+        if (skin === '🚓') {
+            return direction === 'right' ? '🚓' : '🚔';
+        }
+        return skin;
+    }
+    
+    drawCircleStone(x, y, radius, color) {
+        const ctx = this.ctx;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#3a3a3a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+    
+    drawOvalStone(x, y, radius, color, ratioX, ratioY) {
+        const ctx = this.ctx;
+        ctx.beginPath();
+        ctx.ellipse(x, y, radius * ratioX, radius * ratioY, 0, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#3a3a3a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+    
+    drawStoneByShape(x, y, radius, color, shapeInfo) {
+        if (shapeInfo.type === 'circle') {
+            this.drawCircleStone(x, y, radius, color);
+        } else {
+            this.drawOvalStone(x, y, radius, color, shapeInfo.ovalRatioX, shapeInfo.ovalRatioY);
+        }
+    }
+    
+    drawPath() {
+        if (this.pathPoints.length < 2) return;
+        
+        const ctx = this.ctx;
+        
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 6;
+        
+        const smoothPoints = this.getSmoothPathPoints();
+        
+        ctx.beginPath();
+        ctx.moveTo(smoothPoints[0].x, smoothPoints[0].y);
+        for (let i = 1; i < smoothPoints.length; i++) {
+            ctx.lineTo(smoothPoints[i].x, smoothPoints[i].y);
+        }
+        ctx.strokeStyle = '#C4A265';
+        ctx.lineWidth = 56;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(smoothPoints[0].x, smoothPoints[0].y);
+        for (let i = 1; i < smoothPoints.length; i++) {
+            ctx.lineTo(smoothPoints[i].x, smoothPoints[i].y);
+        }
+        ctx.strokeStyle = '#8B5E3C';
+        ctx.lineWidth = 60;
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(smoothPoints[0].x, smoothPoints[0].y);
+        for (let i = 1; i < smoothPoints.length; i++) {
+            ctx.lineTo(smoothPoints[i].x, smoothPoints[i].y);
+        }
+        ctx.strokeStyle = '#DEB887';
+        ctx.lineWidth = 6;
+        ctx.setLineDash([12, 18]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        ctx.shadowBlur = 0;
+    }
+    
+    getSmoothPathPoints() {
+        if (this.pathPoints.length < 3) return this.pathPoints;
+        
+        const smoothPoints = [];
+        
+        for (let i = 0; i < this.pathPoints.length; i++) {
+            const current = this.pathPoints[i];
+            const prev = this.pathPoints[i - 1];
+            const next = this.pathPoints[i + 1];
+            
+            let isTurn = false;
+            if (prev && next) {
+                const dirToPrev = prev.x !== current.x ? (prev.x < current.x ? 'left' : 'right') : (prev.y < current.y ? 'up' : 'down');
+                const dirToNext = next.x !== current.x ? (next.x < current.x ? 'left' : 'right') : (next.y < current.y ? 'up' : 'down');
+                if (dirToPrev !== dirToNext && prev.x !== next.x && prev.y !== next.y) {
+                    isTurn = true;
+                }
+            }
+            
+            if (isTurn && prev && next) {
+                const offset = 20;
+                let cp1x = current.x, cp1y = current.y;
+                let cp2x = current.x, cp2y = current.y;
+                
+                if (prev.x < current.x && next.y < current.y) {
+                    cp1x = current.x; cp1y = current.y - offset;
+                    cp2x = current.x + offset; cp2y = current.y;
+                } else if (prev.x > current.x && next.y < current.y) {
+                    cp1x = current.x; cp1y = current.y - offset;
+                    cp2x = current.x - offset; cp2y = current.y;
+                } else if (prev.x < current.x && next.y > current.y) {
+                    cp1x = current.x; cp1y = current.y + offset;
+                    cp2x = current.x + offset; cp2y = current.y;
+                } else if (prev.x > current.x && next.y > current.y) {
+                    cp1x = current.x; cp1y = current.y + offset;
+                    cp2x = current.x - offset; cp2y = current.y;
+                } else if (prev.y < current.y && next.x > current.x) {
+                    cp1x = current.x - offset; cp1y = current.y;
+                    cp2x = current.x; cp2y = current.y + offset;
+                } else if (prev.y < current.y && next.x < current.x) {
+                    cp1x = current.x + offset; cp1y = current.y;
+                    cp2x = current.x; cp2y = current.y + offset;
+                } else if (prev.y > current.y && next.x > current.x) {
+                    cp1x = current.x - offset; cp1y = current.y;
+                    cp2x = current.x; cp2y = current.y - offset;
+                } else if (prev.y > current.y && next.x < current.x) {
+                    cp1x = current.x + offset; cp1y = current.y;
+                    cp2x = current.x; cp2y = current.y - offset;
+                } else {
+                    smoothPoints.push(current);
+                    continue;
+                }
+                
+                smoothPoints.push({ x: cp1x, y: cp1y });
+                smoothPoints.push({ x: cp2x, y: cp2y });
+            } else {
+                smoothPoints.push(current);
+            }
+        }
+        
+        return smoothPoints;
+    }
+    
+    drawCharacterWithFlip(x, y, skin, needFlip) {
+        const ctx = this.ctx;
+        ctx.font = `${Math.floor(this.stoneRadius * 1.2)}px 'Segoe UI Emoji'`;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowBlur = 4;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        if (needFlip) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(-1, 1);
+            ctx.fillText(skin, 0, 0);
+            ctx.restore();
+        } else {
+            ctx.fillText(skin, x, y);
+        }
+    }
+    
+    drawStones() {
+        let policeDirection = 'right';
+        let policeNeedFlip = false;
+        if (this.lastPoliceIndex !== this.policeIndex && this.policeIndex > 0) {
+            const fromPos = this.pathPoints[this.lastPoliceIndex];
+            const toPos = this.pathPoints[this.policeIndex];
+            if (fromPos && toPos) {
+                if (toPos.x < fromPos.x) {
+                    policeDirection = 'left';
+                    if (currentPoliceSkin === '🏍️' || currentPoliceSkin === '👮') {
+                        policeNeedFlip = true;
+                    }
+                }
+            }
+        }
+        
+        let thiefDirection = 'right';
+        let thiefNeedFlip = false;
+        if (this.lastThiefIndex !== this.thiefIndex && this.thiefIndex > 0) {
+            const fromPos = this.pathPoints[this.lastThiefIndex];
+            const toPos = this.pathPoints[this.thiefIndex];
+            if (fromPos && toPos) {
+                if (toPos.x < fromPos.x) {
+                    thiefDirection = 'left';
+                    thiefNeedFlip = true;
+                }
+            }
+        }
+        
+        const policeDisplaySkin = this.getDisplaySkin(currentPoliceSkin, policeDirection);
+        const thiefDisplaySkin = this.getDisplaySkin(currentThiefSkin, thiefDirection);
+        
+        for (let i = 0; i < this.pathPoints.length && i < this.stoneCount; i++) {
+            const pos = this.pathPoints[i];
+            const letter = this.stones[i];
+            const color = this.getStoneColor(i);
+            const shapeInfo = this.stoneShapeParams[i] || { type: 'circle', ovalRatioX: 0.9, ovalRatioY: 0.8 };
+            
+            this.ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            this.ctx.shadowBlur = 5;
+            
+            this.drawStoneByShape(pos.x, pos.y, this.stoneRadius, color, shapeInfo);
+            
+            this.ctx.beginPath();
+            this.ctx.ellipse(pos.x - 5, pos.y - 5, 6, 4, 0, 0, Math.PI * 2);
+            this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            this.ctx.fill();
+            
+            this.ctx.font = `bold ${Math.floor(this.stoneRadius * 0.8)}px 'Fira Code', monospace`;
+            this.ctx.fillStyle = '#FFD700';
+            this.ctx.shadowBlur = 2;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(letter, pos.x, pos.y);
+            this.ctx.fillStyle = '#FFF8DC';
+            this.ctx.fillText(letter, pos.x - 1, pos.y - 1);
+            
+            if (i === this.policeIndex) {
+                if (currentPoliceSkin === '🚓') {
+                    this.ctx.font = `${Math.floor(this.stoneRadius * 1.2)}px 'Segoe UI Emoji'`;
+                    this.ctx.fillStyle = '#FFFFFF';
+                    this.ctx.shadowBlur = 4;
+                    this.ctx.fillText(policeDisplaySkin, pos.x, pos.y - 5);
+                } else {
+                    this.drawCharacterWithFlip(pos.x, pos.y - 5, policeDisplaySkin, policeNeedFlip);
+                }
+            }
+            
+            // 小偷 - 在右上角显示小偷脚下的字母徽章
+            if (i === this.thiefIndex) {
+                this.drawCharacterWithFlip(pos.x, pos.y - 5, thiefDisplaySkin, thiefNeedFlip);
+                
+                // 在小偷右上角显示小偷当前所在石头的字母（红色圆形徽章）
+                const badgeX = pos.x + this.stoneRadius * 0.6;
+                const badgeY = pos.y - this.stoneRadius * 0.7;
+                const badgeRadius = this.stoneRadius * 0.45;
+                
+                this.ctx.beginPath();
+                this.ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
+                this.ctx.fillStyle = '#FF4757';
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#FFD700';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                
+                // 显示小偷脚下的字母（当前石头上的字母）
+                const thiefStoneLetter = this.stones[i];
+                this.ctx.font = `bold ${Math.floor(badgeRadius * 1.2)}px 'Fira Code', monospace`;
+                this.ctx.fillStyle = '#FFFFFF';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText(thiefStoneLetter, badgeX, badgeY);
+            }
+        }
+        this.ctx.shadowBlur = 0;
+    }
+    
+    drawGrass() {
+        const ctx = this.ctx;
+        ctx.strokeStyle = 'rgba(160, 140, 100, 0.25)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < this.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, this.height);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(this.width, i);
+            ctx.stroke();
+        }
+    }
+    
+    updateTargetLetter() {
+        const nextIndex = this.policeIndex + 1;
+        if (nextIndex < this.stones.length && this.stones[nextIndex]) {
+            this.currentTargetLetter = this.stones[nextIndex];
+        } else if (this.stones.length > 0) {
+            this.currentTargetLetter = this.stones[0];
+        } else {
+            this.currentTargetLetter = 'A';
+        }
+        
+        const currentHintKeyDisplay = document.getElementById('currentHintKeyDisplay');
+        if (currentHintKeyDisplay) currentHintKeyDisplay.textContent = this.currentTargetLetter;
+    }
+    
+    policeMove() {
+        if (!this.gameActive || this.isPaused) return false;
+        if (this.policeIndex >= this.thiefIndex) return false;
+        if (this.policeIndex + 1 >= this.stones.length) return false;
+        
+        this.lastPoliceIndex = this.policeIndex;
+        this.policeIndex++;
+        this.score++;
+        this.combo++;
+        if (this.combo > this.maxCombo) {
+            this.maxCombo = this.combo;
+            const maxComboSpan = document.getElementById('maxComboValue');
+            if (maxComboSpan) maxComboSpan.textContent = this.maxCombo;
+        }
+        
+        const scoreSpan = document.getElementById('scoreValue');
+        const comboSpan = document.getElementById('comboValue');
+        const progressSpan = document.getElementById('progressValue');
+        const headerDistanceSpan = document.getElementById('headerDistanceValue');
+        if (scoreSpan) scoreSpan.textContent = this.score;
+        if (comboSpan) comboSpan.textContent = this.combo;
+        if (progressSpan) progressSpan.textContent = `${this.policeIndex}/${this.stoneCount}`;
+        if (headerDistanceSpan) headerDistanceSpan.textContent = this.thiefIndex - this.policeIndex;
+        
+        this.updateTargetLetter();
+        this.draw();
+        
+        if (window._thiefSound) window._thiefSound.move();
+        
+        if (this.thiefIndex - this.policeIndex > currentMaxDistance) {
+            this.gameActive = false;
+            if (window._thiefMoveInterval) clearInterval(window._thiefMoveInterval);
+            this.endTimingAndSave(false);
+            this.showFailDialog(`距离太远！警察和小偷距离超过 ${currentMaxDistance} 格！`);
+            return true;
+        }
+        
+        if (this.policeIndex >= this.thiefIndex) {
+            this.catchThief();
+        }
+        return true;
+    }
+    
+    thiefMove() {
+        if (!this.gameActive || this.isPaused) return false;
+        if (this.policeIndex >= this.thiefIndex) return false;
+        if (this.thiefIndex + 1 >= this.stones.length) {
+            this.thiefEscape();
+            return false;
+        }
+        
+        this.lastThiefIndex = this.thiefIndex;
+        this.thiefIndex++;
+        this.combo = 0;
+        
+        const comboSpan = document.getElementById('comboValue');
+        const headerDistanceSpan = document.getElementById('headerDistanceValue');
+        if (comboSpan) comboSpan.textContent = this.combo;
+        if (headerDistanceSpan) headerDistanceSpan.textContent = this.thiefIndex - this.policeIndex;
+        
+        this.draw();
+        showFloatingScore('🦹 小偷跑了', gameArea, '#FF6B6B');
+        
+        if (this.thiefIndex - this.policeIndex > currentMaxDistance) {
+            this.gameActive = false;
+            if (window._thiefMoveInterval) clearInterval(window._thiefMoveInterval);
+            this.endTimingAndSave(false);
+            this.showFailDialog(`距离太远！警察和小偷距离超过 ${currentMaxDistance} 格！`);
+            return true;
+        }
+        
+        if (this.policeIndex >= this.thiefIndex) {
+            this.catchThief();
+        }
+        return true;
+    }
+    
+    endTimingAndSave(isWin) {
+        if (!this.levelStartTime) return;
+        const elapsedSeconds = Math.floor((Date.now() - this.levelStartTime) / 1000);
+        if (currentLevelConfig && currentLevelConfig.id && isWin) {
+            saveLevelRecord(currentLevelConfig.id, this.score, this.maxCombo, elapsedSeconds, isWin);
+        }
+        this.levelStartTime = null;
+    }
+    
+    catchThief() {
+        if (!this.gameActive) return;
+        this.gameActive = false;
+        if (window._thiefMoveInterval) clearInterval(window._thiefMoveInterval);
+        if (window._thiefSound) window._thiefSound.catch();
+        this.endTimingAndSave(true);
+        
+        if (currentLevelConfig && currentLevelConfig.id) {
+            syncCompletedToMain(currentLevelConfig.id);
+        }
+        
+        this.showGameOverDialog(true);
+    }
+    
+    thiefEscape() {
+        if (!this.gameActive) return;
+        this.gameActive = false;
+        if (window._thiefMoveInterval) clearInterval(window._thiefMoveInterval);
+        this.endTimingAndSave(false);
+        this.showGameOverDialog(false);
+    }
+    
+    showFailDialog(reason) {
+        const overlay = document.createElement('div');
+        overlay.className = 'congrats-overlay';
+        overlay.innerHTML = `
+            <div class="game-card">
+                <h2>😭 抓捕失败 😭</h2>
+                <p style="color:#E74C3C; margin:10px 0;">${reason}</p>
+                <div class="final-score">正确次数: ${this.score}</div>
+                <p>🔥 最高连击: ${this.maxCombo}</p>
+                <div>
+                    <button id="failRestartBtn">🔄 再玩一次</button>
+                    <button id="failBackBtn">🏠 返回首页</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        document.getElementById('failRestartBtn').addEventListener('click', () => {
+            if (window._autoNextTimer) clearTimeout(window._autoNextTimer);
+            overlay.remove();
+            resetGame();
+        });
+        document.getElementById('failBackBtn').addEventListener('click', () => {
+            if (window._autoNextTimer) clearTimeout(window._autoNextTimer);
+            window.location.href = 'index.html';
+        });
+    }
+    
+    showGameOverDialog(isWin) {
+        const overlay = document.createElement('div');
+        overlay.className = 'congrats-overlay';
+        const hasNext = currentLevelIndex < thiefLevels.length - 1;
+        overlay.innerHTML = `
+            <div class="game-card">
+                <h2>${isWin ? '🎉 抓捕成功！ 🎉' : '😭 抓捕失败 😭'}</h2>
+                <div class="final-score">正确次数: ${this.score}</div>
+                <p>🔥 最高连击: ${this.maxCombo}</p>
+                <p>📋 本关距离: ${this.stoneCount} 格</p>
+                <p>📏 最大距离限制: ${currentMaxDistance} 格</p>
+                ${hasNext ? '<div class="auto-tip" style="font-size:11px; color:#FF8C42; margin:8px 0;">⏰ <span id="countdownNumber">5</span> 秒后自动进入下一关 ⏰</div>' : '<div class="auto-tip" style="font-size:11px; color:#FF8C42; margin:8px 0;">🎊 恭喜完成所有关卡！ 🎊</div>'}
+                <div>
+                    <button id="restartBtnOverlay">🔄 再玩一次</button>
+                    ${hasNext ? '<button id="nextLevelBtnOverlay">➡️ 下一关</button>' : ''}
+                    <button id="backBtnOverlay">🏠 返回首页</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        document.getElementById('restartBtnOverlay').addEventListener('click', () => {
+            if (window._autoNextTimer) clearTimeout(window._autoNextTimer);
+            overlay.remove();
+            resetGame();
+        });
+        if (hasNext) {
+            document.getElementById('nextLevelBtnOverlay').addEventListener('click', () => {
+                if (window._autoNextTimer) clearTimeout(window._autoNextTimer);
+                overlay.remove();
+                goNextLevel();
+            });
+            let countdown = 5;
+            const countdownSpan = overlay.querySelector('#countdownNumber');
+            window._autoNextTimer = setInterval(() => {
+                countdown--;
+                if (countdownSpan) countdownSpan.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(window._autoNextTimer);
+                    overlay.remove();
+                    goNextLevel();
+                }
+            }, 1000);
+        }
+        document.getElementById('backBtnOverlay').addEventListener('click', () => {
+            if (window._autoNextTimer) clearTimeout(window._autoNextTimer);
+            window.location.href = 'index.html';
+        });
+    }
+    
+    reset() {
+        this.policeIndex = 0;
+        this.thiefIndex = Math.min(6, this.stoneCount - 2);
+        this.score = 0;
+        this.combo = 0;
+        this.maxCombo = 0;
+        this.gameActive = true;
+        this.isPaused = false;
+        this.lastPoliceIndex = 0;
+        this.lastThiefIndex = 6;
+        
+        this.generateStones();
+        this.updateTargetLetter();
+        
+        const scoreSpan = document.getElementById('scoreValue');
+        const comboSpan = document.getElementById('comboValue');
+        const maxComboSpan = document.getElementById('maxComboValue');
+        const progressSpan = document.getElementById('progressValue');
+        const headerDistanceSpan = document.getElementById('headerDistanceValue');
+        if (scoreSpan) scoreSpan.textContent = this.score;
+        if (comboSpan) comboSpan.textContent = this.combo;
+        if (maxComboSpan) maxComboSpan.textContent = this.maxCombo;
+        if (progressSpan) progressSpan.textContent = `${this.policeIndex}/${this.stoneCount}`;
+        if (headerDistanceSpan) headerDistanceSpan.textContent = this.thiefIndex - this.policeIndex;
+        
+        this.draw();
+        this.levelStartTime = Date.now();
+    }
+    
+    init(stoneCount) {
+        this.stoneCount = stoneCount;
+        this.generateSnakePath();
+        this.generateStones();
+        this.generateStoneShapeParams();
+        this.policeIndex = 0;
+        this.thiefIndex = Math.min(6, this.stoneCount - 2);
+        this.lastPoliceIndex = 0;
+        this.lastThiefIndex = 6;
+        this.draw();
+        this.levelStartTime = Date.now();
+    }
+    
+    draw() {
+        if (!this.ctx) return;
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        
+        const grad = this.ctx.createLinearGradient(0, 0, 0, this.height);
+        grad.addColorStop(0, '#87CEEB');
+        grad.addColorStop(1, '#6BB5D9');
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        
+        this.drawGrass();
+        this.drawPath();
+        this.drawStones();
+    }
+    
+    resize(width, height) {
+        this.width = width;
+        this.height = height;
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.generateSnakePath();
+        this.draw();
+    }
+}
+
+// ==================== 全局变量 ====================
+let game = null;
+let thiefMoveInterval = null;
+let levelStartTime = null;
+let autoNextTimer = null;
+
+const canvas = document.getElementById('gameCanvas');
+const gameArea = document.getElementById('gameArea');
+const prevLevelBtn = document.getElementById('prevLevelBtn');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
+const resetBtn = document.getElementById('resetBtn');
+const backBtn = document.getElementById('backBtn');
+const historyHeaderBtn = document.getElementById('historyHeaderBtn');
+
+function updateUI() {
+    if (!game) return;
+    const levelNumSpan = document.getElementById('levelNum');
+    const headerLevelBadge = document.getElementById('headerLevelBadge');
+    const maxDistanceHint = document.getElementById('maxDistanceHint');
+    if (levelNumSpan) levelNumSpan.textContent = `${currentGameLevel}/${thiefLevels.length}`;
+    if (headerLevelBadge && currentLevelConfig) {
+        headerLevelBadge.textContent = `第${currentGameLevel}关 · ${(currentLevelConfig.description || '抓小偷').substring(0, 10)}`;
+    }
+    if (maxDistanceHint) maxDistanceHint.textContent = `最大${currentMaxDistance}格`;
+}
+
+function startTiming() { 
+    levelStartTime = Date.now();
+    if (game) game.levelStartTime = levelStartTime;
+}
+
+function endTimingAndSave(isWin) {
+    if (!levelStartTime) return;
+    const elapsedSeconds = Math.floor((Date.now() - levelStartTime) / 1000);
+    if (currentLevelConfig && currentLevelConfig.id && isWin && game) {
+        saveLevelRecord(currentLevelConfig.id, game.score, game.maxCombo, elapsedSeconds, isWin);
+    }
+    levelStartTime = null;
+    if (game) game.levelStartTime = null;
+}
+
+function startThiefMovement() {
+    if (thiefMoveInterval) clearInterval(thiefMoveInterval);
+    thiefMoveInterval = setInterval(() => {
+        if (game && game.gameActive && !game.isPaused) {
+            game.thiefMove();
+        }
+    }, currentThiefInterval);
+    window._thiefMoveInterval = thiefMoveInterval;
+}
+
+function switchToLevel(levelConfig) {
+    if (!levelConfig) return;
+    if (autoNextTimer) { clearTimeout(autoNextTimer); autoNextTimer = null; window._autoNextTimer = null; }
+    if (thiefMoveInterval) clearInterval(thiefMoveInterval);
+    
+    currentLevelConfig = levelConfig;
+    currentGameLevel = levelConfig.id;
+    currentCharSet = levelConfig.keys || null;
+    currentStoneCount = levelConfig.num || 50;
+    currentMaxDistance = levelConfig.maxDistance || 20;
+    
+    let effectiveRate = levelConfig.rate || getRateByLevel(currentGameLevel);
+    currentThiefInterval = calculateThiefInterval(effectiveRate);
+    
+    if (game) {
+        game.stoneCount = currentStoneCount;
+        game.init(currentStoneCount);
+        game.policeIndex = 0;
+        game.thiefIndex = Math.min(6, currentStoneCount - 2);
+        game.score = 0;
+        game.combo = 0;
+        game.maxCombo = 0;
+        game.gameActive = true;
+        game.isPaused = false;
+        game.updateTargetLetter();
+        
+        const scoreSpan = document.getElementById('scoreValue');
+        const comboSpan = document.getElementById('comboValue');
+        const maxComboSpan = document.getElementById('maxComboValue');
+        const progressSpan = document.getElementById('progressValue');
+        const headerDistanceSpan = document.getElementById('headerDistanceValue');
+        if (scoreSpan) scoreSpan.textContent = game.score;
+        if (comboSpan) comboSpan.textContent = game.combo;
+        if (maxComboSpan) maxComboSpan.textContent = game.maxCombo;
+        if (progressSpan) progressSpan.textContent = `${game.policeIndex}/${game.stoneCount}`;
+        if (headerDistanceSpan) headerDistanceSpan.textContent = game.thiefIndex - game.policeIndex;
+        game.draw();
+    }
+    
+    updateUI();
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', currentGameLevel);
+    if (currentCharSet) url.searchParams.set('keys', JSON.stringify(currentCharSet));
+    if (currentStoneCount) url.searchParams.set('num', currentStoneCount);
+    if (effectiveRate) url.searchParams.set('rate', effectiveRate);
+    if (currentMaxDistance) url.searchParams.set('maxDistance', currentMaxDistance);
+    window.history.replaceState({}, '', url);
+    
+    startTiming();
+    startThiefMovement();
+}
+
+function goPrevLevel() {
+    if (currentLevelIndex > 0) {
+        currentLevelIndex--;
+        switchToLevel(thiefLevels[currentLevelIndex]);
+    } else {
+        showFloatingScore('已经是第一关了！', gameArea, '#FFA500');
+    }
+}
+
+function goNextLevel() {
+    if (currentLevelIndex < thiefLevels.length - 1) {
+        currentLevelIndex++;
+        switchToLevel(thiefLevels[currentLevelIndex]);
+    } else {
+        showFloatingScore('恭喜！已是最后一关！', gameArea, '#FFD700');
+    }
+}
+
+function resetGame() {
+    if (autoNextTimer) { clearTimeout(autoNextTimer); autoNextTimer = null; window._autoNextTimer = null; }
+    if (thiefMoveInterval) clearInterval(thiefMoveInterval);
+    
+    if (game) {
+        game.reset();
+    }
+    levelStartTime = Date.now();
+    if (game) game.levelStartTime = levelStartTime;
+    startThiefMovement();
+}
+
+function onKeyPress(e) {
+    if (!game) return;
+    if (e.key === ' ' || e.key === 'Space') {
+        e.preventDefault();
+        if (game.gameActive) {
+            game.isPaused = !game.isPaused;
+            if (game.isPaused) {
+                if (thiefMoveInterval) clearInterval(thiefMoveInterval);
+                const pauseDiv = document.createElement('div');
+                pauseDiv.className = 'pause-overlay';
+                pauseDiv.innerHTML = '<div class="pause-text">⏸ 暂停中<br><span style="font-size:12px;">按空格继续</span></div>';
+                gameArea.appendChild(pauseDiv);
+                game._pauseOverlay = pauseDiv;
+            } else {
+                if (game._pauseOverlay) game._pauseOverlay.remove();
+                startThiefMovement();
+            }
+        }
+        return;
+    }
+    if (!game.gameActive || game.isPaused) return;
+    
+    let key = e.key;
+    const symbolMap = { ';':';', ':':';', ',':',', '<':',', '.':'.', '>':'.', '/':'/', '?':'/' };
+    let matchChar = symbolMap[key] || (key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : null);
+    if (!matchChar) return;
+    
+    if (matchChar === game.currentTargetLetter) {
+        game.policeMove();
+    } else {
+        game.combo = 0;
+        const comboSpan = document.getElementById('comboValue');
+        if (comboSpan) comboSpan.textContent = game.combo;
+        showFloatingScore(`❌ 需要 ${game.currentTargetLetter}`, gameArea, '#FF6B6B');
+        if (window._thiefSound) window._thiefSound.catch();
+    }
+}
+
+function initSkinSelector() {
+    document.querySelectorAll('[data-skin-police]').forEach(opt => {
+        const skinValue = opt.dataset.skinPolice;
+        if (skinValue === currentPoliceSkin) opt.classList.add('active-skin');
+        opt.addEventListener('click', () => {
+            currentPoliceSkin = skinValue;
+            localStorage.setItem(POLICE_SKIN_KEY, currentPoliceSkin);
+            document.querySelectorAll('[data-skin-police]').forEach(o => o.classList.remove('active-skin'));
+            opt.classList.add('active-skin');
+            if (game) game.draw();
+            showFloatingScore('警察皮肤已换', gameArea, '#FFD700');
+        });
+    });
+    
+    document.querySelectorAll('[data-skin-thief]').forEach(opt => {
+        const skinValue = opt.dataset.skinThief;
+        if (skinValue === currentThiefSkin) opt.classList.add('active-skin');
+        opt.addEventListener('click', () => {
+            currentThiefSkin = skinValue;
+            localStorage.setItem(THIEF_SKIN_KEY, currentThiefSkin);
+            document.querySelectorAll('[data-skin-thief]').forEach(o => o.classList.remove('active-skin'));
+            opt.classList.add('active-skin');
+            if (game) game.draw();
+            showFloatingScore('小偷皮肤已换', gameArea, '#FFD700');
+        });
+    });
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        gameArea.requestFullscreen().catch(e => console.log('全屏失败:', e));
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function handleResize() {
+    if (game && gameArea) {
+        const rect = gameArea.getBoundingClientRect();
+        game.resize(rect.width, rect.height);
+    }
+}
+
+async function initGame() {
+    await loadThiefLevels();
+    initSkinSelector();
+    
+    const rect = gameArea.getBoundingClientRect();
+    const canvasWidth = rect.width;
+    const canvasHeight = rect.height;
+    
+    game = new ThiefGame(canvas, canvasWidth, canvasHeight);
+    
+    let startConfig = null;
+    if (initialLevelId && !isNaN(initialLevelId)) startConfig = getLevelById(initialLevelId);
+    if (!startConfig && urlKeysParam) {
+        let targetKeys = parseKeysParam(urlKeysParam);
+        if (targetKeys && targetKeys.length > 0) {
+            for (const level of thiefLevels) {
+                if (level.keys && level.keys.length === targetKeys.length && level.keys.every((k, i) => k === targetKeys[i])) {
+                    startConfig = level;
+                    break;
+                }
+            }
+        }
+    }
+    if (!startConfig && thiefLevels.length > 0) startConfig = thiefLevels[0];
+    
+    if (startConfig) {
+        currentLevelIndex = getLevelIndexById(startConfig.id);
+        currentLevelConfig = startConfig;
+        currentGameLevel = startConfig.id;
+        currentCharSet = startConfig.keys || null;
+        currentStoneCount = startConfig.num || 50;
+        currentMaxDistance = startConfig.maxDistance || 20;
+        
+        game.stoneCount = currentStoneCount;
+        game.init(currentStoneCount);
+        game.policeIndex = 0;
+        game.thiefIndex = Math.min(6, currentStoneCount - 2);
+        game.score = 0;
+        game.combo = 0;
+        game.maxCombo = 0;
+        game.gameActive = true;
+        
+        const scoreSpan = document.getElementById('scoreValue');
+        const comboSpan = document.getElementById('comboValue');
+        const maxComboSpan = document.getElementById('maxComboValue');
+        const progressSpan = document.getElementById('progressValue');
+        const headerDistanceSpan = document.getElementById('headerDistanceValue');
+        if (scoreSpan) scoreSpan.textContent = game.score;
+        if (comboSpan) comboSpan.textContent = game.combo;
+        if (maxComboSpan) maxComboSpan.textContent = game.maxCombo;
+        if (progressSpan) progressSpan.textContent = `${game.policeIndex}/${game.stoneCount}`;
+        if (headerDistanceSpan) headerDistanceSpan.textContent = game.thiefIndex - game.policeIndex;
+        game.draw();
+        
+        let effectiveRate = startConfig.rate || getRateByLevel(currentGameLevel);
+        currentThiefInterval = calculateThiefInterval(effectiveRate);
+        
+        updateUI();
+    }
+    
+    window.addEventListener('keydown', onKeyPress);
+    prevLevelBtn?.addEventListener('click', goPrevLevel);
+    nextLevelBtn?.addEventListener('click', goNextLevel);
+    resetBtn?.addEventListener('click', resetGame);
+    backBtn?.addEventListener('click', () => window.location.href = 'index.html');
+    historyHeaderBtn?.addEventListener('click', showHistoryModal);
+    
+    gameArea.addEventListener('dblclick', toggleFullscreen);
+    document.addEventListener('keydown', (e) => { if (e.altKey && e.key === 'Enter') { e.preventDefault(); toggleFullscreen(); } });
+    window.addEventListener('resize', handleResize);
+    
+    startTiming();
+    startThiefMovement();
+    
+    setTimeout(() => handleResize(), 100);
+}
+
+initGame();
+</script>
+</body>
+</html>
