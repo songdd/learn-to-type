@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>📜 古诗拼音练习 · 诗韵打字</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2C3E50 0%, #1A252F 50%, #0F171E 100%);
+            font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Comic Sans MS', cursive, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 248, 235, 0.95);
+            border-radius: 1.2rem;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.3);
+            padding: 0.6rem;
+            border: 2px solid #D4A574;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #8B6914, #D4A574, #8B6914);
+            border-radius: 50px;
+            box-shadow: 0 2px 0 #5C3D1A;
+        }
+
+        .page-title h1 {
+            font-size: 1.2rem;
+            color: #FFF8E7;
+            text-shadow: 1px 1px 0 #5C3D1A;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .page-title .poem-author {
+            font-size: 0.6rem;
+            color: #FFE0A3;
+            margin-top: 2px;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            gap: 15px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #D4A574;
+            border-top-color: #8B6914;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #8B6914;
+            font-size: 12px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            background: #FFF0D4;
+            border-radius: 30px;
+            padding: 4px 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .stat-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: #D4A574;
+            padding: 2px 10px;
+            border-radius: 25px;
+            color: #4A2A00;
+            font-weight: 700;
+            font-size: 0.65rem;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .stat span {
+            color: #FFF8E7;
+            font-weight: 800;
+            font-size: 0.75rem;
+            margin-right: 4px;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: #FFE8C8;
+            padding: 5px 12px;
+            border-radius: 35px;
+            flex-wrap: wrap;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .nav-message {
+            flex: 1;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #8B6914;
+            background: #FFF8E7;
+            padding: 4px 10px;
+            border-radius: 25px;
+            transition: all 0.2s;
+        }
+
+        .nav-message.error {
+            background: #FFB3B3;
+            color: #8B0000;
+            animation: pulseMsg 0.5s ease;
+        }
+
+        .nav-message.success {
+            background: #B8E6B8;
+            color: #2D6A2D;
+        }
+
+        @keyframes pulseMsg {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .btn {
+            background: #D4A574;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #4A2A00;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.65rem;
+            font-family: inherit;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: #B8860B;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #D4A574;
+            transform: scale(1.02);
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+            background: #C49A6C;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .poem-display {
+            flex: 1;
+            min-width: 260px;
+            background: #FFF8EF;
+            border-radius: 1rem;
+            padding: 0.7rem;
+            border: 2px solid #D4A574;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #8B6914;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #E8D5B0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title .title-icon {
+            font-size: 0.85rem;
+        }
+
+        .poem-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .poem-line {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .poem-char-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 65px;
+            padding: 6px 4px;
+            border-radius: 16px;
+            transition: all 0.15s;
+            background: #FFF5E6;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .poem-char-card.correct {
+            background: #B8E6B8;
+        }
+
+        .poem-char-card.wrong {
+            background: #FFB3B3;
+        }
+
+        .poem-char-card.current {
+            background: #D4A574;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .poem-char-card .char-hanzi {
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Noto Sans CJK SC', 'Segoe UI', sans-serif;
+            color: #4A2A00;
+        }
+
+        .poem-char-card .char-pinyin {
+            font-size: 0.6rem;
+            color: #8B6914;
+            margin-top: 4px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .poem-char-card.current .char-hanzi {
+            color: #FFF8E7;
+            text-shadow: 1px 1px 0 #5C3D1A;
+        }
+
+        .poem-char-card.current .char-pinyin {
+            color: #FFE0A3;
+        }
+
+        .poem-char-card.correct .char-pinyin {
+            color: #2D6A2D;
+        }
+
+        .pinyin-input-area {
+            flex: 1;
+            min-width: 280px;
+            background: #FFF8EF;
+            border-radius: 1rem;
+            padding: 0.7rem;
+            border: 2px solid #D4A574;
+        }
+
+        .input-progress {
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-container {
+            background: #E8D5B0;
+            border-radius: 15px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #B8860B, #D4A574);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 15px;
+        }
+
+        .current-target {
+            background: #FFF0D4;
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+            border: 1px solid #E8D5B0;
+        }
+
+        .target-label {
+            font-size: 0.6rem;
+            color: #8B6914;
+            margin-bottom: 5px;
+        }
+
+        .target-hanzi {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4A2A00;
+            margin-bottom: 5px;
+        }
+
+        .target-pinyin-hint {
+            font-size: 0.85rem;
+            color: #B8860B;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        .input-section {
+            margin-bottom: 12px;
+        }
+
+        .input-label {
+            font-size: 0.6rem;
+            color: #8B6914;
+            margin-bottom: 5px;
+        }
+
+        .pinyin-input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 1rem;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            border: 2px solid #D4A574;
+            border-radius: 40px;
+            outline: none;
+            text-align: center;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .pinyin-input:focus {
+            border-color: #B8860B;
+            box-shadow: 0 0 0 2px #FFE0A3;
+        }
+
+        .pinyin-input.correct {
+            border-color: #2D6A2D;
+            background: #B8E6B8;
+        }
+
+        .pinyin-input.error {
+            border-color: #FF6B6B;
+            background: #FFE0E0;
+            animation: shakeInput 0.3s ease;
+        }
+
+        @keyframes shakeInput {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .compare-hint {
+            background: #FFF5E6;
+            border-radius: 14px;
+            padding: 8px 10px;
+            margin-top: 10px;
+        }
+
+        .compare-title {
+            font-size: 0.6rem;
+            color: #8B6914;
+            margin-bottom: 6px;
+        }
+
+        .compare-content {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            align-items: baseline;
+        }
+
+        .your-input, .correct-input {
+            text-align: center;
+        }
+
+        .your-input .label, .correct-input .label {
+            font-size: 0.55rem;
+        }
+
+        .your-input .value {
+            font-size: 0.9rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: #4A2A00;
+            background: #FFF0D4;
+            padding: 3px 10px;
+            border-radius: 18px;
+            display: inline-block;
+            min-width: 85px;
+        }
+
+        .correct-input .label {
+            color: #2D6A2D;
+        }
+
+        .correct-input .value {
+            font-size: 0.9rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: #2D6A2D;
+            background: #B8E6B8;
+            padding: 3px 10px;
+            border-radius: 18px;
+            display: inline-block;
+            min-width: 85px;
+        }
+
+        .compare-arrow {
+            font-size: 1rem;
+            color: #D4A574;
+        }
+
+        .completion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .completion-card {
+            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
+            border-radius: 28px;
+            padding: 16px 22px;
+            text-align: center;
+            max-width: 320px;
+            width: 85%;
+            border: 3px solid #D4A574;
+            animation: bounceIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .completion-emoji { font-size: 2rem; margin-bottom: 6px; }
+        .completion-title { font-size: 1rem; font-weight: bold; color: #B8860B; margin-bottom: 10px; }
+        .completion-stats { background: #FFF0E0; border-radius: 16px; padding: 10px; margin: 10px 0; }
+        .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.7rem; border-bottom: 1px solid #E8D5B0; }
+        .stat-row:last-child { border-bottom: none; }
+        .completion-buttons { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+        .completion-btn { padding: 5px 14px; border: none; border-radius: 25px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+        .completion-btn-next { background: #B8860B; color: white; }
+        .completion-btn-reset { background: #D4A574; color: #4A2A00; }
+        .completion-btn-menu { background: #E8D5B0; color: #5C3D1A; }
+
+        @media (max-width: 800px) {
+            .poem-char-card { min-width: 55px; }
+            .poem-char-card .char-hanzi { font-size: 1.2rem; }
+            .poem-char-card .char-pinyin { font-size: 0.55rem; }
+            .target-hanzi { font-size: 2rem; }
+            .pinyin-input { font-size: 0.9rem; padding: 8px 12px; }
+            .poem-line { gap: 8px; }
+            .your-input .value, .correct-input .value { min-width: 70px; font-size: 0.8rem; }
+        }
+
+        @media (max-width: 700px) {
+            .main-content { flex-direction: column; }
+            .stats-bar { flex-direction: column; align-items: stretch; }
+            .stat-group { justify-content: center; }
+            .poem-char-card { min-width: 50px; }
+            .poem-char-card .char-hanzi { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="page-title" id="pageTitle">
+        <h1>📜 古诗拼音练习 · 诗韵打字 🖌️</h1>
+        <div class="poem-author" id="poemAuthorInfo">加载中...</div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-group">
+            <div class="stat"><span>🎯 准确率</span> <span id="accuracyValue">100</span>%</div>
+            <div class="stat"><span>⏱️ 用时</span> <span id="timerValue">0</span> s</div>
+            <div class="stat"><span>✨ 进度</span> <span id="progressCount">0</span>/<span id="totalChars">0</span></div>
+            <div class="stat"><span>🔥 连击</span> <span id="comboValue">0</span></div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-buttons">
+            <button id="prevPoemBtn" class="btn">◀ 上一首</button>
+            <button id="nextPoemBtn" class="btn btn-primary">下一首 ▶</button>
+        </div>
+        <div class="nav-message" id="navMessage">🎋 输入拼音，按回车提交</div>
+        <div class="nav-buttons">
+            <button id="resetBtn" class="btn">🔄 重来</button>
+            <button id="backToMenuBtn" class="btn">🏠 返回</button>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <div class="main-content">
+            <div class="poem-display">
+                <div class="section-title">
+                    <span class="title-icon">📖</span>
+                    <span>古诗原文 · 拼音对照</span>
+                </div>
+                <div id="poemLines" class="poem-lines"></div>
+            </div>
+
+            <div class="pinyin-input-area">
+                <div class="input-progress">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: #8B6914;">
+                        <span>练习进度</span>
+                        <span id="progressText">0 / 0</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <div class="current-target">
+                    <div class="target-label">🎯 当前汉字</div>
+                    <div class="target-hanzi" id="currentHanzi">?</div>
+                    <div class="target-pinyin-hint" id="currentPinyinHint">?</div>
+                </div>
+
+                <div class="input-section">
+                    <div class="input-label">⌨️ 输入拼音 (小写，不要带声调)</div>
+                    <input type="text" id="pinyinInput" class="pinyin-input" placeholder="chuang" autocomplete="off">
+                </div>
+
+                <div class="compare-hint">
+                    <div class="compare-title">📊 输入对比</div>
+                    <div class="compare-content">
+                        <div class="your-input">
+                            <div class="label">你的输入</div>
+                            <div class="value" id="yourInputDisplay">—</div>
+                        </div>
+                        <div class="compare-arrow">→</div>
+                        <div class="correct-input">
+                            <div class="label">正确拼音</div>
+                            <div class="value" id="correctPinyinDisplay">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingContainer" class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">📖 加载古诗库中...</div>
+    </div>
+</div>
+
+<script>
+// ==================== 配置路径 ====================
+const CONFIG_PATH = './config.json';
+
+// ==================== 标点符号判断 ====================
+const PUNCTUATION_SET = new Set(['，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…']);
+
+function isPunctuation(char) {
+    return PUNCTUATION_SET.has(char);
+}
+
+// ==================== 检查用户输入是否与正确拼音的前N个字符匹配 ====================
+function isMatchingPrefix(userInput, correctPinyin) {
+    if (!userInput || !correctPinyin) return false;
+    if (userInput.length > correctPinyin.length) return false;
+    const prefixOfCorrect = correctPinyin.substring(0, userInput.length);
+    return userInput === prefixOfCorrect;
+}
+
+// ==================== 同步通关进度到主页 ====================
+function syncCompletedToMain(poemId) {
+    if (!poemId) return;
+    const key = `typing_completed_poetry_writing`;
+    let completed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!completed.includes(poemId)) {
+        completed.push(poemId);
+        completed.sort((a, b) => a - b);
+        localStorage.setItem(key, JSON.stringify(completed));
+        console.log(`✅ 保存完成关卡: poetry_writing - ${poemId}`);
+    }
+}
+
+// ==================== 全局变量 ====================
+let poetryDatabase = [];
+let currentPoemIndex = 0;
+let currentPoem = null;
+
+let practiceChars = [];
+let practicePinyin = [];
+
+let currentIndex = 0;
+let totalPracticeChars = 0;
+
+let correctCount = 0;
+let errorCount = 0;
+let combo = 0;
+let maxCombo = 0;
+let active = true;
+let timerStarted = false;
+let startTime = null;
+let timer = null;
+let seconds = 0;
+
+let userInputs = [];
+let inputStatus = [];
+
+let isProcessing = false;
+
+// 音效
+let audioCtx = null;
+let soundEnabled = true;
+let correctSoundBuffer = null;
+let errorSoundBuffer = null;
+
+// DOM 元素
+const pinyinInput = document.getElementById('pinyinInput');
+const currentHanziSpan = document.getElementById('currentHanzi');
+const currentPinyinHintSpan = document.getElementById('currentPinyinHint');
+const yourInputDisplay = document.getElementById('yourInputDisplay');
+const correctPinyinDisplay = document.getElementById('correctPinyinDisplay');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const mainContent = document.getElementById('mainContent');
+const loadingContainer = document.getElementById('loadingContainer');
+const poemAuthorInfo = document.getElementById('poemAuthorInfo');
+const pageTitleH1 = document.querySelector('#pageTitle h1');
+
+function updateInputPlaceholder(pinyin) {
+    if (!pinyinInput) return;
+    if (pinyin && pinyin !== '') {
+        pinyinInput.placeholder = pinyin;
+    } else {
+        pinyinInput.placeholder = '输入拼音';
+    }
+}
+
+// ==================== 加载 config.json ====================
+async function loadConfig() {
+    try {
+        const response = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        
+        const groups = data['learn-to-type'] || [];
+        const poetryGroup = groups.find(g => g.code === 'poetry_writing');
+        
+        if (poetryGroup && poetryGroup.levels && poetryGroup.levels.length > 0) {
+            poetryDatabase = poetryGroup.levels.map(level => ({
+                id: level.id,
+                title: level.description || `第${level.id}首`,
+                author: level.author || '佚名',
+                dynasty: level.dynasty || '未知',
+                poem: level.poem || []
+            }));
+            console.log(`✅ 从 config.json 加载了 ${poetryDatabase.length} 首古诗`);
+            return true;
+        } else {
+            console.error('未找到 poetry_writing 分组或关卡数据');
+            return false;
+        }
+    } catch (error) {
+        console.error('加载配置文件失败:', error);
+        return false;
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+}
+
+function showMessage(text, isError = false, isSuccess = false) {
+    const msgDiv = document.getElementById('navMessage');
+    if (!msgDiv) return;
+    msgDiv.innerHTML = text;
+    msgDiv.classList.remove('error', 'success');
+    if (isError) msgDiv.classList.add('error');
+    if (isSuccess) msgDiv.classList.add('success');
+    setTimeout(() => {
+        if (msgDiv.innerHTML === text) {
+            msgDiv.classList.remove('error', 'success');
+        }
+    }, 1200);
+}
+
+// ==================== 音效系统 ====================
+function initAudio() {
+    if (audioCtx) return audioCtx;
+    try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        generateSounds();
+    } catch(e) { console.warn("Web Audio API 不支持"); }
+    return audioCtx;
+}
+
+function generateSounds() {
+    if (!audioCtx) return;
+    try {
+        const sampleRate = audioCtx.sampleRate;
+        correctSoundBuffer = audioCtx.createBuffer(1, sampleRate * 0.15, sampleRate);
+        const correctData = correctSoundBuffer.getChannelData(0);
+        errorSoundBuffer = audioCtx.createBuffer(1, sampleRate * 0.12, sampleRate);
+        const errorData = errorSoundBuffer.getChannelData(0);
+
+        for (let i = 0; i < sampleRate * 0.15; i++) {
+            const t = i / sampleRate;
+            let sample = Math.sin(2 * Math.PI * (800 - t * 400) * t) * Math.exp(-t * 12);
+            sample += Math.sin(2 * Math.PI * 200 * t) * Math.exp(-t * 8) * 0.3;
+            correctData[i] = Math.max(-0.5, Math.min(0.5, sample));
+        }
+
+        for (let i = 0; i < sampleRate * 0.12; i++) {
+            const t = i / sampleRate;
+            let sample = Math.sin(2 * Math.PI * (400 - t * 800) * t) * Math.exp(-t * 18);
+            errorData[i] = Math.max(-0.4, Math.min(0.4, sample));
+        }
+    } catch(e) {}
+}
+
+function playSound(buffer, volume = 0.4) {
+    if (!soundEnabled) return;
+    if (!audioCtx || !buffer) return;
+    if (audioCtx.state !== 'running') {
+        audioCtx.resume().catch(() => {});
+        return;
+    }
+    try {
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        const gain = audioCtx.createGain();
+        gain.gain.value = volume;
+        source.connect(gain);
+        gain.connect(audioCtx.destination);
+        source.start();
+    } catch(e) {}
+}
+
+function playCorrect() { playSound(correctSoundBuffer, 0.45); }
+function playError() { playSound(errorSoundBuffer, 0.4); }
+
+function enableAudio() {
+    initAudio();
+    if (audioCtx) audioCtx.resume();
+    document.removeEventListener('click', enableAudio);
+    document.removeEventListener('keydown', enableAudio);
+}
+document.addEventListener('click', enableAudio);
+document.addEventListener('keydown', enableAudio);
+
+// ==================== 更新进度显示 ====================
+function updateProgress() {
+    const completed = correctCount + errorCount;
+    const percent = totalPracticeChars > 0 ? (completed / totalPracticeChars) * 100 : 0;
+    progressBar.style.width = `${percent}%`;
+    progressText.innerText = `${completed} / ${totalPracticeChars}`;
+    document.getElementById('progressCount').innerText = completed;
+    document.getElementById('totalChars').innerText = totalPracticeChars;
+}
+
+function updateStats() {
+    const totalTyped = correctCount + errorCount;
+    const accuracy = totalTyped === 0 ? 100 : Math.floor((correctCount / totalTyped) * 100);
+    document.getElementById('accuracyValue').innerText = accuracy;
+    document.getElementById('comboValue').innerText = combo;
+    updateProgress();
+    return accuracy;
+}
+
+function startTimerOnFirstInput() {
+    if (!timerStarted && active && currentIndex < totalPracticeChars) {
+        timerStarted = true;
+        startTime = Date.now();
+        seconds = 0;
+        document.getElementById('timerValue').innerText = "0";
+        if (timer) clearInterval(timer);
+        timer = setInterval(() => {
+            if (active && startTime && timerStarted) {
+                seconds = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timerValue').innerText = seconds;
+            }
+        }, 500);
+    }
+}
+
+// ==================== 加载古诗（过滤标点） ====================
+function loadPoem(index) {
+    if (!poetryDatabase.length || index >= poetryDatabase.length) return;
+    
+    currentPoem = poetryDatabase[index];
+    if (!currentPoem || !currentPoem.poem) return;
+
+    const rawPoem = currentPoem.poem;
+    practiceChars = [];
+    practicePinyin = [];
+    
+    for (let i = 0; i < rawPoem.length; i++) {
+        const char = rawPoem[i].char;
+        const pinyin = rawPoem[i].pinyin || '';
+        if (!isPunctuation(char)) {
+            practiceChars.push(char);
+            practicePinyin.push(pinyin);
+        }
+    }
+    totalPracticeChars = practiceChars.length;
+
+    const titleText = currentPoem.title || `第${currentPoem.id}首`;
+    poemAuthorInfo.innerHTML = `${titleText} · ${currentPoem.author} (${currentPoem.dynasty})`;
+    pageTitleH1.innerHTML = `📜 ${titleText} · 拼音练习 🖌️`;
+
+    currentIndex = 0;
+    correctCount = 0;
+    errorCount = 0;
+    combo = 0;
+    maxCombo = 0;
+    active = true;
+    timerStarted = false;
+    isProcessing = false;
+    if (timer) clearInterval(timer);
+    timer = null;
+    startTime = null;
+    seconds = 0;
+    document.getElementById('timerValue').innerText = "0";
+    document.getElementById('comboValue').innerText = "0";
+
+    userInputs = new Array(totalPracticeChars).fill('');
+    inputStatus = new Array(totalPracticeChars).fill(null);
+
+    pinyinInput.value = '';
+    pinyinInput.classList.remove('correct', 'error');
+
+    renderPoemDisplay();
+    updateCurrentTarget();
+    updateStats();
+    updateCompareDisplay();
+
+    setTimeout(() => pinyinInput.focus(), 100);
+
+    showMessage(`🎋 开始练习《${titleText}》共${totalPracticeChars}个汉字`, false, true);
+}
+
+function renderPoemDisplay() {
+    const container = document.getElementById('poemLines');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const charsPerLine = 5;
+    let currentLine = [];
+    
+    for (let i = 0; i < practiceChars.length; i++) {
+        const char = practiceChars[i];
+        const pinyin = practicePinyin[i];
+        const status = inputStatus[i];
+        
+        let cardClass = 'poem-char-card';
+        if (i === currentIndex && active) {
+            cardClass += ' current';
+        }
+        if (status === 'correct') {
+            cardClass += ' correct';
+        } else if (status === 'wrong') {
+            cardClass += ' wrong';
+        }
+        
+        const charDiv = document.createElement('div');
+        charDiv.className = cardClass;
+        charDiv.innerHTML = `
+            <div class="char-hanzi">${escapeHtml(char)}</div>
+            <div class="char-pinyin">${escapeHtml(pinyin)}</div>
+        `;
+        currentLine.push(charDiv);
+        
+        if (currentLine.length % charsPerLine === 0 && currentLine.length > 0 && i !== practiceChars.length - 1) {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'poem-line';
+            currentLine.forEach(c => lineDiv.appendChild(c));
+            container.appendChild(lineDiv);
+            currentLine = [];
+        }
+    }
+    
+    if (currentLine.length > 0) {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'poem-line';
+        currentLine.forEach(c => lineDiv.appendChild(c));
+        container.appendChild(lineDiv);
+    }
+}
+
+function updateCurrentTarget() {
+    if (currentIndex < totalPracticeChars) {
+        currentHanziSpan.innerText = practiceChars[currentIndex];
+        currentPinyinHintSpan.innerText = practicePinyin[currentIndex];
+        correctPinyinDisplay.innerText = practicePinyin[currentIndex];
+        updateInputPlaceholder(practicePinyin[currentIndex]);
+    } else {
+        currentHanziSpan.innerText = '🎉';
+        currentPinyinHintSpan.innerText = '完成';
+        correctPinyinDisplay.innerText = '—';
+        updateInputPlaceholder('');
+    }
+}
+
+function updateCompareDisplay() {
+    if (currentIndex < totalPracticeChars) {
+        const currentInput = userInputs[currentIndex] || '';
+        yourInputDisplay.innerText = currentInput || '—';
+        correctPinyinDisplay.innerText = practicePinyin[currentIndex];
+    } else {
+        yourInputDisplay.innerText = '—';
+        correctPinyinDisplay.innerText = '—';
+    }
+}
+
+// ==================== 实时校验 ====================
+function validateInput() {
+    if (!active) return;
+    if (currentIndex >= totalPracticeChars) return;
+    
+    const inputValue = pinyinInput.value.trim().toLowerCase();
+    const correctPinyin = practicePinyin[currentIndex];
+    
+    if (inputValue === '') {
+        pinyinInput.classList.remove('error');
+        return;
+    }
+    
+    if (isMatchingPrefix(inputValue, correctPinyin)) {
+        pinyinInput.classList.remove('error');
+    } else {
+        playError();
+        pinyinInput.classList.add('error');
+        showMessage(`⚠️ 输入错误！正确拼音是 "${correctPinyin}"，请修正`, true);
+        
+        setTimeout(() => {
+            pinyinInput.classList.remove('error');
+        }, 800);
+    }
+}
+
+// ==================== 提交拼音 ====================
+function submitPinyin() {
+    if (!active) return false;
+    if (currentIndex >= totalPracticeChars) return false;
+    if (isProcessing) return false;
+    
+    const inputValue = pinyinInput.value.trim().toLowerCase();
+    if (inputValue === '') {
+        showMessage(`📝 请输入拼音 "${practicePinyin[currentIndex]}"`, false);
+        return false;
+    }
+    
+    startTimerOnFirstInput();
+    
+    const correctPinyin = practicePinyin[currentIndex];
+    
+    if (inputValue === correctPinyin) {
+        isProcessing = true;
+        
+        playCorrect();
+        userInputs[currentIndex] = inputValue;
+        inputStatus[currentIndex] = 'correct';
+        correctCount++;
+        combo++;
+        if (combo > maxCombo) maxCombo = combo;
+        
+        pinyinInput.classList.add('correct');
+        showMessage(`✅ 正确！拼音 "${inputValue}" 匹配！连击 x${combo}`, false, true);
+        
+        currentIndex++;
+        renderPoemDisplay();
+        updateCurrentTarget();
+        updateStats();
+        updateCompareDisplay();
+        
+        pinyinInput.value = '';
+        pinyinInput.classList.remove('correct', 'error');
+        isProcessing = false;
+        
+        if (currentIndex >= totalPracticeChars) {
+            finish();
+        } else {
+            setTimeout(() => pinyinInput.focus(), 50);
+        }
+        return true;
+    } else {
+        playError();
+        showMessage(`❌ 错误！正确拼音是 "${correctPinyin}"，你输入了 "${inputValue}"`, true);
+        
+        pinyinInput.classList.add('error');
+        setTimeout(() => {
+            pinyinInput.classList.remove('error');
+            pinyinInput.focus();
+        }, 800);
+        return false;
+    }
+}
+
+function finish() {
+    if (currentIndex < totalPracticeChars) return;
+    active = false;
+    if (timer) clearInterval(timer);
+    
+    // 同步通关进度到主页
+    if (currentPoem && currentPoem.id) {
+        syncCompletedToMain(currentPoem.id);
+    }
+    
+    const totalTyped = correctCount + errorCount;
+    const accuracy = totalTyped === 0 ? 100 : Math.floor((correctCount / totalTyped) * 100);
+    showMessage(`🎉 恭喜完成《${currentPoem.title}》！准确率 ${accuracy}% 🎉`, false, true);
+    
+    setTimeout(() => {
+        showCompletionDialog();
+    }, 500);
+}
+
+function showCompletionDialog() {
+    const totalTyped = correctCount + errorCount;
+    const accuracy = totalTyped === 0 ? 100 : Math.floor((correctCount / totalTyped) * 100);
+    const hasNext = currentPoemIndex < poetryDatabase.length - 1;
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'completion-overlay';
+    overlay.innerHTML = `
+        <div class="completion-card">
+            <div class="completion-emoji">🏆 ${accuracy === 100 ? '⭐⭐⭐' : accuracy >= 90 ? '⭐⭐' : '⭐'}</div>
+            <div class="completion-title">《${escapeHtml(currentPoem.title)}》完成！</div>
+            <div class="completion-stats">
+                <div class="stat-row"><span class="stat-label">📊 准确率</span><span class="stat-value">${accuracy}%</span></div>
+                <div class="stat-row"><span class="stat-label">⏱️ 用时</span><span class="stat-value">${seconds} 秒</span></div>
+                <div class="stat-row"><span class="stat-label">✅ 正确</span><span class="stat-value">${correctCount}</span></div>
+                <div class="stat-row"><span class="stat-label">❌ 错误/跳过</span><span class="stat-value">${errorCount}</span></div>
+                <div class="stat-row"><span class="stat-label">🔥 最高连击</span><span class="stat-value">${maxCombo}</span></div>
+            </div>
+            ${hasNext ? '<div class="auto-tip" style="font-size:0.65rem; color:#B8860B; margin:6px 0;">⏰ 5秒后自动进入下一首</div>' : '<div class="auto-tip">🎊 恭喜完成所有古诗！ 🎊</div>'}
+            <div class="completion-buttons">
+                ${hasNext ? '<button class="completion-btn completion-btn-next" id="completionNextBtn">📖 下一首</button>' : ''}
+                <button class="completion-btn completion-btn-reset" id="completionResetBtn">🔄 重玩</button>
+                <button class="completion-btn completion-btn-menu" id="completionMenuBtn">🏠 菜单</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    let autoTimer = null;
+    if (hasNext) {
+        let countdown = 5;
+        const autoTip = overlay.querySelector('.auto-tip');
+        autoTimer = setInterval(() => {
+            countdown--;
+            if (autoTip) autoTip.innerHTML = `⏰ ${countdown}秒后自动进入下一首`;
+            if (countdown <= 0) {
+                clearInterval(autoTimer);
+                overlay.remove();
+                goNextPoem();
+            }
+        }, 1000);
+    }
+    
+    const nextBtn = document.getElementById('completionNextBtn');
+    const resetBtn = document.getElementById('completionResetBtn');
+    const menuBtn = document.getElementById('completionMenuBtn');
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (autoTimer) clearInterval(autoTimer);
+            overlay.remove();
+            goNextPoem();
+        });
+    }
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (autoTimer) clearInterval(autoTimer);
+            overlay.remove();
+            resetCurrent();
+        });
+    }
+    
+    if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+            if (autoTimer) clearInterval(autoTimer);
+            window.location.href = 'index.html';
+        });
+    }
+}
+
+function resetCurrent() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    timerStarted = false;
+    startTime = null;
+    seconds = 0;
+    isProcessing = false;
+    document.getElementById('timerValue').innerText = "0";
+    
+    currentIndex = 0;
+    correctCount = 0;
+    errorCount = 0;
+    combo = 0;
+    maxCombo = 0;
+    active = true;
+    
+    userInputs = new Array(totalPracticeChars).fill('');
+    inputStatus = new Array(totalPracticeChars).fill(null);
+    
+    pinyinInput.value = '';
+    pinyinInput.classList.remove('correct', 'error');
+    
+    renderPoemDisplay();
+    updateCurrentTarget();
+    updateStats();
+    updateCompareDisplay();
+    
+    setTimeout(() => pinyinInput.focus(), 100);
+    showMessage(`🔄 重新开始《${currentPoem.title}》，加油～`, false);
+}
+
+function goPrevPoem() {
+    if (currentPoemIndex > 0) {
+        currentPoemIndex--;
+        loadPoem(currentPoemIndex);
+    } else {
+        showMessage("🎋 已经是第一首诗了！", true);
+    }
+}
+
+function goNextPoem() {
+    if (currentPoemIndex < poetryDatabase.length - 1) {
+        currentPoemIndex++;
+        loadPoem(currentPoemIndex);
+    } else {
+        showMessage("🎉 恭喜！已经是最后一首诗了！", false, true);
+    }
+}
+
+// ==================== 监听输入事件 ====================
+function setupInputEvents() {
+    pinyinInput.addEventListener('input', (e) => {
+        if (isProcessing) return;
+        const inputValue = e.target.value.trim().toLowerCase();
+        yourInputDisplay.innerText = inputValue || '—';
+        validateInput();
+        
+        if (currentIndex < totalPracticeChars) {
+            const correctPinyin = practicePinyin[currentIndex];
+            if (inputValue === correctPinyin) {
+                submitPinyin();
+            }
+        }
+    });
+    
+    pinyinInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitPinyin();
+        }
+    });
+}
+
+function getPoemIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const poemId = parseInt(urlParams.get('id'));
+    if (poemId && !isNaN(poemId)) {
+        return poemId;
+    }
+    return null;
+}
+
+async function init() {
+    const loaded = await loadConfig();
+    
+    if (!loaded || poetryDatabase.length === 0) {
+        showMessage('❌ 加载古诗库失败，请检查 config.json', true);
+        loadingContainer.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div class="loading-text">❌ 加载失败，请检查配置文件</div>
+        `;
+        return;
+    }
+    
+    const poemId = getPoemIdFromUrl();
+    if (poemId && poemId >= 1 && poemId <= poetryDatabase.length) {
+        currentPoemIndex = poemId - 1;
+    } else {
+        currentPoemIndex = 0;
+    }
+    
+    loadingContainer.style.display = 'none';
+    mainContent.style.display = 'block';
+    
+    loadPoem(currentPoemIndex);
+    setupInputEvents();
+    
+    document.getElementById('prevPoemBtn').addEventListener('click', goPrevPoem);
+    document.getElementById('nextPoemBtn').addEventListener('click', goNextPoem);
+    document.getElementById('resetBtn').addEventListener('click', resetCurrent);
+    document.getElementById('backToMenuBtn').addEventListener('click', () => window.location.href = 'index.html');
+    
+    initAudio();
+    console.log(`✅ 初始化完成，共 ${poetryDatabase.length} 首古诗`);
+}
+
+init();
+</script>
+</body>
+</html>
