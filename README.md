@@ -1,6 +1,22 @@
-# 灵键打字 - 儿童打字练习平台
-## 1 项目概述
+# 灵键打字 - 打字练习游戏系统 - 详细设计与优化分析
+## 1 系统概述
 灵键打字是一款专为儿童和打字初学者设计的互动式打字练习平台。通过趣味化的游戏形式（基础打字练习、小飞机射击、打地鼠），让用户在轻松愉快的氛围中掌握键盘指法，提升打字速度和准确率
+这是一个基于HTML/CSS/JavaScript构建的打字练习游戏平台，包含6个核心游戏模块和完整的用户管理、关卡配置系统。
+### 1.1 技术栈
+前端: 原生HTML5 + CSS3 + Vanilla JavaScript
+存储: localStorage (用户进度、游戏记录)
+配置: JSON配置文件驱动
+音效: Web Audio API
+### 1.2 核心模块
+模块	文件	核心玩法
+首页导航	index.html	关卡分组展示、进度追踪
+基础打字	basictype.html	顺序输入练习
+小飞机射击	plane_shooter.html	打字射击敌人
+打地鼠	whackamole.html	打字打地鼠
+警察抓小偷	catch_thief.html	打字追逃
+古诗拼音	poetry_writing.html	拼音输入练习
+英文文章	english_typing.html	单词填空练习
+登录系统	login.html	邀请码验证
 
 ## 2 三大核心模块
 ### 2.1 基础打字练习 (basictype.html)

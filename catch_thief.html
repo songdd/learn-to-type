@@ -1069,6 +1069,16 @@ function getRateByLevel(levelId) {
 // ==================== 历史记录 ====================
 const HISTORY_KEY = 'catch_thief_history';
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
 function getHistory() {
     const saved = localStorage.getItem(HISTORY_KEY);
     if (saved) try { return JSON.parse(saved); } catch(e) {}
@@ -1116,35 +1126,86 @@ function showHistoryModal() {
     const { totalScore, completedCount, bestCombo } = getTotalStats();
     const records = Object.values(history).sort((a, b) => a.id - b.id);
     let tableRows = '', bestRowId = '', bestScore = 0;
-    records.forEach(r => { if (r.score > bestScore) { bestScore = r.score; bestRowId = r.id; } });
-    records.forEach(r => {
-        tableRows += `<tr class="${r.id === bestRowId ? 'best-row' : ''}">`;
-        tableRows += `<td>${r.id}</td><td style="max-width:80px; overflow:hidden;">${r.description.substring(0, 10)}...</td>`;
-        tableRows += `<td style="color:#FF6B35;">${r.score}</td><td style="color:#2D6A2D;">${r.maxCombo}</td><td style="font-size:9px;">${r.time}秒</td>`;
-        tableRows += `</tr>`;
+    
+    // 找出最高分
+    records.forEach(r => { 
+        if (r.score > bestScore) { 
+            bestScore = r.score; 
+            bestRowId = r.id; 
+        } 
     });
+    
+    // 生成表格行
+    records.forEach(r => {
+        const isBest = r.id === bestRowId && bestScore > 0;
+        tableRows += `<tr class="${isBest ? 'best-row' : ''}">`;
+        tableRows += `<td style="text-align:center;">${r.id}</td>`;
+        // ✅ 修复：完整显示名称，自动换行
+        tableRows += `<td style="word-break:break-word; white-space:normal; max-width:120px; text-align:left; padding:4px 6px;">${escapeHtml(r.description || '')}</td>`;
+        tableRows += `<td style="color:#FF6B35; font-weight:bold; text-align:center;">${r.score}</td>`;
+        tableRows += `<td style="color:#2D6A2D; text-align:center;">${r.maxCombo}</td>`;
+        tableRows += `<td style="font-size:9px; text-align:center;">${r.time}秒</td>`;
+        tableRows += `</tr>`; // ✅ 正确闭合
+    });
+    
+    if (records.length === 0) {
+        tableRows = '<tr><td colspan="5" class="no-data">暂无记录</td></tr>';
+    }
+    
     const modal = document.createElement('div');
     modal.className = 'history-modal';
     modal.innerHTML = `
         <div class="history-card">
-            <div class="history-header"><h3>📊 追捕战绩</h3><button class="history-close">✕</button></div>
+            <div class="history-header">
+                <h3>📊 追捕战绩</h3>
+                <button class="history-close">✕</button>
+            </div>
             <div class="history-content">
-                <div class="history-stats"><div class="history-summary">
-                    <div class="summary-item"><div class="summary-label">通关数</div><div class="summary-value">${completedCount}/${thiefLevels.length}</div></div>
-                    <div class="summary-item"><div class="summary-label">总分</div><div class="summary-value">${totalScore}</div></div>
-                    <div class="summary-item"><div class="summary-label">最高连击</div><div class="summary-value">${bestCombo}</div></div>
-                </div></div>
-                <table class="history-table"><thead><tr><th>关卡</th><th>名称</th><th>正确数</th><th>连击</th><th>用时</th></table></thead>
-                <tbody>${tableRows || '<td><td colspan="5" class="no-data">暂无记录</td>'}</tbody>
-            </table>
+                <div class="history-stats">
+                    <div class="history-summary">
+                        <div class="summary-item">
+                            <div class="summary-label">通关数</div>
+                            <div class="summary-value">${completedCount}/${thiefLevels.length}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">总分</div>
+                            <div class="summary-value">${totalScore}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">最高连击</div>
+                            <div class="summary-value">${bestCombo}</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">关卡</th>
+                                <th style="min-width:80px;">名称</th>
+                                <th style="width:50px;">得分</th>
+                                <th style="width:50px;">连击</th>
+                                <th style="width:50px;">用时</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
                 <button class="clear-history-btn" id="clearHistoryBtn">🗑️ 清空所有记录</button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
+    
     modal.querySelector('.history-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    
     modal.querySelector('#clearHistoryBtn').addEventListener('click', () => {
-        if (confirm('清空所有记录？')) { localStorage.removeItem(HISTORY_KEY); modal.remove(); showFloatingScore('已清空', gameArea); }
+        if (confirm('清空所有记录？')) { 
+            localStorage.removeItem(HISTORY_KEY); 
+            modal.remove(); 
+            showFloatingScore('已清空', gameArea); 
+        }
     });
 }
 

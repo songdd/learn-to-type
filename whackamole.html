@@ -44,6 +44,9 @@
             flex-shrink: 0;
             overflow-x: auto;
         }
+        .game-header::-webkit-scrollbar {
+            display: none;
+        }
 
         .game-title {
             display: flex;
@@ -124,6 +127,7 @@
             cursor: pointer;
             box-shadow: 0 2px 0 #1A6A6A;
             flex-shrink: 0;
+            font-family: inherit;
         }
         .history-header-btn:hover {
             transform: translateY(-1px);
@@ -446,6 +450,7 @@
             justify-content: center;
             align-items: center;
             z-index: 10000;
+            animation: fadeIn 0.2s ease;
         }
         .history-card {
             background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
@@ -455,6 +460,15 @@
             max-height: 80vh;
             overflow: hidden;
             border: 2px solid #FFB347;
+            animation: bounceIn 0.3s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .history-header {
             background: linear-gradient(135deg, #FF8C42, #FF6B35);
@@ -464,7 +478,7 @@
             align-items: center;
             color: white;
         }
-        .history-header h3 { font-size: 15px; }
+        .history-header h3 { font-size: 15px; margin: 0; }
         .history-close {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -474,15 +488,40 @@
             font-size: 16px;
             cursor: pointer;
             color: white;
+            transition: 0.2s;
         }
-        .history-content { padding: 12px; max-height: 60vh; overflow-y: auto; }
+        .history-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+        .history-content { 
+            padding: 12px; 
+            max-height: 60vh; 
+            overflow-y: auto; 
+        }
+        .history-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-content::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        .history-content::-webkit-scrollbar-thumb {
+            background: #D4A574;
+            border-radius: 4px;
+        }
         .history-stats {
             background: #FFF0E0;
             border-radius: 14px;
             margin-bottom: 12px;
             padding: 10px;
         }
-        .history-summary { display: flex; justify-content: space-around; text-align: center; gap: 8px; }
+        .history-summary { 
+            display: flex; 
+            justify-content: space-around; 
+            text-align: center; 
+            gap: 8px; 
+        }
         .summary-item {
             background: white;
             border-radius: 10px;
@@ -501,8 +540,23 @@
             text-align: center;
             border-bottom: 1px solid #FFD699;
         }
-        .history-table th { background: #FFE0A3; color: #4A2A00; }
-        .best-row { background: #FFF0C0; font-weight: bold; }
+        .history-table th { 
+            background: #FFE0A3; 
+            color: #4A2A00; 
+            font-weight: bold;
+        }
+        .best-row { 
+            background: #FFF0C0; 
+            font-weight: bold; 
+        }
+        .best-row td {
+            border-bottom-color: #D4A76A;
+        }
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
         .clear-history-btn {
             background: #E74C3C;
             color: white;
@@ -513,12 +567,13 @@
             cursor: pointer;
             margin-top: 10px;
             width: 100%;
+            font-family: inherit;
         }
         .clear-history-btn:hover {
             background: #C0392B;
         }
 
-        /* 过关弹框样式 - 与小飞机页面保持一致，添加到 gameArea 内部使用 absolute 定位 */
+        /* 过关弹框样式 */
         .congrats-overlay {
             position: absolute;
             top: 0;
@@ -532,6 +587,77 @@
             align-items: center;
             z-index: 1000;
             border-radius: 40px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .game-card {
+            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
+            border-radius: 40px;
+            padding: 20px 28px;
+            text-align: center;
+            border: 3px solid #FFB347;
+            animation: bounceIn 0.4s ease;
+            max-width: 320px;
+            width: 85%;
+        }
+        .game-card h2 {
+            font-size: 22px;
+            color: #FF8C42;
+            margin-bottom: 10px;
+        }
+        .game-card .final-score {
+            font-size: 38px;
+            font-weight: bold;
+            color: #FF4757;
+            margin: 10px 0;
+        }
+        .game-card p {
+            color: #8B4513;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .game-card .auto-tip {
+            font-size: 11px;
+            color: #FF8C42;
+            margin: 8px 0;
+        }
+        .game-card button {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            border: none;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .game-card button:hover {
+            transform: scale(1.02);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #FF8C42;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 1000;
+            animation: fadeInOut 2s ease;
+            white-space: nowrap;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
         }
 
         @media (max-width: 800px) {
@@ -769,81 +895,72 @@ function getMoleHTML(letter, skinEmoji = currentSkin) {
 
 // ==================== 洞位布局配置（8种不同布局，按关卡ID循环） ====================
 const HOLE_LAYOUTS = [
-    // 布局0: 上面2个 + 中间1个 + 下面3个
     [
-        { row: 1, col: 1 },  // 洞1
-        { row: 1, col: 3 },  // 洞2
-        { row: 2, col: 2 },  // 洞3
-        { row: 3, col: 1 },  // 洞4
-        { row: 3, col: 2 },  // 洞5
-        { row: 3, col: 3 }   // 洞6
+        { row: 1, col: 1 },
+        { row: 1, col: 3 },
+        { row: 2, col: 2 },
+        { row: 3, col: 1 },
+        { row: 3, col: 2 },
+        { row: 3, col: 3 }
     ],
-    // 布局1: 上面3个 + 中间1个 + 下面2个
     [
-        { row: 1, col: 1 },  // 洞1
-        { row: 1, col: 2 },  // 洞2
-        { row: 1, col: 3 },  // 洞3
-        { row: 2, col: 2 },  // 洞4
-        { row: 3, col: 1 },  // 洞5
-        { row: 3, col: 3 }   // 洞6
+        { row: 1, col: 1 },
+        { row: 1, col: 2 },
+        { row: 1, col: 3 },
+        { row: 2, col: 2 },
+        { row: 3, col: 1 },
+        { row: 3, col: 3 }
     ],
-    // 布局2: 上面1个 + 中间3个 + 下面2个
     [
-        { row: 1, col: 2 },  // 洞1
-        { row: 2, col: 1 },  // 洞2
-        { row: 2, col: 2 },  // 洞3
-        { row: 2, col: 3 },  // 洞4
-        { row: 3, col: 1 },  // 洞5
-        { row: 3, col: 3 }   // 洞6
+        { row: 1, col: 2 },
+        { row: 2, col: 1 },
+        { row: 2, col: 2 },
+        { row: 2, col: 3 },
+        { row: 3, col: 1 },
+        { row: 3, col: 3 }
     ],
-    // 布局3: 上面2个 + 中间2个 + 下面2个（梅花形）
     [
-        { row: 1, col: 1 },  // 洞1
-        { row: 1, col: 3 },  // 洞2
-        { row: 2, col: 1 },  // 洞3
-        { row: 2, col: 3 },  // 洞4
-        { row: 3, col: 1 },  // 洞5
-        { row: 3, col: 3 }   // 洞6
+        { row: 1, col: 1 },
+        { row: 1, col: 3 },
+        { row: 2, col: 1 },
+        { row: 2, col: 3 },
+        { row: 3, col: 1 },
+        { row: 3, col: 3 }
     ],
-    // 布局4: 上面2个 + 中间2个 + 下面2个（X形 + 中心）
     [
-        { row: 1, col: 1 },  // 洞1
-        { row: 1, col: 3 },  // 洞2
-        { row: 2, col: 2 },  // 洞3
-        { row: 3, col: 1 },  // 洞4
-        { row: 3, col: 2 },  // 洞5
-        { row: 3, col: 3 }   // 洞6
+        { row: 1, col: 1 },
+        { row: 1, col: 3 },
+        { row: 2, col: 2 },
+        { row: 3, col: 1 },
+        { row: 3, col: 2 },
+        { row: 3, col: 3 }
     ],
-    // 布局5: 上面2个 + 中间3个 + 下面1个
     [
-        { row: 1, col: 1 },  // 洞1
-        { row: 1, col: 3 },  // 洞2
-        { row: 2, col: 1 },  // 洞3
-        { row: 2, col: 2 },  // 洞4
-        { row: 2, col: 3 },  // 洞5
-        { row: 3, col: 2 }   // 洞6
+        { row: 1, col: 1 },
+        { row: 1, col: 3 },
+        { row: 2, col: 1 },
+        { row: 2, col: 2 },
+        { row: 2, col: 3 },
+        { row: 3, col: 2 }
     ],
-    // 布局6: 全部随机分散
     [
-        { row: 1, col: 2 },  // 洞1
-        { row: 1, col: 1 },  // 洞2
-        { row: 2, col: 3 },  // 洞3
-        { row: 2, col: 1 },  // 洞4
-        { row: 3, col: 2 },  // 洞5
-        { row: 3, col: 3 }   // 洞6
+        { row: 1, col: 2 },
+        { row: 1, col: 1 },
+        { row: 2, col: 3 },
+        { row: 2, col: 1 },
+        { row: 3, col: 2 },
+        { row: 3, col: 3 }
     ],
-    // 布局7: 三角形分布
     [
-        { row: 1, col: 2 },  // 洞1（顶部）
-        { row: 2, col: 1 },  // 洞2（左中）
-        { row: 2, col: 2 },  // 洞3（中中）
-        { row: 2, col: 3 },  // 洞4（右中）
-        { row: 3, col: 1 },  // 洞5（左下）
-        { row: 3, col: 3 }   // 洞6（右下）
+        { row: 1, col: 2 },
+        { row: 2, col: 1 },
+        { row: 2, col: 2 },
+        { row: 2, col: 3 },
+        { row: 3, col: 1 },
+        { row: 3, col: 3 }
     ]
 ];
 
-// 根据关卡ID获取固定布局（同一关卡每次重玩布局相同）
 function getLayoutForLevel(levelId) {
     const layoutIndex = (levelId - 1) % HOLE_LAYOUTS.length;
     return HOLE_LAYOUTS[layoutIndex];
@@ -938,6 +1055,17 @@ function updateDifficultyByConfig() {
 // ==================== 历史记录 ====================
 const HISTORY_KEY = 'whackamole_history';
 
+// ✅ escapeHtml 函数
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
 function getHistory() {
     const saved = localStorage.getItem(HISTORY_KEY);
     if (saved) try { return JSON.parse(saved); } catch(e) {}
@@ -967,7 +1095,6 @@ function saveLevelRecord(levelId, scoreVal, maxComboVal, timeSeconds) {
     return isNewRecord;
 }
 
-// 同步通关进度到主页面
 function syncCompletedToMain(levelId) {
     if (!levelId) return;
     const key = `typing_completed_whackamole`;
@@ -997,35 +1124,84 @@ function showHistoryModal() {
     const { totalScore, completedCount, bestCombo } = getTotalStats();
     const records = Object.values(history).sort((a, b) => a.id - b.id);
     let tableRows = '', bestRowId = '', bestScore = 0;
-    records.forEach(r => { if (r.score > bestScore) { bestScore = r.score; bestRowId = r.id; } });
-    records.forEach(r => {
-        tableRows += `<tr class="${r.id === bestRowId ? 'best-row' : ''}">`;
-        tableRows += `<td>${r.id}</td><td style="max-width:80px; overflow:hidden;">${(r.description || '').substring(0, 10)}...</td>`;
-        tableRows += `<td style="color:#FF6B35;">${r.score}</td><td style="color:#2D6A2D;">${r.maxCombo}</td><td style="font-size:9px;">${r.time}秒</td>`;
-        tableRows += `<tr>`;
+    
+    records.forEach(r => { 
+        if (r.score > bestScore) { 
+            bestScore = r.score; 
+            bestRowId = r.id; 
+        } 
     });
+    
+    records.forEach(r => {
+        const isBest = r.id === bestRowId && bestScore > 0;
+        tableRows += `<tr class="${isBest ? 'best-row' : ''}">`;
+        tableRows += `<td style="text-align:center;">${r.id}</td>`;
+        // ✅ 修复：完整显示名称，自动换行
+        tableRows += `<td style="word-break:break-word; white-space:normal; max-width:120px; text-align:left; padding:4px 6px;">${escapeHtml(r.description || '')}</td>`;
+        tableRows += `<td style="color:#FF6B35; font-weight:bold; text-align:center;">${r.score}</td>`;
+        tableRows += `<td style="color:#2D6A2D; text-align:center;">${r.maxCombo}</td>`;
+        tableRows += `<td style="font-size:9px; text-align:center;">${r.time}秒</td>`;
+        tableRows += `</tr>`;
+    });
+    
+    if (records.length === 0) {
+        tableRows = '<tr><td colspan="5" class="no-data">暂无记录</td></tr>';
+    }
+    
     const modal = document.createElement('div');
     modal.className = 'history-modal';
     modal.innerHTML = `
         <div class="history-card">
-            <div class="history-header"><h3>📊 通关战绩</h3><button class="history-close">✕</button></div>
+            <div class="history-header">
+                <h3>📊 通关战绩</h3>
+                <button class="history-close">✕</button>
+            </div>
             <div class="history-content">
-                <div class="history-stats"><div class="history-summary">
-                    <div class="summary-item"><div class="summary-label">通关数</div><div class="summary-value">${completedCount}/${whackLevels.length}</div></div>
-                    <div class="summary-item"><div class="summary-label">总分</div><div class="summary-value">${totalScore}</div></div>
-                    <div class="summary-item"><div class="summary-label">最高连击</div><div class="summary-value">${bestCombo}</div></div>
-                </div></div>
-                <table class="history-table"><thead><tr><th>关卡</th><th>名称</th><th>得分</th><th>连击</th><th>用时</th></table></thead>
-                <tbody>${tableRows || '<tr><td colspan="5" class="no-data">暂无记录</td>'}</tbody>
-            </table>
+                <div class="history-stats">
+                    <div class="history-summary">
+                        <div class="summary-item">
+                            <div class="summary-label">通关数</div>
+                            <div class="summary-value">${completedCount}/${whackLevels.length}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">总分</div>
+                            <div class="summary-value">${totalScore}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">最高连击</div>
+                            <div class="summary-value">${bestCombo}</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">关卡</th>
+                                <th style="min-width:80px;">名称</th>
+                                <th style="width:50px;">得分</th>
+                                <th style="width:50px;">连击</th>
+                                <th style="width:50px;">用时</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
                 <button class="clear-history-btn" id="clearHistoryBtn">🗑️ 清空所有记录</button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
+    
     modal.querySelector('.history-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    
     modal.querySelector('#clearHistoryBtn').addEventListener('click', () => {
-        if (confirm('清空所有记录？')) { localStorage.removeItem(HISTORY_KEY); modal.remove(); showFloatingScore('已清空', gameArea); }
+        if (confirm('清空所有记录？')) { 
+            localStorage.removeItem(HISTORY_KEY); 
+            modal.remove(); 
+            showFloatingScore('已清空', gameArea); 
+        }
     });
 }
 
@@ -1452,7 +1628,7 @@ function startSpawning() {
     }, currentSpawnInterval);
 }
 
-// ==================== 过关弹框（与小飞机页面相同的实现方式） ====================
+// ==================== 过关弹框 ====================
 function endGame(isComplete = false) {
     if (!gameActive) return;
     gameActive = false;
@@ -1471,42 +1647,34 @@ function endGame(isComplete = false) {
     
     const hasNext = currentLevelIndex < whackLevels.length - 1;
     
-    // 创建弹框 - 参照小飞机页面，添加到 gameArea 内部，使用 absolute 定位
     const overlay = document.createElement('div');
     overlay.className = 'congrats-overlay';
     
     overlay.innerHTML = `
-        <div class="game-card" style="background: linear-gradient(145deg, #FFF8F0, #FFEFD5); border-radius: 40px; padding: 20px 28px; text-align: center; border: 3px solid #FFB347;">
-            <h2 style="font-size: 22px; color: #FF8C42; margin-bottom: 10px;">🎉 通关成功！ 🎉</h2>
-            <div class="final-score" style="font-size: 38px; font-weight: bold; color: #FF4757; margin: 10px 0;">${score}</div>
-            <p style="color: #8B4513; margin: 5px 0;">🔥 最高连击: ${maxCombo}</p>
-            <p style="color: #8B4513; margin: 5px 0;">📋 本关目标: ${totalTargets}</p>
-            ${hasNext ? '<div class="auto-tip" style="font-size: 11px; color: #FF8C42; margin: 8px 0;">⏰ <span id="countdownNumber">5</span> 秒后自动进入下一关 ⏰</div>' : '<div class="auto-tip" style="font-size: 11px; color: #FF8C42; margin: 8px 0;">🎊 恭喜完成所有关卡！ 🎊</div>'}
-            <div style="margin-top: 10px;">
-                <button id="restartBtnOverlay" style="background: linear-gradient(135deg, #FF8C42, #FF6B35); border: none; border-radius: 40px; padding: 6px 16px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; margin: 5px;">🔄 再玩一次</button>
-                ${hasNext ? '<button id="nextLevelBtnOverlay" style="background: linear-gradient(135deg, #FF8C42, #FF6B35); border: none; border-radius: 40px; padding: 6px 16px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; margin: 5px;">➡️ 下一关</button>' : ''}
-                <button id="backBtnOverlay" style="background: linear-gradient(135deg, #FF8C42, #FF6B35); border: none; border-radius: 40px; padding: 6px 16px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; margin: 5px;">🏠 返回首页</button>
+        <div class="game-card">
+            <h2>🎉 通关成功！ 🎉</h2>
+            <div class="final-score">${score}</div>
+            <p>🔥 最高连击: ${maxCombo}</p>
+            <p>📋 本关目标: ${totalTargets}</p>
+            ${hasNext ? '<div class="auto-tip">⏰ <span id="countdownNumber">5</span> 秒后自动进入下一关 ⏰</div>' : '<div class="auto-tip">🎊 恭喜完成所有关卡！ 🎊</div>'}
+            <div>
+                <button id="restartBtnOverlay">🔄 再玩一次</button>
+                ${hasNext ? '<button id="nextLevelBtnOverlay">➡️ 下一关</button>' : ''}
+                <button id="backBtnOverlay">🏠 返回首页</button>
             </div>
         </div>
     `;
     
-    // 关键：添加到 gameArea 内部（不是 body）
     gameArea.appendChild(overlay);
     
-    const restartBtn = document.getElementById('restartBtnOverlay');
-    const nextBtn = document.getElementById('nextLevelBtnOverlay');
-    const backBtn = document.getElementById('backBtnOverlay');
+    document.getElementById('restartBtnOverlay').addEventListener('click', () => {
+        if (autoNextTimer) clearTimeout(autoNextTimer);
+        overlay.remove();
+        resetGame();
+    });
     
-    if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
-            if (autoNextTimer) clearTimeout(autoNextTimer);
-            overlay.remove();
-            resetGame();
-        });
-    }
-    
-    if (nextBtn && hasNext) {
-        nextBtn.addEventListener('click', () => {
+    if (hasNext) {
+        document.getElementById('nextLevelBtnOverlay').addEventListener('click', () => {
             if (autoNextTimer) clearTimeout(autoNextTimer);
             overlay.remove();
             goNextLevel();
@@ -1525,14 +1693,11 @@ function endGame(isComplete = false) {
         }, 1000);
     }
     
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            if (autoNextTimer) clearTimeout(autoNextTimer);
-            window.location.href = 'index.html';
-        });
-    }
+    document.getElementById('backBtnOverlay').addEventListener('click', () => {
+        if (autoNextTimer) clearTimeout(autoNextTimer);
+        window.location.href = 'index.html';
+    });
     
-    // 点击遮罩层关闭
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
             if (autoNextTimer) clearTimeout(autoNextTimer);
