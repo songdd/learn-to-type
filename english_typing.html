@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>📖 英文文章练习 · 上下对照填空</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2E86AB 0%, #1B4965 50%, #0F2A3F 100%);
+            font-family: 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', system-ui, sans-serif;
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 248, 235, 0.95);
+            border-radius: 1.2rem;
+            box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.3);
+            padding: 0.6rem;
+            border: 2px solid #FFB347;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 6px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #2E86AB, #1B4965);
+            border-radius: 50px;
+        }
+        .page-title h1 {
+            font-size: 1.2rem;
+            color: #FFF8E7;
+            text-shadow: 1px 1px 0 #0F2A3F;
+        }
+
+        .level-subtitle {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #FFE0A3;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+        .level-subtitle .level-number {
+            font-weight: 700;
+            color: #FFD700;
+        }
+        .level-subtitle .level-title {
+            font-weight: 600;
+        }
+        .level-subtitle .level-divider {
+            color: rgba(255, 255, 255, 0.3);
+            margin: 0 6px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            background: #FFF0D4;
+            border-radius: 30px;
+            padding: 6px 24px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: #1B4965;
+        }
+        .stat-item .stat-label {
+            font-weight: 600;
+            color: #1B4965;
+        }
+        .stat-item .stat-value {
+            font-weight: 800;
+            color: #2E86AB;
+            font-size: 0.8rem;
+        }
+        .stat-divider {
+            color: #D4A574;
+            font-size: 0.8rem;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: #FFE8C8;
+            padding: 6px 16px;
+            border-radius: 35px;
+            flex-wrap: wrap;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .nav-message {
+            flex: 1;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #1B4965;
+            background: #FFF8E7;
+            padding: 4px 12px;
+            border-radius: 25px;
+            transition: all 0.2s;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-message.error {
+            background: #FF1744;
+            color: white;
+            animation: errorPulse 0.5s ease;
+        }
+        .nav-message.success {
+            background: #B8E6B8;
+            color: #2D6A2D;
+        }
+        .nav-message.warning {
+            background: #FFB74D;
+            color: #4A2A00;
+        }
+
+        @keyframes errorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .btn {
+            background: #2E86AB;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.7rem;
+        }
+        .btn-primary {
+            background: #FF8C42;
+        }
+        .btn-primary:hover {
+            background: #FFB347;
+            transform: scale(1.02);
+        }
+        .btn:hover {
+            transform: scale(1.02);
+            background: #1B4965;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .left-panel {
+            flex: 0 0 200px;
+            min-width: 170px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .right-panel {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .control-card {
+            background: #FFF8EF;
+            border-radius: 1rem;
+            padding: 16px;
+            border: 2px solid #FFB347;
+        }
+
+        .current-target {
+            text-align: center;
+            background: #FFF0D4;
+            border-radius: 20px;
+            padding: 16px;
+        }
+        .current-word-label {
+            font-size: 0.65rem;
+            color: #1B4965;
+        }
+        .current-word-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: 'Segoe UI', monospace;
+            color: #FF8C42;
+            margin: 4px 0;
+            word-break: break-all;
+        }
+
+        .progress-bar-container {
+            background: #E8D5B0;
+            border-radius: 15px;
+            height: 10px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #2E86AB, #FF8C42);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            font-size: 0.65rem;
+            color: #1B4965;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .action-buttons .btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .nav-controls .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .article-card {
+            background: #FFF8EF;
+            border-radius: 1rem;
+            padding: 16px 20px 20px 20px;
+            border: 2px solid #FFB347;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #1B4965;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #FFE0A3;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .line-group {
+            margin-bottom: 4px;
+        }
+        .line-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .original-line {
+            font-size: 1rem;
+            line-height: 1.8;
+            font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+            color: #2C3E50;
+            padding: 6px 8px 4px 8px;
+            background: #F8F9FA;
+            border-radius: 8px 8px 0 0;
+            word-break: break-word;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            letter-spacing: 0.3px;
+        }
+        .original-line .word-highlight {
+            display: inline-block;
+            padding: 0 2px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .original-line .word-highlight.current-word {
+            background: #FF8C42;
+            color: white;
+            padding: 0 6px;
+        }
+        .original-line .word-highlight.done-word {
+            color: #2D6A2D;
+        }
+
+        .input-line {
+            padding: 4px 8px 10px 8px;
+            background: #FEF9E6;
+            border-radius: 0 0 8px 8px;
+            min-height: 40px;
+            border-bottom: 1px solid #E8D5B0;
+        }
+        .line-group:last-child .input-line {
+            border-bottom: none;
+        }
+
+        .words-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        .custom-word-input {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .underline-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2.5px solid #D4A574;
+            padding: 6px 2px 3px 2px;
+            text-align: center;
+            font-size: 1rem;
+            font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+            font-weight: 500;
+            color: #2C3E50;
+            outline: none;
+            width: 100%;
+            min-width: 30px;
+            transition: border-color 0.2s;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .underline-input:focus {
+            border-bottom-color: #2E86AB;
+            border-bottom-width: 3.5px;
+        }
+
+        .underline-input.correct {
+            border-bottom-color: #2D6A2D;
+            color: #2D6A2D;
+            border-bottom-width: 2.5px;
+        }
+        .underline-input.correct:disabled {
+            border-bottom-width: 2.5px;
+        }
+
+        .underline-input.prefix-error {
+            border-bottom-color: #FF1744 !important;
+            border-bottom-width: 3.5px !important;
+            color: #FF1744 !important;
+            animation: errorPulse 0.5s ease;
+        }
+
+        .underline-input.prefix-error::placeholder {
+            color: #FF1744 !important;
+            opacity: 0.6;
+        }
+
+        .underline-input::placeholder {
+            color: #B8A88A;
+            font-size: 0.9rem;
+            font-weight: 400;
+            opacity: 0.7;
+            letter-spacing: 0.3px;
+            transition: color 0.2s;
+            font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+        }
+
+        .underline-input.correct::placeholder {
+            color: #2D6A2D;
+            opacity: 0.5;
+        }
+
+        .underline-input:disabled {
+            opacity: 1;
+            cursor: default;
+        }
+
+        .status-space {
+            height: 16px;
+            line-height: 16px;
+        }
+
+        .content-scroll {
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 4px;
+            scroll-behavior: smooth;
+        }
+        .content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: #D4A574;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 800px) {
+            .original-line { gap: 6px 12px; font-size: 0.85rem; }
+            .words-container { gap: 6px 12px; }
+            .underline-input { font-size: 0.85rem; padding: 5px 2px 2px 2px; }
+            .underline-input::placeholder { font-size: 0.75rem; }
+            .article-card { padding: 12px 14px 16px 14px; }
+            .left-panel { flex: 1; min-width: 150px; }
+            .stats-bar { gap: 12px; padding: 4px 16px; }
+            .stat-item { font-size: 0.6rem; }
+        }
+        @media (max-width: 600px) {
+            .original-line { gap: 4px 8px; font-size: 0.75rem; }
+            .words-container { gap: 4px 8px; }
+            .underline-input { font-size: 0.75rem; padding: 4px 1px 2px 1px; }
+            .underline-input::placeholder { font-size: 0.65rem; }
+            .article-card { padding: 10px 10px 14px 10px; }
+            .left-panel { flex: 1; min-width: 130px; }
+            .stats-bar { gap: 8px; padding: 4px 12px; flex-wrap: wrap; }
+            .stat-item { font-size: 0.55rem; }
+            .stat-divider { display: none; }
+            .main-content { flex-direction: column-reverse; }
+        }
+
+        .completion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .completion-card {
+            background: linear-gradient(145deg, #FFF8F0, #FFEFD5);
+            border-radius: 28px;
+            padding: 20px 28px 18px 28px;
+            text-align: center;
+            max-width: 360px;
+            width: 90%;
+            border: 3px solid #FFB347;
+            animation: bounceIn 0.3s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .completion-emoji {
+            font-size: 2.2rem;
+            margin-bottom: 4px;
+        }
+        .completion-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #FF8C42;
+            margin-bottom: 10px;
+        }
+        .completion-stats {
+            background: #FFF0E0;
+            border-radius: 16px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 0.75rem;
+            border-bottom: 1px solid #E8D5B0;
+        }
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .completion-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .completion-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .completion-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+        }
+        .completion-btn:hover {
+            transform: scale(1.02);
+        }
+        .completion-btn-next {
+            background: #FF8C42;
+            color: white;
+        }
+        .completion-btn-next:hover {
+            background: #FFB347;
+        }
+        .completion-btn-reset {
+            background: #2E86AB;
+            color: white;
+        }
+        .completion-btn-reset:hover {
+            background: #1B4965;
+        }
+        .completion-btn-menu {
+            background: #E8D5B0;
+            color: #5C3D1A;
+        }
+        .completion-btn-menu:hover {
+            background: #D4C4A0;
+        }
+
+        .completion-timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.7rem;
+            color: #1B4965;
+            padding: 4px 0;
+            border-top: 1px solid #E8D5B0;
+            padding-top: 8px;
+        }
+        .completion-timer .timer-number {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #FF8C42;
+            background: #FFF0D4;
+            padding: 0 10px;
+            border-radius: 20px;
+            min-width: 30px;
+            display: inline-block;
+        }
+        .completion-timer .timer-label {
+            color: #8B6914;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #FF8C42;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            z-index: 1000;
+            animation: fadeOut 2s ease;
+            white-space: nowrap;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            70% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            gap: 15px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #FFB347;
+            border-top-color: #2E86AB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 隐藏的测量元素 */
+        #wordMeasurer {
+            position: absolute;
+            visibility: hidden;
+            white-space: nowrap;
+            top: -9999px;
+            left: -9999px;
+            pointer-events: none;
+            font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="page-title">
+        <h1>📖 英文文章练习 · 上下对照填空 ✨</h1>
+        <div class="level-subtitle" id="levelSubtitle">
+            <span class="level-number">第 1 关</span>
+            <span class="level-divider">·</span>
+            <span class="level-title">加载中...</span>
+        </div>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+            <span class="stat-label">🎯 准确率:</span>
+            <span class="stat-value" id="accuracyValue">100</span><span class="stat-value">%</span>
+        </div>
+        <span class="stat-divider">│</span>
+        <div class="stat-item">
+            <span class="stat-label">⏱️ 用时:</span>
+            <span class="stat-value" id="timerValue">0</span><span class="stat-value">s</span>
+        </div>
+        <span class="stat-divider">│</span>
+        <div class="stat-item">
+            <span class="stat-label">📝 进度:</span>
+            <span class="stat-value" id="progressCount">0</span><span class="stat-value">/</span><span class="stat-value" id="totalWords">0</span>
+        </div>
+        <span class="stat-divider">│</span>
+        <div class="stat-item">
+            <span class="stat-label">🔥 连击:</span>
+            <span class="stat-value" id="comboValue">0</span>
+        </div>
+        <span class="stat-divider">│</span>
+        <div class="stat-item">
+            <span class="stat-label">🚀 速度:</span>
+            <span class="stat-value" id="wpmValue">0</span><span class="stat-value"> WPM</span>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-buttons">
+            <button id="prevArticleBtn" class="btn">◀ 上一篇</button>
+            <button id="nextArticleBtn" class="btn btn-primary">下一篇 ▶</button>
+        </div>
+        <div class="nav-message" id="navMessage">✨ 输入单词，自动校验前缀</div>
+        <div class="nav-buttons">
+            <button id="resetBtn" class="btn">🔄 重玩</button>
+            <button id="backToMenuBtn" class="btn">🏠 返回</button>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="control-card">
+                    <div class="current-target">
+                        <div class="current-word-label">🎯 当前单词</div>
+                        <div class="current-word-display" id="currentWordDisplay">—</div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0 / 0</div>
+                    <div class="action-buttons">
+                        <button id="submitAllBtn" class="btn btn-primary">✅ 提交所有</button>
+                        <button id="resetAllBtn" class="btn">🔄 重置所有</button>
+                    </div>
+                    <div class="nav-controls">
+                        <button id="gotoFirstIncompleteBtn" class="btn btn-primary">🎯 跳转到未完成</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="content-scroll" id="contentScroll">
+                    <div class="article-card">
+                        <div id="linesContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="wordMeasurer"></div>
+
+    <div id="loadingContainer" class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">📖 加载文章中...</div>
+    </div>
+</div>
+
+<script>
+// ==================== 配置 ====================
+var CONFIG_PATH = './config.json';
+
+// ==================== 文章数据 ====================
+var articleDatabase = [];
+var currentArticleIndex = 0;
+var currentArticle = null;
+
+var rows = [];
+var allWords = [];
+var wordCorrect = [];
+var wordUserInput = [];
+var wordCompleted = [];
+var wordRowIndex = [];
+var wordIndexInRow = [];
+
+var currentWordIndex = 0;
+
+var totalWords = 0;
+var correctWords = 0;
+var errorWords = 0;
+var combo = 0;
+var maxCombo = 0;
+var active = true;
+var timerStarted = false;
+var startTime = null;
+var timer = null;
+var seconds = 0;
+
+var audioCtx = null;
+var correctSoundBuffer = null;
+var errorSoundBuffer = null;
+var errorMsgTimer = null;
+
+// DOM
+var linesContainer = document.getElementById('linesContainer');
+var currentWordDisplaySpan = document.getElementById('currentWordDisplay');
+var accuracySpan = document.getElementById('accuracyValue');
+var timerSpan = document.getElementById('timerValue');
+var progressCountSpan = document.getElementById('progressCount');
+var totalWordsSpan = document.getElementById('totalWords');
+var comboSpan = document.getElementById('comboValue');
+var wpmSpan = document.getElementById('wpmValue');
+var progressBar = document.getElementById('progressBar');
+var progressTextSpan = document.getElementById('progressText');
+var levelSubtitleSpan = document.getElementById('levelSubtitle');
+var navMessageSpan = document.getElementById('navMessage');
+var wordMeasurer = document.getElementById('wordMeasurer');
+var contentScroll = document.getElementById('contentScroll');
+
+// ==================== 缓存 DOM 元素引用 ====================
+var wordElements = [];       // 每个单词对应的输入框元素
+var statusElements = [];     // 每个单词对应的状态占位元素
+var originalWordElements = []; // 每个单词对应的原文高亮元素
+
+// ==================== 辅助函数 ====================
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function showMessage(text, type) {
+    if (!navMessageSpan) return;
+    if (errorMsgTimer) {
+        clearTimeout(errorMsgTimer);
+        errorMsgTimer = null;
+    }
+    navMessageSpan.innerHTML = text;
+    navMessageSpan.classList.remove('error', 'success', 'warning');
+    if (type === 'error') {
+        navMessageSpan.classList.add('error');
+        errorMsgTimer = setTimeout(function() {
+            navMessageSpan.classList.remove('error');
+            navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+            errorMsgTimer = null;
+        }, 3000);
+    } else if (type === 'success') {
+        navMessageSpan.classList.add('success');
+        errorMsgTimer = setTimeout(function() {
+            navMessageSpan.classList.remove('success');
+            navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+            errorMsgTimer = null;
+        }, 1500);
+    } else {
+        navMessageSpan.innerHTML = text;
+    }
+}
+
+function showToast(msg) {
+    var existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function() { if (toast.parentNode) toast.remove(); }, 2000);
+}
+
+// ==================== 加载配置 ====================
+async function loadConfig() {
+    try {
+        var response = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        var data = await response.json();
+        var groups = data['learn-to-type'] || [];
+        var englishGroup = null;
+        for (var g = 0; g < groups.length; g++) {
+            if (groups[g].code === 'english_typing') {
+                englishGroup = groups[g];
+                break;
+            }
+        }
+        if (englishGroup && englishGroup.levels) {
+            articleDatabase = [];
+            for (var l = 0; l < englishGroup.levels.length; l++) {
+                var level = englishGroup.levels[l];
+                articleDatabase.push({
+                    id: level.id,
+                    title: level.description || '第' + level.id + '篇',
+                    author: level.author || '佚名',
+                    text: level.text || ''
+                });
+            }
+            console.log('✅ 加载了 ' + articleDatabase.length + ' 篇文章');
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('加载失败:', error);
+        return false;
+    }
+}
+
+// ==================== 音效系统 ====================
+function initAudio() {
+    if (audioCtx) return audioCtx;
+    try {
+        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        generateSounds();
+    } catch (e) {}
+    return audioCtx;
+}
+
+function generateSounds() {
+    if (!audioCtx) return;
+    try {
+        var sampleRate = audioCtx.sampleRate;
+        correctSoundBuffer = audioCtx.createBuffer(1, sampleRate * 0.15, sampleRate);
+        var correctData = correctSoundBuffer.getChannelData(0);
+        errorSoundBuffer = audioCtx.createBuffer(1, sampleRate * 0.12, sampleRate);
+        var errorData = errorSoundBuffer.getChannelData(0);
+
+        for (var i = 0; i < sampleRate * 0.15; i++) {
+            var t = i / sampleRate;
+            var sample = Math.sin(2 * Math.PI * (800 - t * 400) * t) * Math.exp(-t * 12);
+            correctData[i] = Math.max(-0.5, Math.min(0.5, sample));
+        }
+        for (var i = 0; i < sampleRate * 0.12; i++) {
+            var t = i / sampleRate;
+            var sample = Math.sin(2 * Math.PI * (400 - t * 800) * t) * Math.exp(-t * 18);
+            errorData[i] = Math.max(-0.4, Math.min(0.4, sample));
+        }
+    } catch (e) {}
+}
+
+function playCorrect() {
+    if (!audioCtx || !correctSoundBuffer) return;
+    if (audioCtx.state !== 'running') { audioCtx.resume().catch(function() {}); return; }
+    try {
+        var source = audioCtx.createBufferSource();
+        source.buffer = correctSoundBuffer;
+        var gain = audioCtx.createGain();
+        gain.gain.value = 0.4;
+        source.connect(gain);
+        gain.connect(audioCtx.destination);
+        source.start();
+    } catch (e) {}
+}
+
+function playError() {
+    if (!audioCtx || !errorSoundBuffer) return;
+    if (audioCtx.state !== 'running') { audioCtx.resume().catch(function() {}); return; }
+    try {
+        var source = audioCtx.createBufferSource();
+        source.buffer = errorSoundBuffer;
+        var gain = audioCtx.createGain();
+        gain.gain.value = 0.35;
+        source.connect(gain);
+        gain.connect(audioCtx.destination);
+        source.start();
+    } catch (e) {}
+}
+
+function enableAudio() {
+    initAudio();
+    if (audioCtx) audioCtx.resume();
+    document.removeEventListener('click', enableAudio);
+    document.removeEventListener('keydown', enableAudio);
+}
+document.addEventListener('click', enableAudio);
+document.addEventListener('keydown', enableAudio);
+
+// ==================== 更新统计 ====================
+function updateStats() {
+    var total = correctWords + errorWords;
+    var accuracy = total === 0 ? 100 : Math.floor((correctWords / total) * 100);
+    accuracySpan.innerText = accuracy;
+    comboSpan.innerText = combo;
+
+    var wpm = 0;
+    if (seconds > 0) {
+        wpm = Math.floor((correctWords / seconds) * 60);
+    }
+    wpmSpan.innerText = wpm;
+
+    var percent = totalWords > 0 ? ((correctWords + errorWords) / totalWords) * 100 : 0;
+    progressBar.style.width = percent + '%';
+    progressCountSpan.innerText = correctWords + errorWords;
+    totalWordsSpan.innerText = totalWords;
+    progressTextSpan.innerText = (correctWords + errorWords) + ' / ' + totalWords;
+}
+
+function startTimer() {
+    if (!timerStarted && active) {
+        timerStarted = true;
+        startTime = Date.now();
+        if (timer) clearInterval(timer);
+        timer = setInterval(function() {
+            if (active && startTime) {
+                seconds = Math.floor((Date.now() - startTime) / 1000);
+                timerSpan.innerText = seconds;
+                updateStats();
+            }
+        }, 500);
+    }
+}
+
+// ==================== 保存进度 ====================
+function syncCompletedToMain(articleId) {
+    if (!articleId) return;
+    var key = 'typing_completed_english_typing';
+    var completed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (completed.indexOf(articleId) === -1) {
+        completed.push(articleId);
+        localStorage.setItem(key, JSON.stringify(completed));
+        console.log('✅ 保存完成文章: ' + articleId);
+    }
+}
+
+// ==================== 解析文章为行和单词 ====================
+function parseArticleToRows(text) {
+    var sentences = text.split(/(?<=[.!?])\s+/);
+    var result = [];
+    for (var s = 0; s < sentences.length; s++) {
+        var sentence = sentences[s].trim();
+        if (sentence.length === 0) continue;
+        var words = sentence.match(/\b\w+(?:'\w+)?\b|[.,!?;:]/g) || [];
+        if (words.length > 0) {
+            result.push(words);
+        }
+    }
+    return result;
+}
+
+// ==================== 初始化数据 ====================
+function initData() {
+    allWords = [];
+    wordCorrect = [];
+    wordUserInput = [];
+    wordCompleted = [];
+    wordRowIndex = [];
+    wordIndexInRow = [];
+
+    for (var r = 0; r < rows.length; r++) {
+        for (var w = 0; w < rows[r].length; w++) {
+            allWords.push(rows[r][w]);
+            wordCorrect.push(false);
+            wordUserInput.push('');
+            wordCompleted.push(false);
+            wordRowIndex.push(r);
+            wordIndexInRow.push(w);
+        }
+    }
+    totalWords = allWords.length;
+}
+
+// ==================== 获取第一个未完成的单词索引 ====================
+function getFirstIncompleteIndex() {
+    for (var i = 0; i < allWords.length; i++) {
+        if (!wordCompleted[i]) return i;
+    }
+    return -1;
+}
+
+// ==================== 检查前缀匹配 ====================
+function isPrefixMatch(input, word) {
+    if (!input) return true;
+    var inputLower = input.toLowerCase();
+    var wordLower = word.toLowerCase();
+    return wordLower.indexOf(inputLower) === 0;
+}
+
+// ==================== 获取当前字体大小 ====================
+function getCurrentFontSize() {
+    var width = window.innerWidth;
+    if (width < 600) return 14;
+    if (width < 800) return 15;
+    return 16;
+}
+
+// ==================== 方案B：真实 DOM 测量单词宽度 ====================
+function measureWordWidth(word, fontSize) {
+    if (!wordMeasurer) return word.length * 0.65 + 0.5;
+    wordMeasurer.style.fontSize = fontSize + 'px';
+    wordMeasurer.textContent = word || ' ';
+    var width = wordMeasurer.offsetWidth;
+    if (width === 0) {
+        return word.length * 0.65 + 0.5;
+    }
+    return width + 6;
+}
+
+// ==================== 获取全局索引 ====================
+function getGlobalIndex(row, col) {
+    var idx = 0;
+    for (var r = 0; r < row; r++) {
+        idx += rows[r].length;
+    }
+    return idx + col;
+}
+
+// ==================== 增量更新：只更新变化的元素 ====================
+function updateWordElement(idx) {
+    if (idx >= allWords.length) return;
+    
+    var word = allWords[idx];
+    var isCorrect = wordCompleted[idx];
+    var userValue = wordUserInput[idx] || '';
+    var isCurrent = (idx === currentWordIndex && !isCorrect);
+    
+    // 1. 更新输入框
+    var input = wordElements[idx];
+    if (input) {
+        if (isCorrect) {
+            input.value = word;
+            input.classList.add('correct');
+            input.disabled = true;
+            input.classList.remove('prefix-error');
+        } else {
+            input.value = userValue;
+            input.classList.remove('correct');
+            input.disabled = false;
+        }
+        // 更新 placeholder
+        input.placeholder = word;
+    }
+    
+    // 2. 更新状态占位
+    var statusEl = statusElements[idx];
+    if (statusEl) {
+        if (isCorrect) {
+            statusEl.innerHTML = '';
+        } else {
+            statusEl.innerHTML = '';
+        }
+    }
+    
+    // 3. 更新原文高亮
+    var origEl = originalWordElements[idx];
+    if (origEl) {
+        origEl.classList.remove('current-word', 'done-word');
+        if (isCorrect) {
+            origEl.classList.add('done-word');
+        } else if (isCurrent) {
+            origEl.classList.add('current-word');
+        }
+    }
+    
+    // 4. 更新当前单词显示
+    updateCurrentWordDisplay();
+}
+
+// ==================== 增量更新：当前行完成时，更新整行状态 ====================
+function updateRowStatus(rowIdx) {
+    var rowWords = rows[rowIdx];
+    for (var i = 0; i < rowWords.length; i++) {
+        var gIdx = getGlobalIndex(rowIdx, i);
+        updateWordElement(gIdx);
+    }
+}
+
+// ==================== 构建初始 DOM ====================
+function buildInitialDOM() {
+    if (!allWords.length) return;
+    
+    // 重置缓存
+    wordElements = [];
+    statusElements = [];
+    originalWordElements = [];
+    
+    linesContainer.innerHTML = '';
+    var fontSize = getCurrentFontSize();
+    
+    for (var r = 0; r < rows.length; r++) {
+        var group = document.createElement('div');
+        group.className = 'line-group';
+        
+        // 原文行
+        var originalDiv = document.createElement('div');
+        originalDiv.className = 'original-line';
+        
+        for (var w = 0; w < rows[r].length; w++) {
+            var gIdx = getGlobalIndex(r, w);
+            var word = rows[r][w];
+            var isCurrent = (gIdx === currentWordIndex && !wordCompleted[gIdx]);
+            var isDone = wordCompleted[gIdx];
+            
+            var span = document.createElement('span');
+            span.className = 'word-highlight';
+            if (isCurrent) span.classList.add('current-word');
+            if (isDone) span.classList.add('done-word');
+            span.textContent = word;
+            originalDiv.appendChild(span);
+            originalWordElements[gIdx] = span;
+        }
+        group.appendChild(originalDiv);
+        
+        // 输入行
+        var inputDiv = document.createElement('div');
+        inputDiv.className = 'input-line';
+        var container = document.createElement('div');
+        container.className = 'words-container';
+        
+        for (var wi = 0; wi < rows[r].length; wi++) {
+            var gIdx = getGlobalIndex(r, wi);
+            var word = rows[r][wi];
+            var isCorrect = wordCompleted[gIdx];
+            var userValue = wordUserInput[gIdx] || '';
+            
+            var wrapper = document.createElement('div');
+            wrapper.className = 'custom-word-input';
+            var widthPx = measureWordWidth(word, fontSize);
+            wrapper.style.width = widthPx + 'px';
+            
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'underline-input';
+            if (isCorrect) {
+                input.classList.add('correct');
+            }
+            input.value = isCorrect ? word : userValue;
+            input.placeholder = word;
+            input.disabled = isCorrect;
+            input.dataset.idx = gIdx;
+            input.style.fontSize = fontSize + 'px';
+            
+            // 绑定事件（只绑定一次）
+            if (!isCorrect) {
+                input.addEventListener('input', function(idx, expectedWord) {
+                    return function(e) {
+                        if (wordCompleted[idx]) return;
+                        var currentValue = e.target.value;
+                        wordUserInput[idx] = currentValue;
+                        
+                        if (currentValue.length > 0) {
+                            if (isPrefixMatch(currentValue, expectedWord)) {
+                                e.target.classList.remove('prefix-error');
+                                if (navMessageSpan.classList.contains('error')) {
+                                    navMessageSpan.classList.remove('error');
+                                    navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+                                    if (errorMsgTimer) {
+                                        clearTimeout(errorMsgTimer);
+                                        errorMsgTimer = null;
+                                    }
+                                }
+                            } else {
+                                e.target.classList.add('prefix-error');
+                                var errorText = '❌ 前缀错误！期望: "' + expectedWord + '"，当前: "' + currentValue + '"';
+                                showMessage(errorText, 'error');
+                                if (!e.target._errorSoundTimer) {
+                                    playError();
+                                    e.target._errorSoundTimer = setTimeout(function() {
+                                        e.target._errorSoundTimer = null;
+                                    }, 300);
+                                }
+                            }
+                        } else {
+                            e.target.classList.remove('prefix-error');
+                            if (navMessageSpan.classList.contains('error')) {
+                                navMessageSpan.classList.remove('error');
+                                navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+                                if (errorMsgTimer) {
+                                    clearTimeout(errorMsgTimer);
+                                    errorMsgTimer = null;
+                                }
+                            }
+                        }
+                        
+                        if (currentValue.toLowerCase() === expectedWord.toLowerCase()) {
+                            e.target.classList.remove('prefix-error');
+                            if (navMessageSpan.classList.contains('error')) {
+                                navMessageSpan.classList.remove('error');
+                                if (errorMsgTimer) {
+                                    clearTimeout(errorMsgTimer);
+                                    errorMsgTimer = null;
+                                }
+                            }
+                            handleWordSubmit(idx, e.target);
+                        }
+                    };
+                }(gIdx, word));
+                
+                input.addEventListener('focus', function(idx) {
+                    return function() {
+                        if (idx !== currentWordIndex && !wordCompleted[idx]) {
+                            currentWordIndex = idx;
+                            // 更新所有单词的显示状态
+                            for (var i = 0; i < allWords.length; i++) {
+                                updateWordElement(i);
+                            }
+                            updateCurrentWordDisplay();
+                            scrollToWord(idx);
+                        }
+                    };
+                }(gIdx));
+            }
+            
+            wrapper.appendChild(input);
+            wordElements[gIdx] = input;
+            
+            var statusSpace = document.createElement('div');
+            statusSpace.className = 'status-space';
+            wrapper.appendChild(statusSpace);
+            statusElements[gIdx] = statusSpace;
+            
+            container.appendChild(wrapper);
+        }
+        
+        inputDiv.appendChild(container);
+        group.appendChild(inputDiv);
+        linesContainer.appendChild(group);
+    }
+    
+    updateCurrentWordDisplay();
+    updateStats();
+    
+    // 聚焦当前单词
+    setTimeout(function() {
+        var inputs = document.querySelectorAll('.underline-input:not(:disabled)');
+        for (var i = 0; i < inputs.length; i++) {
+            if (parseInt(inputs[i].dataset.idx) === currentWordIndex && !inputs[i].disabled) {
+                inputs[i].focus();
+                if (inputs[i].value.length > 0) {
+                    var event = new Event('input');
+                    inputs[i].dispatchEvent(event);
+                }
+                break;
+            }
+        }
+        if (document.activeElement === document.body && inputs.length > 0) {
+            inputs[0].focus();
+        }
+    }, 100);
+    
+    scrollToWord(currentWordIndex);
+}
+
+// ==================== 滚动到指定单词 ====================
+function scrollToWord(idx) {
+    if (idx >= wordElements.length) return;
+    var targetEl = wordElements[idx];
+    if (!targetEl) return;
+    
+    // 使用 requestAnimationFrame 避免布局抖动
+    requestAnimationFrame(function() {
+        var rect = targetEl.getBoundingClientRect();
+        var containerRect = contentScroll.getBoundingClientRect();
+        var padding = 80;
+        if (rect.top < containerRect.top + padding || rect.bottom > containerRect.bottom - padding) {
+            targetEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+    });
+}
+
+// ==================== 更新当前单词显示 ====================
+function updateCurrentWordDisplay() {
+    if (currentWordIndex < allWords.length && !wordCompleted[currentWordIndex]) {
+        currentWordDisplaySpan.innerText = allWords[currentWordIndex];
+    } else {
+        var allDone = true;
+        for (var i = 0; i < allWords.length; i++) {
+            if (!wordCompleted[i]) { allDone = false; break; }
+        }
+        if (allDone) {
+            currentWordDisplaySpan.innerText = '🎉 全部完成！';
+        } else {
+            currentWordDisplaySpan.innerText = '—';
+        }
+    }
+}
+
+// ==================== 处理单词提交 ====================
+function handleWordSubmit(idx, inputElement) {
+    if (!active) return;
+    if (wordCompleted[idx]) return;
+    
+    var expectedWord = allWords[idx];
+    var userWord = inputElement.value.trim();
+    
+    startTimer();
+    
+    if (userWord.toLowerCase() === expectedWord.toLowerCase()) {
+        playCorrect();
+        wordCompleted[idx] = true;
+        wordUserInput[idx] = expectedWord;
+        correctWords++;
+        combo++;
+        if (combo > maxCombo) maxCombo = combo;
+        
+        // ★★★ 增量更新：只更新这个单词 ★★★
+        updateWordElement(idx);
+        updateStats();
+        
+        showMessage('✅ 正确！ "' + expectedWord + '"', 'success');
+        
+        // 跳到下一个未完成的单词
+        var nextIdx = idx + 1;
+        while (nextIdx < allWords.length && wordCompleted[nextIdx]) {
+            nextIdx++;
+        }
+        if (nextIdx < allWords.length) {
+            currentWordIndex = nextIdx;
+            // 更新下一个单词为当前状态
+            updateWordElement(nextIdx);
+            updateCurrentWordDisplay();
+            scrollToWord(nextIdx);
+            // 聚焦到下一个输入框
+            setTimeout(function() {
+                var nextInput = wordElements[nextIdx];
+                if (nextInput && !nextInput.disabled) {
+                    nextInput.focus();
+                }
+            }, 50);
+        } else {
+            var allDone = true;
+            for (var i = 0; i < allWords.length; i++) {
+                if (!wordCompleted[i]) { allDone = false; break; }
+            }
+            if (allDone) {
+                finishArticle();
+            }
+        }
+    } else {
+        playError();
+        errorWords++;
+        combo = 0;
+        
+        inputElement.classList.add('prefix-error');
+        showMessage('❌ 错误！应该是 "' + expectedWord + '"', 'error');
+        
+        setTimeout(function() {
+            inputElement.classList.remove('prefix-error');
+        }, 500);
+        
+        inputElement.value = '';
+        wordUserInput[idx] = '';
+        inputElement.focus();
+    }
+    
+    updateStats();
+}
+
+// ==================== 提交所有 ====================
+function submitAll() {
+    if (!active) return;
+    
+    var hasError = false;
+    for (var i = 0; i < allWords.length; i++) {
+        if (wordCompleted[i]) continue;
+        
+        var expectedWord = allWords[i];
+        var userWord = (wordUserInput[i] || '').trim();
+        
+        if (userWord.toLowerCase() === expectedWord.toLowerCase()) {
+            wordCompleted[i] = true;
+            wordUserInput[i] = expectedWord;
+            correctWords++;
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+        } else {
+            hasError = true;
+            if (userWord) {
+                errorWords++;
+                combo = 0;
+            }
+        }
+    }
+    
+    // 批量更新所有单词状态
+    for (var i = 0; i < allWords.length; i++) {
+        updateWordElement(i);
+    }
+    updateStats();
+    
+    if (!hasError) {
+        showMessage('🎉 所有单词全部正确！', 'success');
+        var allDone = true;
+        for (var i = 0; i < allWords.length; i++) {
+            if (!wordCompleted[i]) { allDone = false; break; }
+        }
+        if (allDone) {
+            finishArticle();
+        }
+    } else {
+        showMessage('⚠️ 还有单词不正确，请修改后再提交', 'error');
+        playError();
+    }
+}
+
+// ==================== 重置所有 ====================
+function resetAll() {
+    if (!active) return;
+    
+    for (var i = 0; i < allWords.length; i++) {
+        wordCompleted[i] = false;
+        wordUserInput[i] = '';
+    }
+    correctWords = 0;
+    errorWords = 0;
+    combo = 0;
+    currentWordIndex = getFirstIncompleteIndex();
+    if (currentWordIndex === -1) currentWordIndex = 0;
+    
+    // 批量更新所有单词
+    for (var i = 0; i < allWords.length; i++) {
+        updateWordElement(i);
+    }
+    updateStats();
+    
+    if (navMessageSpan.classList.contains('error')) {
+        navMessageSpan.classList.remove('error');
+        navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+        if (errorMsgTimer) {
+            clearTimeout(errorMsgTimer);
+            errorMsgTimer = null;
+        }
+    }
+    
+    showMessage('🔄 已重置所有单词', 'normal');
+    scrollToWord(currentWordIndex);
+}
+
+// ==================== 跳转到未完成 ====================
+function goToFirstIncomplete() {
+    var idx = getFirstIncompleteIndex();
+    if (idx !== -1) {
+        currentWordIndex = idx;
+        // 更新所有单词的显示状态
+        for (var i = 0; i < allWords.length; i++) {
+            updateWordElement(i);
+        }
+        updateCurrentWordDisplay();
+        scrollToWord(idx);
+        showMessage('🎯 跳转到第 ' + (idx + 1) + ' 个单词', 'normal');
+        setTimeout(function() {
+            var input = wordElements[idx];
+            if (input && !input.disabled) {
+                input.focus();
+            }
+        }, 100);
+    } else {
+        showToast('🎉 所有单词都已完成！');
+    }
+}
+
+// ==================== 完成文章 ====================
+function finishArticle() {
+    active = false;
+    if (timer) clearInterval(timer);
+    
+    var total = correctWords + errorWords;
+    var accuracy = total === 0 ? 100 : Math.floor((correctWords / total) * 100);
+    var wpm = parseInt(wpmSpan.innerText) || 0;
+    
+    if (currentArticle && currentArticle.id) {
+        syncCompletedToMain(currentArticle.id);
+    }
+    
+    showCompletionDialog(accuracy, wpm);
+}
+
+// ==================== 显示通关弹框 ====================
+function showCompletionDialog(accuracy, wpm) {
+    var hasNext = currentArticleIndex < articleDatabase.length - 1;
+    
+    var overlay = document.createElement('div');
+    overlay.className = 'completion-overlay';
+    overlay.innerHTML = `
+        <div class="completion-card">
+            <div class="completion-emoji">🏆 ${accuracy === 100 ? '⭐⭐⭐' : accuracy >= 90 ? '⭐⭐' : '⭐'}</div>
+            <div class="completion-title">《${escapeHtml(currentArticle.title)}》完成！</div>
+            <div class="completion-stats">
+                <div class="stat-row"><span>📊 准确率</span><span>${accuracy}%</span></div>
+                <div class="stat-row"><span>⏱️ 用时</span><span>${seconds} 秒</span></div>
+                <div class="stat-row"><span>✅ 正确单词</span><span>${correctWords}</span></div>
+                <div class="stat-row"><span>❌ 错误单词</span><span>${errorWords}</span></div>
+                <div class="stat-row"><span>🔥 最高连击</span><span>${maxCombo}</span></div>
+                <div class="stat-row"><span>🚀 打字速度</span><span>${wpm} WPM</span></div>
+            </div>
+            <div class="completion-footer">
+                <div class="completion-buttons">
+                    ${hasNext ? '<button class="completion-btn completion-btn-next" id="completionNextBtn">📖 下一篇</button>' : ''}
+                    <button class="completion-btn completion-btn-reset" id="completionResetBtn">🔄 重玩</button>
+                    <button class="completion-btn completion-btn-menu" id="completionMenuBtn">🏠 菜单</button>
+                </div>
+                <div class="completion-timer">
+                    <span class="timer-label">⏰</span>
+                    <span class="timer-number" id="timerCountdown">10</span>
+                    <span class="timer-label">秒后自动${hasNext ? '进入下一篇' : '关闭'}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    var resetBtn = overlay.querySelector('#completionResetBtn');
+    var menuBtn = overlay.querySelector('#completionMenuBtn');
+    var nextBtn = overlay.querySelector('#completionNextBtn');
+    
+    var timerCountdownSpan = overlay.querySelector('#timerCountdown');
+    var countdown = 10;
+    var autoTimer = null;
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            if (autoTimer) clearInterval(autoTimer);
+            overlay.remove();
+            resetCurrentArticle();
+        });
+    }
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function() {
+            if (autoTimer) clearInterval(autoTimer);
+            overlay.remove();
+            window.location.href = 'index.html';
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            if (autoTimer) clearInterval(autoTimer);
+            overlay.remove();
+            goNextArticle();
+        });
+    }
+    
+    if (hasNext) {
+        autoTimer = setInterval(function() {
+            countdown--;
+            if (timerCountdownSpan) {
+                timerCountdownSpan.textContent = countdown;
+            }
+            if (countdown <= 0) {
+                clearInterval(autoTimer);
+                overlay.remove();
+                goNextArticle();
+            }
+        }, 1000);
+    } else {
+        autoTimer = setInterval(function() {
+            countdown--;
+            if (timerCountdownSpan) {
+                timerCountdownSpan.textContent = countdown;
+            }
+            if (countdown <= 0) {
+                clearInterval(autoTimer);
+                overlay.remove();
+            }
+        }, 1000);
+    }
+    
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    });
+}
+
+// ==================== 重置当前文章 ====================
+function resetCurrentArticle() {
+    active = true;
+    timerStarted = false;
+    if (timer) clearInterval(timer);
+    timer = null;
+    startTime = null;
+    seconds = 0;
+    timerSpan.innerText = "0";
+    
+    correctWords = 0;
+    errorWords = 0;
+    combo = 0;
+    maxCombo = 0;
+    
+    for (var i = 0; i < allWords.length; i++) {
+        wordCompleted[i] = false;
+        wordUserInput[i] = '';
+    }
+    currentWordIndex = getFirstIncompleteIndex();
+    if (currentWordIndex === -1) currentWordIndex = 0;
+    
+    // 批量更新所有单词
+    for (var i = 0; i < allWords.length; i++) {
+        updateWordElement(i);
+    }
+    updateStats();
+    
+    if (navMessageSpan.classList.contains('error')) {
+        navMessageSpan.classList.remove('error');
+        navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+        if (errorMsgTimer) {
+            clearTimeout(errorMsgTimer);
+            errorMsgTimer = null;
+        }
+    }
+    
+    showMessage('🔄 重新开始《' + currentArticle.title + '》', 'normal');
+    scrollToWord(currentWordIndex);
+}
+
+// ==================== 加载文章 ====================
+function loadArticle(index) {
+    if (!articleDatabase.length || index >= articleDatabase.length) return;
+    
+    currentArticle = articleDatabase[index];
+    currentArticleIndex = index;
+    
+    var levelNum = index + 1;
+    var title = currentArticle.title || '未知文章';
+    if (levelSubtitleSpan) {
+        levelSubtitleSpan.innerHTML = 
+            '<span class="level-number">第 ' + levelNum + ' 关</span>' +
+            '<span class="level-divider">·</span>' +
+            '<span class="level-title">' + escapeHtml(title) + '</span>';
+    }
+    
+    rows = parseArticleToRows(currentArticle.text);
+    if (rows.length === 0) {
+        rows = [currentArticle.text.split(/\s+/)];
+    }
+    
+    initData();
+    
+    correctWords = 0;
+    errorWords = 0;
+    combo = 0;
+    maxCombo = 0;
+    currentWordIndex = 0;
+    active = true;
+    timerStarted = false;
+    if (timer) clearInterval(timer);
+    timer = null;
+    startTime = null;
+    seconds = 0;
+    timerSpan.innerText = "0";
+    
+    var h1El = document.querySelector('.page-title h1');
+    if (h1El) {
+        h1El.innerHTML = '📖 ' + escapeHtml(title) + ' · 上下对照填空 ✨';
+    }
+    
+    if (navMessageSpan.classList.contains('error')) {
+        navMessageSpan.classList.remove('error');
+        navMessageSpan.innerHTML = '✨ 输入单词，自动校验前缀';
+        if (errorMsgTimer) {
+            clearTimeout(errorMsgTimer);
+            errorMsgTimer = null;
+        }
+    }
+    
+    // 构建 DOM（只执行一次）
+    buildInitialDOM();
+    updateStats();
+    
+    showMessage('✨ 开始练习《' + title + '》，共 ' + totalWords + ' 个单词', 'normal');
+}
+
+function goPrevArticle() {
+    if (currentArticleIndex > 0) {
+        loadArticle(currentArticleIndex - 1);
+    } else {
+        showMessage('已经是第一篇文章了！', 'error');
+    }
+}
+
+function goNextArticle() {
+    if (currentArticleIndex < articleDatabase.length - 1) {
+        loadArticle(currentArticleIndex + 1);
+    } else {
+        showMessage('🎉 恭喜！已经是最后一篇文章了！', 'success');
+    }
+}
+
+// ==================== 获取URL参数 ====================
+function getArticleIdFromUrl() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var id = parseInt(urlParams.get('id'));
+    return id && !isNaN(id) ? id : null;
+}
+
+// ==================== 绑定事件 ====================
+function bindEvents() {
+    document.getElementById('prevArticleBtn').addEventListener('click', goPrevArticle);
+    document.getElementById('nextArticleBtn').addEventListener('click', goNextArticle);
+    document.getElementById('resetBtn').addEventListener('click', resetCurrentArticle);
+    document.getElementById('backToMenuBtn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+    document.getElementById('submitAllBtn').addEventListener('click', submitAll);
+    document.getElementById('resetAllBtn').addEventListener('click', resetAll);
+    document.getElementById('gotoFirstIncompleteBtn').addEventListener('click', goToFirstIncomplete);
+}
+
+// ==================== 窗口大小变化时重新渲染 ====================
+var resizeTimer = null;
+window.addEventListener('resize', function() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        if (allWords.length > 0) {
+            // 重新测量宽度并更新
+            var fontSize = getCurrentFontSize();
+            for (var i = 0; i < allWords.length; i++) {
+                var word = allWords[i];
+                var widthPx = measureWordWidth(word, fontSize);
+                var wrapper = wordElements[i] ? wordElements[i].parentElement : null;
+                if (wrapper) {
+                    wrapper.style.width = widthPx + 'px';
+                }
+                if (wordElements[i]) {
+                    wordElements[i].style.fontSize = fontSize + 'px';
+                }
+            }
+        }
+        resizeTimer = null;
+    }, 300);
+});
+
+// ==================== 初始化 ====================
+async function init() {
+    var loaded = await loadConfig();
+    if (!loaded || articleDatabase.length === 0) {
+        var loadingContainer = document.getElementById('loadingContainer');
+        loadingContainer.innerHTML = '<div class="loading-spinner"></div><div class="loading-text">❌ 加载失败，请检查 config.json</div>';
+        return;
+    }
+    
+    var articleId = getArticleIdFromUrl();
+    if (articleId) {
+        for (var i = 0; i < articleDatabase.length; i++) {
+            if (articleDatabase[i].id === articleId) {
+                currentArticleIndex = i;
+                break;
+            }
+        }
+    }
+    
+    document.getElementById('loadingContainer').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    
+    loadArticle(currentArticleIndex);
+    bindEvents();
+    initAudio();
+    
+    console.log('✅ 初始化完成，共 ' + articleDatabase.length + ' 篇文章');
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+</script>
+</body>
+</html>

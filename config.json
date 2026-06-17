@@ -887,7 +887,7 @@
         "id": "4",
         "code": "catch_thief",
         "name": "警察抓小偷",       
-        "description": "警察抓小偷",
+        "description": "打字追逃游戏！敲对字母警察前进，打错或等待太久小偷就会逃跑。在距离超过限制前追上小偷即可通关！每关练习不同键位，速度逐渐加快，挑战你的反应和打字准确率。",
         "levels": [
                     {
                         "id": 1,
@@ -2294,7 +2294,255 @@
                     ]
                 }
             ]
-        }
+        },
+        {
+        "id": "6",
+        "code": "english_typing",
+        "name": "📖 英文文章练习",
+        "headerBackground": "linear-gradient(135deg, #2E86AB, #1B4965)",
+        "description": "通过经典英文短文练习打字，提升英文输入速度和准确性。从短句到长文章，循序渐进。",
+        "levels": [
+            {
+            "id": 1,
+            "description": "A Cat",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "The cat sits on the mat. It is a small cat. The cat likes to sleep in the sun."
+            },
+            {
+            "id": 2,
+            "description": "A Dog",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "The dog runs in the park. It is a happy dog. The dog loves to play with a ball."
+            },
+            {
+            "id": 3,
+            "description": "My School",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "I go to school every day. I learn many things. My favorite subject is English. I like to play with my friends."
+            },
+            {
+            "id": 4,
+            "description": "My Family",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "There are four people in my family. My father is a doctor. My mother is a teacher. My sister is a student. I love my family very much."
+            },
+            {
+            "id": 5,
+            "description": "The Sun",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "The sun is very bright. It gives us light and heat. The sun rises in the east and sets in the west."
+            },
+            {
+            "id": 6,
+            "description": "My Pet",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "I have a pet rabbit. It is white and soft. It likes to eat carrots. I play with it every day."
+            },
+            {
+            "id": 7,
+            "description": "The Flower",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "The flower is red and beautiful. It smells very good. I water the flower every morning."
+            },
+            {
+            "id": 8,
+            "description": "My Friend",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "Tom is my best friend. He is kind and funny. We play football together. I like to talk with him."
+            },
+            {
+            "id": 9,
+            "description": "The Bird",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "The bird flies in the sky. It sings a sweet song. The bird lives in a nest in the tree."
+            },
+            {
+            "id": 10,
+            "description": "My Room",
+            "author": "Unknown",
+            "difficulty": "beginner",
+            "url": "./english_typing.html",
+            "text": "My room is clean and tidy. There is a bed and a desk. I have many books on the shelf. I like my room."
+            },
+            {
+            "id": 11,
+            "description": "The Wise Owl",
+            "author": "Aesop",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "An old owl lived in an oak tree. Every day he saw many things happening around him. He heard people talking. He noticed that some people were kind and some were not. The owl became wiser every day."
+            },
+            {
+            "id": 12,
+            "description": "The Fox and the Grapes",
+            "author": "Aesop",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "A hungry fox saw some grapes hanging from a vine. He tried to reach them but could not. He jumped and jumped but still could not reach the grapes. Finally he gave up and said the grapes were sour anyway."
+            },
+            {
+            "id": 13,
+            "description": "The Boy Who Cried Wolf",
+            "author": "Aesop",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "A boy watched sheep near a village. He cried Wolf to make the villagers come. They came but there was no wolf. He did this many times. One day a wolf really came. The boy cried for help but no one believed him. The wolf ate the sheep."
+            },
+            {
+            "id": 14,
+            "description": "The Tortoise and the Hare",
+            "author": "Aesop",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "A hare laughed at a tortoise for being slow. The tortoise challenged the hare to a race. The hare ran fast and stopped to rest. He fell asleep. The tortoise kept walking slowly. When the hare woke up the tortoise had already won the race."
+            },
+            {
+            "id": 15,
+            "description": "The Lion and the Mouse",
+            "author": "Aesop",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "A lion caught a little mouse. The mouse asked the lion to let him go. He promised to help the lion one day. The lion laughed but let him go. Later the lion was caught in a net. The mouse chewed the net and set the lion free."
+            },
+            {
+            "id": 16,
+            "description": "The Ant and the Grasshopper",
+            "author": "Aesop",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "All summer the ant worked hard storing food. The grasshopper played and sang. When winter came the grasshopper had no food. He went to the ant for help. The ant asked what he did all summer. The grasshopper said he sang. The ant told him to dance all winter."
+            },
+            {
+            "id": 17,
+            "description": "Friendship",
+            "author": "Ralph Waldo Emerson",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "A friend is a person with whom I may be sincere. Before him I may think aloud. I am arrived at last in the presence of a man who is real. He is the healthiest the most trustworthy the most sensible of men."
+            },
+            {
+            "id": 18,
+            "description": "Nature",
+            "author": "Ralph Waldo Emerson",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "Nature is a sea of forms. It does not repeat itself. Every day the sun rises and sets. Every day the stars shine at night. The beauty of nature fills the heart with joy and peace."
+            },
+            {
+            "id": 19,
+            "description": "Success",
+            "author": "Ralph Waldo Emerson",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "To laugh often and much to win the respect of intelligent people to earn the appreciation of honest critics to leave the world a bit better whether by a healthy child a garden patch or a redeemed social condition to know even one life has breathed easier because you have lived is to have succeeded."
+            },
+            {
+            "id": 20,
+            "description": "The Road Not Taken",
+            "author": "Robert Frost",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "Two roads diverged in a yellow wood. And sorry I could not travel both. And be one traveler long I stood. And looked down one as far as I could. To where it bent in the undergrowth."
+            },
+            {
+            "id": 21,
+            "description": "Stopping by Woods",
+            "author": "Robert Frost",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "Whose woods these are I think I know. His house is in the village though. He will not see me stopping here. To watch his woods fill up with snow. The woods are lovely dark and deep. But I have promises to keep. And miles to go before I sleep."
+            },
+            {
+            "id": 22,
+            "description": "Dreams",
+            "author": "Langston Hughes",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "Hold fast to dreams for if dreams die life is a broken winged bird that cannot fly. Hold fast to dreams for when dreams go life is a barren field frozen with snow."
+            },
+            {
+            "id": 23,
+            "description": "I Wandered Lonely as a Cloud",
+            "author": "William Wordsworth",
+            "difficulty": "advanced",
+            "url": "./english_typing.html",
+            "text": "I wandered lonely as a cloud that floats on high o'er vales and hills. When all at once I saw a crowd a host of golden daffodils. Beside the lake beneath the trees fluttering and dancing in the breeze."
+            },
+            {
+            "id": 24,
+            "description": "Kindness",
+            "author": "Unknown",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "Kindness is a simple act that can change someone's day. A smile a hug or a few kind words can make a big difference. Always try to be kind to others. The world needs more kindness."
+            },
+            {
+            "id": 25,
+            "description": "Never Give Up",
+            "author": "Unknown",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "Life is full of challenges. Sometimes you will fail. But do not give up. Keep trying and you will succeed. Remember that every failure is a step closer to success. Believe in yourself."
+            },
+            {
+            "id": 26,
+            "description": "The Value of Time",
+            "author": "Unknown",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "Time is more valuable than money. You can earn more money but you cannot get back lost time. Use your time wisely. Do not waste it on things that do not matter. Every moment is precious."
+            },
+            {
+            "id": 27,
+            "description": "Gratitude",
+            "author": "Unknown",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "Being grateful for what you have is the key to happiness. Take a moment each day to think about the good things in your life. Family friends health and love are all things to be thankful for."
+            },
+            {
+            "id": 28,
+            "description": "The Power of Reading",
+            "author": "Unknown",
+            "difficulty": "intermediate",
+            "url": "./english_typing.html",
+            "text": "Reading opens the door to new worlds. It helps you learn new things and see different perspectives. Books can take you on adventures without leaving your home. Make reading a daily habit."
+            },
+            {
+            "id": 29,
+            "description": "If",
+            "author": "Rudyard Kipling",
+            "difficulty": "expert",
+            "url": "./english_typing.html",
+            "text": "If you can keep your head when all about you are losing theirs and blaming it on you. If you can trust yourself when all men doubt you but make allowance for their doubting too. Yours is the earth and everything that's in it. And which is more you'll be a man my son."
+            },
+            {
+            "id": 30,
+            "description": "Invictus",
+            "author": "William Ernest Henley",
+            "difficulty": "expert",
+            "url": "./english_typing.html",
+            "text": "Out of the night that covers me black as the pit from pole to pole. I thank whatever gods may be for my unconquerable soul. In the fell clutch of circumstance I have not winced nor cried aloud. Under the bludgeonings of chance my head is bloody but unbowed. I am the master of my fate. I am the captain of my soul."
+            }
+        ]
+        }        
     ]
-  
 }
