@@ -1,1178 +1,1317 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>打字练习 · 儿童乐园闯关</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>奕霖打字 · 儿童打字成长乐园</title>
     <style>
+        /* ===== 全局重置 & 基础 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
         }
-
         body {
-            background: linear-gradient(145deg, #FFE8C5 0%, #FFD6A5 100%);
+            background: #FFF6ED;
+            font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Comic Sans MS', cursive, sans-serif;
+            color: #3D2B1A;
             min-height: 100vh;
-            font-family: 'Comic Neue', 'Comic Neue', 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', 'Poppins', cursive, sans-serif;
-            padding: 30px 20px 50px;
+            padding: 0 16px 40px;
         }
-
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
         .container {
-            max-width: 1400px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
-        /* ==================== 加载进度条样式 ==================== */
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            gap: 24px;
-        }
-        
-        .loading-animation {
-            width: 80px;
-            height: 80px;
-            position: relative;
-        }
-        
-        .loading-animation .circle {
-            width: 100%;
-            height: 100%;
-            border: 4px solid rgba(255, 200, 100, 0.3);
-            border-top-color: #FF8C42;
-            border-right-color: #FFB347;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        .loading-animation .inner-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 36px;
-            animation: bounce 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-        }
-        
-        .loading-bar-container {
-            width: 280px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .loading-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #FF8C42, #FFB347, #FFD700);
-            border-radius: 20px;
-            animation: loadingProgress 2s ease-in-out infinite;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .loading-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.3), 
-                transparent);
-            animation: shimmer 1.5s infinite;
-        }
-        
-        @keyframes loadingProgress {
-            0% { width: 0%; }
-            30% { width: 40%; }
-            60% { width: 75%; }
-            85% { width: 90%; }
-            100% { width: 100%; }
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .loading-text {
-            font-size: 14px;
-            color: #8B6914;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .loading-dots {
-            display: inline-flex;
-            gap: 4px;
-        }
-        
-        .loading-dots span {
+        /* ===== 滚动条 ===== */
+        ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
-            background: #FF8C42;
-            border-radius: 50%;
-            animation: dotPulse 1.4s ease-in-out infinite;
         }
-        
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
+        ::-webkit-scrollbar-track {
+            background: #F5E6D3;
+            border-radius: 10px;
         }
-        
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes dotPulse {
-            0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
-            30% { opacity: 1; transform: scale(1.2); }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB882;
+            border-radius: 10px;
         }
 
-        /* 调试面板样式 */
-        .debug-panel {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.85);
-            border-radius: 12px;
-            padding: 10px 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 10000;
-            backdrop-filter: blur(8px);
-            border: 1px solid #ff9800;
-            flex-wrap: wrap;
-        }
-        .debug-btn {
-            background: #ff9800;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: monospace;
-            transition: 0.2s;
-        }
-        .debug-btn:hover {
-            background: #ffb347;
-            transform: scale(1.02);
-        }
-        .debug-btn.danger {
-            background: #e74c3c;
-            color: white;
-        }
-        .debug-btn.danger:hover {
-            background: #ff6b6b;
-        }
-        .debug-badge {
-            background: #ff9800;
-            color: #1e2a2a;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .section-wrapper {
-            margin-bottom: 35px;
-        }
-        .section-wrapper:last-child {
-            margin-bottom: 0;
-        }
-
-        .section-header {
-            border-radius: 22px;
-            margin-bottom: 18px;
-            padding: 14px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-            position: relative;
-            overflow: hidden;
-        }
-        .section-header:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
-        }
-        
-        /* 分组卡片背景大图标 */
-        .section-header-bg-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 80px;
-            opacity: 0.15;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-        .section-header:hover .section-header-bg-icon {
-            opacity: 0.25;
-            transform: translateY(-50%) scale(1.05);
-        }
-
-        .section-header-content {
+        /* ===== 顶部导航 ===== */
+        .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 16px 0 12px;
             flex-wrap: wrap;
+            gap: 12px 20px;
+            border-bottom: 2px solid rgba(255, 184, 130, 0.3);
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
             gap: 12px;
-            position: relative;
-            z-index: 2;
         }
-        .section-title-area {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex: 1;
-        }
-        .arrow-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-            background: rgba(255,255,255,0.3);
-            width: 36px;
-            height: 36px;
+        .nav-logo {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            backdrop-filter: blur(4px);
-            color: #fff;
         }
-        .arrow-icon.collapsed {
-            transform: rotate(-90deg);
-        }
-        .title-text {
-            flex: 1;
-        }
-        .title-text h2 {
-            font-size: 1.35rem;
-            color: #fff;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-            margin-bottom: 4px;
-            font-weight: 700;
-        }
-        .title-text .badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.25);
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            color: #fff;
-            margin-top: 2px;
-        }
-        .description-text {
-            max-width: 450px;
-            color: #FFF3E0;
-            font-size: 0.8rem;
-            line-height: 1.35;
-            background: rgba(0,0,0,0.2);
-            padding: 6px 14px;
-            border-radius: 18px;
-        }
-        .group-progress {
-            font-size: 0.7rem;
-            background: rgba(255,255,255,0.3);
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-left: 10px;
-            color: #fff;
-            font-weight: bold;
-        }
-        .reset-progress-btn {
-            background: rgba(0,0,0,0.2);
-            border: none;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            cursor: pointer;
-            margin-left: 8px;
-            transition: 0.2s;
-        }
-        .reset-progress-btn:hover {
-            background: rgba(0,0,0,0.4);
-        }
-        @media (max-width: 700px) {
-            .section-header {
-                padding: 10px 16px;
-                margin-bottom: 14px;
-                border-radius: 18px;
-            }
-            .title-text h2 {
-                font-size: 1.1rem;
-            }
-            .arrow-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 1.2rem;
-            }
-            .description-text {
-                font-size: 0.7rem;
-                max-width: 100%;
-                padding: 4px 10px;
-            }
-            .section-wrapper {
-                margin-bottom: 25px;
-            }
-            .debug-panel {
-                bottom: 10px;
-                right: 10px;
-                padding: 6px 10px;
-            }
-            .debug-btn {
-                padding: 4px 8px;
-                font-size: 0.6rem;
-            }
-            .section-header-bg-icon {
-                font-size: 60px;
-                right: 10px;
-            }
-        }
-
-        .levels-wrapper {
-            transition: max-height 0.4s ease-out, opacity 0.3s ease, visibility 0.3s ease;
-            overflow: hidden;
-            max-height: 10000px;
-            opacity: 1;
-            visibility: visible;
-            padding-top: 6px;
-        }
-        .levels-wrapper.collapsed {
-            max-height: 0;
-            opacity: 0;
-            visibility: hidden;
-            padding-top: 0;
-        }
-
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 14px;
-            justify-items: center;
-            align-items: start;
-        }
-
-        .level-card {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            box-shadow: 0 8px 16px -6px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255,255,255,0.5);
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.2);
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            border: 2px solid rgba(255,245,190,0.8);
-            aspect-ratio: 1 / 0.9;
-        }
-        .level-card.card-completed {
-            border: 3px solid #4CAF50;
-            box-shadow: 0 0 0 2px #C8E6C9, 0 8px 16px -6px rgba(0,0,0,0.2);
-        }
-        .completed-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #4CAF50;
-            color: white;
-            font-size: 1rem;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            z-index: 10;
-            border: 2px solid white;
-            font-weight: bold;
-        }
-
-        .card-bg-layer {
-            position: relative;
+        .nav-logo img {
             width: 100%;
             height: 100%;
-            padding: 12px 8px 14px 8px;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.2s;
-            overflow: hidden;
+            object-fit: contain;
+            display: block;
         }
-
-        .level-badge {
-            align-self: flex-start;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(8px);
-            padding: 3px 10px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: bold;
+        .nav-brand {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             letter-spacing: 0.5px;
-            color: #FFF7E8;
-            border: 1px solid #FFE0A3;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-bottom: 8px;
-            white-space: nowrap;
         }
-        
-        .practice-content {
-            flex: 1;
+        .nav-links {
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            margin: 4px 0;
-            min-height: 0;
-            overflow: hidden;
+            gap: 18px;
+            font-weight: 600;
+            font-size: 15px;
         }
-        .practice-text {
-            font-weight: 700;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(6px);
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 40px;
-            color: #fff9e8;
-            text-shadow: 0 2px 4px #00000030;
-            font-family: 'Comic Neue', 'Comic Sans MS', monospace;
-            border: 1px solid rgba(255,245,180,0.6);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            font-size: clamp(0.7rem, 3vw, 1rem);
+        .nav-links a {
+            color: #6B4F3A;
+            transition: color 0.2s;
+            position: relative;
         }
-
-        .card-footer {
-            height: 5px;
-            background: linear-gradient(90deg, #F9C74F, #F9844A, #F8961E, #90BE6D, #43AA8B);
-            width: 100%;
-            flex-shrink: 0;
+        .nav-links a:hover {
+            color: #FF6B35;
         }
-
-        .level-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 25px -10px rgba(0, 0, 0, 0.3);
-            border-color: #FFD966;
-        }
-        .level-card:active {
-            transform: translateY(-2px) scale(0.98);
-        }
-
-        .level-card::before {
-            content: "⭐";
+        .nav-links a::after {
+            content: '';
             position: absolute;
-            top: -6px;
-            right: 8px;
-            font-size: 14px;
-            opacity: 0.6;
-            pointer-events: none;
-            z-index: 2;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2.5px;
+            background: #FF6B35;
+            border-radius: 4px;
+            transition: width 0.25s;
         }
-        .level-card.card-completed::before {
-            opacity: 1;
-            color: #FFD700;
-            text-shadow: 0 0 2px orange;
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 184, 130, 0.25);
+            padding: 6px 14px 6px 10px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(255, 184, 130, 0.4);
+        }
+        .user-avatar {
+            font-size: 22px;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            font-family: inherit;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.4);
+        }
+        .btn-logout {
+            background: rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #6B4F3A;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn-logout:hover {
+            background: rgba(255, 107, 53, 0.12);
+            border-color: #FF6B35;
+            color: #FF6B35;
         }
 
-        @media (max-width: 1100px) {
-            .levels-grid {
-                grid-template-columns: repeat(4, 1fr);
+        /* ===== 英雄区 ===== */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            padding: 40px 0 48px;
+            flex-wrap: wrap;
+        }
+        .hero-text {
+            flex: 1 1 380px;
+        }
+        .hero-text .tag {
+            display: inline-block;
+            background: #FFE0A3;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #B85C1A;
+            margin-bottom: 12px;
+        }
+        .hero-text h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            line-height: 1.2;
+            font-weight: 800;
+            color: #2C1F14;
+        }
+        .hero-text h1 .highlight {
+            background: linear-gradient(135deg, #FF6B35, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .hero-text p {
+            font-size: 18px;
+            color: #6B4F3A;
+            margin: 16px 0 24px;
+            max-width: 480px;
+            line-height: 1.6;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .btn-hero {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            border: none;
+            padding: 14px 36px;
+            border-radius: 60px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35);
+            transition: 0.25s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-hero:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 28px rgba(255, 107, 53, 0.45);
+        }
+        .btn-hero-secondary {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 2px solid #FFB882;
+            padding: 12px 30px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #6B4F3A;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+        .btn-hero-secondary:hover {
+            background: #fff;
+            border-color: #FF6B35;
+            transform: translateY(-2px);
+        }
+        .hero-visual {
+            flex: 1 1 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .hero-emoji-grid {
+            font-size: clamp(60px, 12vw, 120px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 24px 32px;
+            border-radius: 80px;
+            border: 2px solid rgba(255, 184, 130, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+            line-height: 1.2;
+        }
+        .hero-emoji-grid span {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.06));
+        }
+
+        /* ===== 通用标题 ===== */
+        .section-title {
+            font-size: clamp(24px, 3vw, 34px);
+            font-weight: 700;
+            color: #2C1F14;
+            margin-bottom: 8px;
+        }
+        .section-sub {
+            font-size: 16px;
+            color: #8B6F5A;
+            margin-bottom: 24px;
+        }
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .view-all-link {
+            color: #FF6B35;
+            font-weight: 600;
+            font-size: 15px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .view-all-link:hover {
+            color: #FF8C42;
+            transform: translateX(4px);
+        }
+
+        /* ===== 核心亮点 ===== */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            padding: 30px 0 40px;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 32px;
+            padding: 24px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 184, 130, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            transition: 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: #FFB882;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+        .feature-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+        .feature-card p {
+            font-size: 14px;
+            color: #6B4F3A;
+            line-height: 1.5;
+        }
+
+        /* ===== 内容卡片网格 ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 40px;
+        }
+        .card-grid.game-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+        .card-grid.poetry-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+        .card-grid.english-grid {
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(6px);
+            border-radius: 28px;
+            padding: 18px 16px 16px;
+            border: 1.5px solid rgba(255, 184, 130, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: 0.25s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .content-card:hover {
+            transform: translateY(-4px);
+            border-color: #FFB882;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+        }
+        .content-card .card-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: #FF6B35;
+            background: #FFE0A3;
+            padding: 2px 12px;
+            border-radius: 30px;
+            align-self: flex-start;
+            margin-bottom: 8px;
+        }
+        .content-card .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #2C1F14;
+            margin-bottom: 4px;
+        }
+        .content-card .card-desc {
+            font-size: 13px;
+            color: #7A5F4A;
+            flex: 1;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .content-card .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #A58874;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 10px;
+            margin-top: auto;
+        }
+        .content-card .card-emoji {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        /* ===== 游戏卡片特殊 ===== */
+        .game-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 32px;
+            padding: 22px 20px 20px;
+            border: 2px solid rgba(255, 184, 130, 0.2);
+            transition: 0.3s;
+            cursor: pointer;
+            text-align: center;
+        }
+        .game-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: #FFB882;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+        }
+        .game-card .game-icon {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .game-card h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .game-card p {
+            font-size: 14px;
+            color: #6B4F3A;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .game-card .btn-game {
+            background: linear-gradient(135deg, #FF8C42, #FF6B35);
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            display: inline-block;
+        }
+        .game-card .btn-game:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 14px rgba(255, 107, 53, 0.3);
+        }
+        .game-card .game-status {
+            font-size: 12px;
+            color: #A58874;
+            margin-top: 8px;
+        }
+
+        /* ===== 进度预览 ===== */
+        .dashboard-preview {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 24px 28px;
+            border: 1px solid rgba(255, 184, 130, 0.25);
+            margin: 20px 0 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px 40px;
+        }
+        .dash-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .dash-item .num {
+            font-size: 28px;
+            font-weight: 800;
+            color: #FF6B35;
+        }
+        .dash-item .label {
+            font-size: 14px;
+            color: #7A5F4A;
+            font-weight: 500;
+        }
+        .dash-divider {
+            width: 1px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== 页脚 ===== */
+        .footer {
+            margin-top: 50px;
+            padding-top: 24px;
+            border-top: 2px solid rgba(255, 184, 130, 0.2);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 14px;
+            color: #8B6F5A;
+        }
+        .footer a {
+            color: #6B4F3A;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer a:hover {
+            color: #FF6B35;
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 700px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .nav-links {
+                gap: 12px;
+                font-size: 14px;
+                flex-wrap: wrap;
+            }
+            .nav-right {
+                justify-content: flex-start;
+            }
+            .hero {
+                padding: 20px 0 28px;
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+            .hero-text p {
+                max-width: 100%;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .hero-emoji-grid {
+                font-size: 48px;
+                padding: 16px 24px;
+                gap: 4px 12px;
+            }
+            .dashboard-preview {
+                flex-direction: column;
+                align-items: stretch;
                 gap: 12px;
             }
-        }
-        @media (max-width: 700px) {
-            .levels-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
+            .dash-divider {
+                display: none;
             }
-            body {
-                padding: 20px 12px 40px;
+            .footer {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
             }
-            .level-badge {
-                font-size: 0.6rem;
-                padding: 2px 8px;
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
-            .levels-wrapper {
-                padding-top: 4px;
+            .nav-logo {
+                width: 36px;
+                height: 36px;
+            }
+            .nav-brand {
+                font-size: 18px;
             }
         }
         @media (max-width: 480px) {
-            .levels-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+            body {
+                padding: 0 10px 30px;
+            }
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .card-grid.game-grid {
+                grid-template-columns: 1fr;
+            }
+            .card-grid.poetry-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .card-grid.english-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .content-card {
+                padding: 14px 12px;
+            }
+            .btn-hero {
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+            .nav-logo {
+                width: 32px;
+                height: 32px;
             }
         }
 
-        .status-message {
+        /* ===== 加载占位 ===== */
+        .loading-placeholder {
             text-align: center;
-            background: #F4A261CC;
-            color: #2d3e2b;
-            padding: 20px 28px;
-            border-radius: 60px;
-            margin: 40px auto;
-            max-width: 500px;
-            font-weight: bold;
-            backdrop-filter: blur(6px);
-            font-size: 1.2rem;
+            padding: 40px 0;
+            color: #A58874;
+            font-size: 15px;
+        }
+        .loading-placeholder .spinner {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #F0E3D6;
+            border-top-color: #FF8C42;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .error-box {
-            background: #E9C46A;
-            border-left: 6px solid #E76F51;
-        }
-
-        .fade-in {
-            animation: bounceIn 0.35s ease-out forwards;
-        }
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.95) translateY(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .cute-toast {
+        /* ===== Toast ===== */
+        .toast-global {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: #2A9D8F;
-            color: #FFF3E0;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            background: #3D2B1A;
+            color: #FFF6ED;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
             z-index: 9999;
-            border: 2px solid #F9C74F;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-            font-family: inherit;
-            max-width: 85vw;
-            text-align: center;
-            backdrop-filter: blur(4px);
-            pointer-events: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            animation: toastPop 2.4s ease forwards;
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @keyframes toastPop {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div id="dynamicContent">
-        <div class="loading-container">
-            <div class="loading-animation">
-                <div class="circle"></div>
-                <div class="inner-icon">🎮</div>
+    <div class="container" id="app">
+
+        <!-- ===== 导航栏 ===== -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <span class="nav-logo">
+                    <img src="./pic/brand-icon2.svg" alt="奕霖打字" onerror="this.style.display='none';this.parentElement.textContent='⌨️';" />
+                </span>
+                <span class="nav-brand">奕霖打字</span>
             </div>
-            <div class="loading-bar-container">
-                <div class="loading-bar"></div>
+            <div class="nav-links">
+                <a href="#features">课程</a>
+                <a href="#games">游戏</a>
+                <a href="#poetry">国学</a>
+                <a href="#english">文学</a>
+                <a href="#progress">进度</a>
+                <a href="admin.html" target="_blank" style="color:#8B6F5A;">管理</a>
             </div>
-            <div class="loading-text">
-                <span>加载游戏中</span>
-                <div class="loading-dots">
-                    <span></span><span></span><span></span>
+            <div class="nav-right" id="navUserArea">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+        </nav>
+
+        <!-- ===== 英雄区 ===== -->
+        <section class="hero">
+            <div class="hero-text">
+                <span class="tag">🐣 专为儿童设计</span>
+                <h1>
+                    像玩游戏一样，<br />
+                    <span class="highlight">学会盲打！</span>
+                </h1>
+                <p>
+                    奕霖打字 · 儿童打字成长乐园。<br />
+                    在闯关和射击中，轻松掌握键盘指法，提升打字速度。
+                </p>
+                <div class="hero-actions">
+                    <button class="btn-hero" id="heroStartBtn">🚀 开始第一课</button>
+                    <button class="btn-hero-secondary" id="heroExploreBtn">✨ 探索游戏</button>
                 </div>
             </div>
-        </div>
+            <div class="hero-visual">
+                <div class="hero-emoji-grid">
+                    <span>✈️</span><span>🐭</span>
+                    <span>🚓</span><span>⌨️</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 核心亮点 ===== -->
+        <section id="features">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🌟 为什么选择奕霖打字？</h2>
+                    <div class="section-sub">寓教于乐，让打字成为孩子的超能力</div>
+                </div>
+            </div>
+            <div class="features">
+                <div class="feature-card">
+                    <span class="feature-icon">📚</span>
+                    <h3>系统化课程</h3>
+                    <p>从基准键到全键盘，52个关卡循序渐进，零基础也能轻松跟上。</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎮</span>
+                    <h3>趣味游戏化</h3>
+                    <p>在飞机射击、打地鼠、抓小偷中练习，告别枯燥，越玩越上瘾。</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📜</span>
+                    <h3>国学天地</h3>
+                    <p>在经典诗词中练习拼音打字，感受传统文化之美，寓教于乐。</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🌍</span>
+                    <h3>外国文学</h3>
+                    <p>阅读英文经典短文，在练习打字的同时提升英语语感和阅读能力。</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>成长看得见</h3>
+                    <p>详细的学习报告，记录准确率、速度和通关进度，见证每一步成长。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 课程预览 ===== -->
+        <section id="courses">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📖 热门课程</h2>
+                    <div class="section-sub">从基础到精通，一步一步成为打字小能手</div>
+                </div>
+                <a href="courses.html" class="view-all-link">查看全部课程 →</a>
+            </div>
+            <div class="card-grid" id="courseGrid">
+                <!-- JS 动态渲染 -->
+                <div class="loading-placeholder"><span class="spinner"></span>加载课程中...</div>
+            </div>
+        </section>
+
+        <!-- ===== 游戏乐园 ===== -->
+        <section id="games">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🎮 游戏乐园</h2>
+                    <div class="section-sub">在欢乐的游戏中，不知不觉提升打字速度</div>
+                </div>
+                <a href="games.html" class="view-all-link">查看全部游戏 →</a>
+            </div>
+            <div class="card-grid game-grid" id="gameGrid">
+                <!-- JS 动态渲染 -->
+                <div class="loading-placeholder"><span class="spinner"></span>加载游戏中...</div>
+            </div>
+        </section>
+
+        <!-- ===== 国学天地 ===== -->
+        <section id="poetry">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📜 国学天地</h2>
+                    <div class="section-sub">在经典诗词中练习拼音打字，感受传统文化之美</div>
+                </div>
+                <a href="poetry.html" class="view-all-link">查看全部诗词 →</a>
+            </div>
+            <div class="card-grid poetry-grid" id="poetryGrid">
+                <!-- JS 动态渲染 -->
+                <div class="loading-placeholder"><span class="spinner"></span>加载诗词中...</div>
+            </div>
+        </section>
+
+        <!-- ===== 外国文学 ===== -->
+        <section id="english">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🌍 外国文学</h2>
+                    <div class="section-sub">阅读英文经典，在练习打字的同时提升英语语感</div>
+                </div>
+                <a href="literature.html" class="view-all-link">查看全部文章 →</a>
+            </div>
+            <div class="card-grid english-grid" id="englishGrid">
+                <!-- JS 动态渲染 -->
+                <div class="loading-placeholder"><span class="spinner"></span>加载英文文章中...</div>
+            </div>
+        </section>
+
+        <!-- ===== 进度预览 ===== -->
+        <section id="progress">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📊 我的学习报告</h2>
+                    <div class="section-sub">看看你的成长足迹吧</div>
+                </div>
+            </div>
+            <div class="dashboard-preview" id="dashboardPreview">
+                <!-- JS 动态渲染 -->
+                <div style="color:#A58874; width:100%; text-align:center; padding:8px 0;">登录后查看详细进度 ✨</div>
+            </div>
+        </section>
+
+        <!-- ===== 页脚 ===== -->
+        <footer class="footer">
+            <span>© 2026 奕霖打字 · 快乐学习，轻松打字</span>
+            <div class="footer-links">
+                <a href="admin.html" target="_blank">管理后台</a>
+                <a href="#" onclick="clearAllProgress();return false;">重置进度</a>
+            </div>
+        </footer>
     </div>
-</div>
 
-<script>
-    // ==================== 检查 debug 参数 ====================
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDebug = urlParams.get('debug') === '1';
+    <script>
+        // ================================================================
+        //  配置 & 工具
+        // ================================================================
+        const CONFIG_PATH = './config.json';
 
-    // ==================== 登录验证 ====================
-    (function() {
-        const loggedIn = localStorage.getItem('logged_in');
-        const userName = localStorage.getItem('user_name');
-        
-        if (!isDebug && (!loggedIn || !userName)) {
-            window.location.href = 'login.html';
-            return;
+        // ---------- 工具函数 ----------
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
         }
-        
-        if (isDebug) {
-            console.log('🐞 调试模式已启用，跳过登录验证');
-            if (!localStorage.getItem('logged_in')) {
-                localStorage.setItem('logged_in', 'true');
-                localStorage.setItem('user_name', 'Debug_User');
-            }
+
+        function showToast(msg) {
+            const old = document.querySelector('.toast-global');
+            if (old) old.remove();
+            const el = document.createElement('div');
+            el.className = 'toast-global';
+            el.textContent = msg;
+            document.body.appendChild(el);
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 2400);
         }
-        
-        if (userName) {
-            console.log('🎮 欢迎回来，', userName);
+
+        // ---------- 读取 localStorage ----------
+        function getCompletedLevels(groupCode) {
+            const key = `typing_completed_${groupCode}`;
+            try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
         }
-    })();
 
-    // ==================== 调试功能 ====================
-    function showDebugPanel() {
-        if (!isDebug) return;
-        
-        const panel = document.createElement('div');
-        panel.className = 'debug-panel';
-        panel.innerHTML = `
-            <span class="debug-badge">🐞 DEBUG MODE</span>
-            <button id="debugClearLoginBtn" class="debug-btn danger">🗑️ 清除登录信息</button>
-            <button id="debugClearProgressBtn" class="debug-btn">📊 清除所有进度</button>
-            <button id="debugUnlockAllBtn" class="debug-btn">🔓 解锁所有关卡</button>
-            <button id="debugReloadBtn" class="debug-btn">🔄 重新加载</button>
-            <button id="debugResetCollapseBtn" class="debug-btn">📂 重置折叠状态</button>
-        `;
-        document.body.appendChild(panel);
-        
-        document.getElementById('debugClearLoginBtn').addEventListener('click', () => {
-            if (confirm('⚠️ 确定清除登录信息？清除后需要重新登录。')) {
-                localStorage.removeItem('logged_in');
-                localStorage.removeItem('user_name');
-                alert('已清除登录信息，即将跳转到登录页');
-                window.location.href = window.location.pathname;
-            }
-        });
-        
-        document.getElementById('debugClearProgressBtn').addEventListener('click', () => {
-            if (confirm('⚠️ 确定清除所有通关进度吗？此操作不可恢复！')) {
-                const keys = Object.keys(localStorage);
-                keys.forEach(key => {
-                    if (key.startsWith('typing_completed_')) {
-                        localStorage.removeItem(key);
-                    }
-                });
-                alert('已清除所有通关进度，页面即将刷新');
-                window.location.reload();
-            }
-        });
-        
-        document.getElementById('debugUnlockAllBtn').addEventListener('click', () => {
-            if (confirm('🔓 确定解锁所有关卡吗？')) {
-                fetch(CONFIG_PATH, { cache: 'no-cache' })
-                    .then(res => res.json())
-                    .then(data => {
-                        const groups = data['learn-to-type'] || [];
-                        groups.forEach(group => {
-                            const groupCode = group.code || 'default';
-                            const key = `typing_completed_${groupCode}`;
-                            const allLevelIds = group.levels.map(level => level.id);
-                            localStorage.setItem(key, JSON.stringify(allLevelIds));
-                        });
-                        alert('✅ 已解锁所有关卡！页面即将刷新');
-                        window.location.reload();
-                    })
-                    .catch(err => {
-                        console.error('加载配置失败:', err);
-                        alert('解锁失败，请检查 config.json');
-                    });
-            }
-        });
-        
-        document.getElementById('debugReloadBtn').addEventListener('click', () => {
-            window.location.reload();
-        });
-        
-        document.getElementById('debugResetCollapseBtn').addEventListener('click', () => {
-            if (confirm('📂 确定重置所有分组的折叠状态吗？')) {
-                const keys = Object.keys(localStorage);
-                keys.forEach(key => {
-                    if (key.startsWith('group_collapsed_')) {
-                        localStorage.removeItem(key);
-                    }
-                });
-                alert('已重置折叠状态，页面即将刷新');
-                window.location.reload();
-            }
-        });
-    }
-
-    /**
-     * 打字练习关卡选择器 - 支持分组折叠，完成进度记录，动态num和rate参数
-     */
-    const CONFIG_PATH = './config.json';
-    const container = document.getElementById('dynamicContent');
-
-    // ==================== 折叠状态管理 ====================
-    const COLLAPSE_STORAGE_PREFIX = 'group_collapsed_';
-    
-    function saveGroupCollapsedState(groupCode, isCollapsed) {
-        const key = COLLAPSE_STORAGE_PREFIX + groupCode;
-        localStorage.setItem(key, isCollapsed ? 'true' : 'false');
-    }
-    
-    function loadGroupCollapsedState(groupCode) {
-        const key = COLLAPSE_STORAGE_PREFIX + groupCode;
-        const saved = localStorage.getItem(key);
-        if (saved === null) return false;
-        return saved === 'true';
-    }
-
-    const LEVEL_MAP = {
-        'beginner': { code: 'beginner', name: '初级', desc: '顺序排列' },
-        'intermediate': { code: 'intermediate', name: '中级', desc: '轻微打乱' },
-        'advanced': { code: 'advanced', name: '高级', desc: '完全打乱' }
-    };
-
-    const GROUP_HEADER_COLORS = [
-        "linear-gradient(135deg, #FF6B6B, #EE5A24)",
-        "linear-gradient(135deg, #4ECDC4, #2C8F8F)",
-        "linear-gradient(135deg, #FFE66D, #F39C12)",
-        "linear-gradient(135deg, #9B59B6, #6C3483)",
-        "linear-gradient(135deg, #3498DB, #1F618D)",
-        "linear-gradient(135deg, #1ABC9C, #117A65)",
-        "linear-gradient(135deg, #E74C3C, #B03A2E)",
-        "linear-gradient(135deg, #2ECC71, #1E8449)",
-        "linear-gradient(135deg, #FF69B4, #C71585)",
-        "linear-gradient(135deg, #D35400, #A04000)",
-        "linear-gradient(135deg, #16A085, #0E6655)",
-        "linear-gradient(135deg, #27AE60, #1D8348)",
-        "linear-gradient(135deg, #2980B9, #1A5276)",
-        "linear-gradient(135deg, #8E44AD, #6C3483)",
-        "linear-gradient(135deg, #F1C40F, #D4AC0D)",
-        "linear-gradient(135deg, #E84393, #B53471)",
-        "linear-gradient(135deg, #6C5CE7, #4A3B9E)",
-        "linear-gradient(135deg, #00CEC9, #00A8A4)",
-        "linear-gradient(135deg, #FF7675, #D63031)",
-        "linear-gradient(135deg, #74B9FF, #0984E3)",
-        "linear-gradient(135deg, #A29BFE, #6C5CE7)",
-        "linear-gradient(135deg, #55EFC4, #00B894)",
-        "linear-gradient(135deg, #FD79A8, #E84393)",
-        "linear-gradient(135deg, #FAB1A0, #E17055)",
-        "linear-gradient(135deg, #FFEAA7, #FDCB6E)"
-    ];
-
-    const CARD_COLOR_PALETTE = [
-        "#FF6B6B", "#4ECDC4", "#FFE66D", "#FF9F1C", "#9B59B6",
-        "#3498DB", "#E67E22", "#1ABC9C", "#E74C3C", "#F39C12",
-        "#2ECC71", "#FF69B4", "#5D9B9B", "#D35400", "#C0392B",
-        "#16A085", "#27AE60", "#2980B9", "#8E44AD", "#F1C40F",
-        "#E84393", "#6C5CE7", "#00CEC9", "#FF7675", "#74B9FF",
-        "#A29BFE", "#55EFC4", "#FD79A8", "#FAB1A0", "#FFEAA7"
-    ];
-
-    // ==================== 获取分组背景图标 ====================
-    function getGroupBgIcon(groupCode) {
-        switch(groupCode) {
-            case 'basictype': return '⌨️';
-            case 'plane_shooter': return '✈️';
-            case 'whackamole': return '🐭';
-            case 'catch_thief': return '🚓';
-            default: return '🎮';
+        function getHistory(groupCode) {
+            const keyMap = {
+                'plane_shooter': 'plane_shooter_history',
+                'whackamole': 'whackamole_history',
+                'catch_thief': 'catch_thief_history',
+                'poetry_writing': 'poetry_writing_history',
+                'english_typing': 'english_typing_history'
+            };
+            const key = keyMap[groupCode] || `${groupCode}_history`;
+            try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; }
         }
-    }
 
-    // ==================== LocalStorage 进度管理 ====================
-    function getCompletedLevels(groupCode) {
-        const key = `typing_completed_${groupCode}`;
-        const stored = localStorage.getItem(key);
-        return stored ? JSON.parse(stored) : [];
-    }
-
-    function clearCompletedLevels(groupCode) {
-        const key = `typing_completed_${groupCode}`;
-        localStorage.removeItem(key);
-    }
-
-    function getGroupHeaderBackground(groupData, groupIndex) {
-        if (groupData.headerBackground && groupData.headerBackground.trim() !== '') {
-            return groupData.headerBackground;
-        }
-        const seed = (groupData.id ? parseInt(groupData.id) : groupIndex) || groupIndex;
-        const index = seed % GROUP_HEADER_COLORS.length;
-        return GROUP_HEADER_COLORS[index];
-    }
-
-    function getCardBackground(levelItem, cardId, groupId) {
-        if (levelItem.background && levelItem.background.trim() !== '') {
-            let bg = levelItem.background;
-            if (!bg.includes('linear') && !bg.includes('radial') && !bg.includes('url')) {
-                bg = `linear-gradient(145deg, ${bg}, ${bg}cc)`;
-            }
-            return bg;
-        }
-        const seed = (typeof cardId === 'number' ? cardId : parseInt(cardId) || 0) + (typeof groupId === 'string' ? groupId.charCodeAt(0) || 0 : 0);
-        const color = CARD_COLOR_PALETTE[seed % CARD_COLOR_PALETTE.length];
-        return `linear-gradient(145deg, ${color}, ${color}cc)`;
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    function showCuteToast(message, isError = false) {
-        const oldToast = document.querySelector('.cute-toast');
-        if (oldToast) oldToast.remove();
-        const toast = document.createElement('div');
-        toast.className = 'cute-toast';
-        if (isError) toast.style.background = '#E76F51';
-        toast.innerText = message;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s';
-            setTimeout(() => {
-                if (toast.parentNode) toast.parentNode.removeChild(toast);
-            }, 300);
-        }, 3000);
-    }
-
-    function serializeKeys(keysArray) {
-        if (!keysArray || !Array.isArray(keysArray) || keysArray.length === 0) return '';
-        return encodeURIComponent(JSON.stringify(keysArray));
-    }
-
-    function getFontSizeByTextLength(text) {
-        const len = text.length;
-        if (len <= 8) return '1rem';
-        if (len <= 12) return '0.85rem';
-        if (len <= 16) return '0.75rem';
-        if (len <= 20) return '0.7rem';
-        return '0.65rem';
-    }
-
-    function renderLevelsGroup(groupData, groupIndex) {
-        const groupId = groupData.id || groupIndex;
-        const groupCode = groupData.code || 'default';
-        const groupName = groupData.name || `练习分组 ${groupId}`;
-        const groupDescription = groupData.description || '';
-        const levelsArray = groupData.levels || [];
-        const headerBg = getGroupHeaderBackground(groupData, groupIndex);
-        const bgIcon = getGroupBgIcon(groupCode);
-        
-        const completedLevels = getCompletedLevels(groupCode);
-        const totalLevels = levelsArray.length;
-        const completedCount = completedLevels.filter(id => levelsArray.some(level => level.id === id)).length;
-        const progressPercent = totalLevels > 0 ? Math.round((completedCount / totalLevels) * 100) : 0;
-
-        if (!levelsArray.length) return null;
-
-        const sectionDiv = document.createElement('div');
-        sectionDiv.className = 'section-wrapper';
-        sectionDiv.setAttribute('data-group-id', groupId);
-        sectionDiv.setAttribute('data-group-code', groupCode);
-        
-        const headerDiv = document.createElement('div');
-        headerDiv.className = 'section-header';
-        headerDiv.style.background = headerBg;
-        
-        // 背景大图标
-        const bgIconDiv = document.createElement('div');
-        bgIconDiv.className = 'section-header-bg-icon';
-        bgIconDiv.textContent = bgIcon;
-        headerDiv.appendChild(bgIconDiv);
-        
-        const headerContent = document.createElement('div');
-        headerContent.className = 'section-header-content';
-        
-        const titleArea = document.createElement('div');
-        titleArea.className = 'section-title-area';
-        
-        const arrowSpan = document.createElement('div');
-        arrowSpan.className = 'arrow-icon';
-        arrowSpan.innerHTML = '▼';
-        
-        const titleTextDiv = document.createElement('div');
-        titleTextDiv.className = 'title-text';
-        titleTextDiv.innerHTML = `
-            <h2>${escapeHtml(groupName)} 
-                <span class="group-progress">📊 ${completedCount}/${totalLevels} (${progressPercent}%)</span>
-                <button class="reset-progress-btn" data-group-code="${groupCode}" title="重置该分组进度">🔄 重置</button>
-            </h2>
-            <span class="badge">📚 ${totalLevels} 个关卡</span>
-        `;
-        
-        titleArea.appendChild(arrowSpan);
-        titleArea.appendChild(titleTextDiv);
-        
-        const descDiv = document.createElement('div');
-        descDiv.className = 'description-text';
-        descDiv.innerHTML = escapeHtml(groupDescription) || '点击任意方块，开始练习之旅 ✨';
-        
-        headerContent.appendChild(titleArea);
-        headerContent.appendChild(descDiv);
-        headerDiv.appendChild(headerContent);
-        
-        const wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'levels-wrapper';
-        
-        const gridDiv = document.createElement('div');
-        gridDiv.className = 'levels-grid';
-        
-        // 渲染卡片
-        levelsArray.forEach((levelItem, idx) => {
-            const cardId = levelItem.id ?? (idx + 1);
-            let description = levelItem.description || `第${cardId}关练习`;
-            if (description.length > 20) description = description.substring(0, 18) + '..';
-            
-            const bgStyle = getCardBackground(levelItem, cardId, groupId);
-            
-            let keysArray = levelItem.keys;
-            if (!keysArray || !Array.isArray(keysArray)) keysArray = [];
-            
-            let levelValue = levelItem.level;
-            if (!levelValue || !LEVEL_MAP[levelValue]) levelValue = 'beginner';
-            
-            const keysParamStr = serializeKeys(keysArray);
-            const fontSize = getFontSizeByTextLength(description);
-            const numValue = levelItem.num || '';
-            const rateValue = levelItem.rate || '';
-            const maxDistanceValue = levelItem.maxDistance || '';
-            
-            const isCompleted = completedLevels.includes(cardId);
-            const completedClass = isCompleted ? 'card-completed' : '';
-            
-            const card = document.createElement('div');
-            card.className = `level-card fade-in ${completedClass}`;
-            card.setAttribute('data-url-base', levelItem.url || '#');
-            card.setAttribute('data-keys-param', keysParamStr);
-            card.setAttribute('data-level', levelValue);
-            card.setAttribute('data-level-code', LEVEL_MAP[levelValue]?.code || 'beginner');
-            card.setAttribute('data-id', cardId);
-            card.setAttribute('data-description', description);
-            card.setAttribute('data-group-code', groupCode);
-            card.setAttribute('data-level-id', levelItem.id);
-            if (numValue) {
-                card.setAttribute('data-num', numValue);
-            }
-            if (rateValue) {
-                card.setAttribute('data-rate', rateValue);
-            }
-            if (maxDistanceValue) {
-                card.setAttribute('data-max-distance', maxDistanceValue);
-            }
-            
-            const completedBadge = isCompleted ? '<div class="completed-badge">✅</div>' : '';
-            
-            card.innerHTML = `
-                ${completedBadge}
-                <div class="card-bg-layer" style="background: ${bgStyle}; background-size: cover; background-position: center;">
-                    <div class="level-badge">🎈 第 ${cardId} 关</div>
-                    <div class="practice-content">
-                        <span class="practice-text" style="font-size: ${fontSize};">${escapeHtml(description)}</span>
-                    </div>
-                </div>
-                <div class="card-footer"></div>
-            `;
-            gridDiv.appendChild(card);
-        });
-        
-        wrapperDiv.appendChild(gridDiv);
-        sectionDiv.appendChild(headerDiv);
-        sectionDiv.appendChild(wrapperDiv);
-        
-        // 折叠逻辑
-        const savedCollapsed = loadGroupCollapsedState(groupCode);
-        let isCollapsed = savedCollapsed;
-        
-        if (isCollapsed) {
-            wrapperDiv.classList.add('collapsed');
-            arrowSpan.classList.add('collapsed');
-        }
-        
-        headerDiv.addEventListener('click', (e) => {
-            if (e.target.classList && e.target.classList.contains('reset-progress-btn')) {
-                return;
-            }
-            e.stopPropagation();
-            isCollapsed = !isCollapsed;
-            
-            if (isCollapsed) {
-                wrapperDiv.classList.add('collapsed');
-                arrowSpan.classList.add('collapsed');
-            } else {
-                wrapperDiv.classList.remove('collapsed');
-                arrowSpan.classList.remove('collapsed');
-            }
-            
-            saveGroupCollapsedState(groupCode, isCollapsed);
-        });
-        
-        const resetBtn = titleTextDiv.querySelector('.reset-progress-btn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const groupCodeAttr = resetBtn.getAttribute('data-group-code');
-                if (confirm(`确定要重置「${groupName}」的所有通关进度吗？`)) {
-                    clearCompletedLevels(groupCodeAttr);
-                    showCuteToast(`🔄 已重置「${groupName}」的进度`);
-                    const newSection = renderLevelsGroup(groupData, groupIndex);
-                    if (newSection) {
-                        sectionDiv.parentNode.replaceChild(newSection, sectionDiv);
-                        bindGlobalCardClicks();
-                    }
-                }
+        function getTotalCompletedCount(groups) {
+            let total = 0;
+            groups.forEach(g => {
+                const completed = getCompletedLevels(g.code);
+                total += completed.filter(id => g.levels.some(l => l.id === id)).length;
             });
+            return total;
         }
-        
-        return sectionDiv;
-    }
 
-    function bindGlobalCardClicks() {
-        if (window._globalClickHandler) {
-            document.body.removeEventListener('click', window._globalClickHandler);
+        function getBestComboFromHistory(groups) {
+            let best = 0;
+            groups.forEach(g => {
+                const hist = getHistory(g.code);
+                Object.values(hist).forEach(r => {
+                    if (r.maxCombo && r.maxCombo > best) best = r.maxCombo;
+                });
+            });
+            return best;
         }
-        const handler = (e) => {
-            const card = e.target.closest('.level-card');
-            if (!card) return;
-            
-            const baseUrl = card.getAttribute('data-url-base');
-            const keysParam = encodeURIComponent(card.getAttribute('data-keys-param') || '');
-            const levelValue = encodeURIComponent(card.getAttribute('data-level') || 'beginner');
-            const numValue = card.getAttribute('data-num') || '';
-            const rateValue = card.getAttribute('data-rate') || '';
-            const levelId = card.getAttribute('data-level-id') || '';
-            const maxDistanceValue = card.getAttribute('data-max-distance') || '';
-            const desc = card.getAttribute('data-description') || '这个关卡';
-            
-            if (!baseUrl || baseUrl === '#' || baseUrl === '') {
-                showCuteToast(`🧸 “${desc}” 暂未配置跳转地址，请在 config.json 中配置 url 字段～`, true);
+
+        function getTotalScoreFromHistory(groups) {
+            let total = 0;
+            groups.forEach(g => {
+                const hist = getHistory(g.code);
+                Object.values(hist).forEach(r => {
+                    if (r.score) total += r.score;
+                });
+            });
+            return total;
+        }
+
+        // ---------- 获取用户状态 ----------
+        function getUserInfo() {
+            const loggedIn = localStorage.getItem('logged_in') === 'true';
+            const userName = localStorage.getItem('user_name') || '';
+            return { loggedIn, userName };
+        }
+
+        // ---------- 渲染导航 ----------
+        function renderNav() {
+            const area = document.getElementById('navUserArea');
+            const { loggedIn, userName } = getUserInfo();
+            if (loggedIn && userName) {
+                area.innerHTML = `
+                    <div class="user-badge">
+                        <span class="user-avatar">🧒</span>
+                        <span>${escapeHtml(userName)}</span>
+                    </div>
+                    <button class="btn-logout" id="logoutBtn">退出</button>
+                `;
+                document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                    localStorage.removeItem('logged_in');
+                    localStorage.removeItem('user_name');
+                    showToast('👋 已退出');
+                    renderNav();
+                    renderDashboard();
+                });
+            } else {
+                area.innerHTML = `<button class="btn-login" id="loginBtn">🔑 登录</button>`;
+                document.getElementById('loginBtn')?.addEventListener('click', () => {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+
+        // ================================================================
+        //  加载 & 渲染数据
+        // ================================================================
+        let configData = null;
+
+        async function loadConfig() {
+            try {
+                const res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                configData = data['learn-to-type'] || [];
+                return configData;
+            } catch (e) {
+                console.error('加载 config.json 失败:', e);
+                return null;
+            }
+        }
+
+        // ---------- 渲染课程 ----------
+        function renderCourses(groups) {
+            const grid = document.getElementById('courseGrid');
+            const basicGroup = groups.find(g => g.code === 'basictype');
+            if (!basicGroup || !basicGroup.levels || basicGroup.levels.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#A58874;padding:20px;">暂无课程数据</div>`;
                 return;
             }
-            
-            let separator = baseUrl.includes('?') ? '&' : '?';
-            let finalUrl = `${baseUrl}${separator}keys=${keysParam}&level=${levelValue}`;
-            if (numValue) {
-                finalUrl += `&num=${numValue}`;
-            }
-            if (rateValue) {
-                finalUrl += `&rate=${rateValue}`;
-            }
-            if (levelId) {
-                finalUrl += `&id=${levelId}`;
-            }
-            if (maxDistanceValue) {
-                finalUrl += `&maxDistance=${maxDistanceValue}`;
-            }
-            console.log(`✨ 闯关: ${desc} | id=${levelId} | keys=[${decodeURIComponent(keysParam)}] | level=${decodeURIComponent(levelValue)} | num=${numValue} | rate=${rateValue} | maxDistance=${maxDistanceValue}`);
-            window.location.href = finalUrl;
-        };
-        document.body.addEventListener('click', handler);
-        window._globalClickHandler = handler;
-    }
 
-    function showError(message) {
-        if (container) {
-            container.innerHTML = `
-                <div class="status-message error-box">
-                    🧸 加载失败<br>
-                    <span style="font-size: 0.85rem;">${escapeHtml(message)}</span><br>
-                    <span style="font-size: 0.75rem;">请确保根目录下存在 config.json 且格式正确</span>
-                </div>
-            `;
-        }
-        showCuteToast('❌ 无法加载 config.json', true);
-    }
+            const completed = getCompletedLevels('basictype');
+            const showLevels = basicGroup.levels.slice(0, 8);
 
-    function loadAndRender() {
-        if (container) {
-            container.innerHTML = `
-                <div class="loading-container">
-                    <div class="loading-animation">
-                        <div class="circle"></div>
-                        <div class="inner-icon">🎮</div>
-                    </div>
-                    <div class="loading-bar-container">
-                        <div class="loading-bar"></div>
-                    </div>
-                    <div class="loading-text">
-                        <span>加载游戏中</span>
-                        <div class="loading-dots">
-                            <span></span><span></span><span></span>
+            let html = '';
+            showLevels.forEach(level => {
+                const isDone = completed.includes(level.id);
+                const desc = level.description || `第${level.id}关`;
+                const shortDesc = desc.length > 18 ? desc.slice(0, 16) + '…' : desc;
+                const keysDisplay = level.keys && level.keys.length > 0 ? level.keys.join(' ') : '全键盘';
+                const url = level.url || 'basictype.html';
+                const params = new URLSearchParams();
+                if (level.id) params.set('id', level.id);
+                if (level.keys) params.set('keys', JSON.stringify(level.keys));
+                if (level.level) params.set('level', level.level);
+                if (level.num) params.set('num', level.num);
+                const link = `${url}?${params.toString()}`;
+
+                html += `
+                    <div class="content-card" onclick="window.location.href='${link}'">
+                        <span class="card-badge">${isDone ? '✅ 已通关' : '🎯 进行中'}</span>
+                        <span class="card-emoji">${isDone ? '🌟' : '📖'}</span>
+                        <div class="card-title">${escapeHtml(shortDesc)}</div>
+                        <div class="card-desc">⌨️ ${escapeHtml(keysDisplay)}</div>
+                        <div class="card-meta">
+                            <span>第 ${level.id} 关</span>
+                            <span>${isDone ? '🎉 完成' : '⏳ 未开始'}</span>
                         </div>
                     </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // ---------- 渲染游戏 ----------
+        function renderGames(groups) {
+            const grid = document.getElementById('gameGrid');
+            const gameCodes = ['plane_shooter', 'whackamole', 'catch_thief'];
+            const gameGroups = groups.filter(g => gameCodes.includes(g.code));
+
+            if (gameGroups.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#A58874;padding:20px;">暂无游戏数据</div>`;
+                return;
+            }
+
+            const iconMap = {
+                'plane_shooter': '✈️',
+                'whackamole': '🐭',
+                'catch_thief': '🚓'
+            };
+            const nameMap = {
+                'plane_shooter': '小飞机射击',
+                'whackamole': '打地鼠',
+                'catch_thief': '警察抓小偷'
+            };
+            const colorMap = {
+                'plane_shooter': 'linear-gradient(135deg, #FFE8B5, #FFD4A0)',
+                'whackamole': 'linear-gradient(135deg, #F9D56E, #F8C471)',
+                'catch_thief': 'linear-gradient(135deg, #FFF0D0, #FFE0B5)'
+            };
+
+            let html = '';
+            gameGroups.forEach(g => {
+                const completed = getCompletedLevels(g.code);
+                const total = g.levels ? g.levels.length : 0;
+                const done = completed.filter(id => g.levels.some(l => l.id === id)).length;
+                const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+                const firstLevel = g.levels && g.levels.length > 0 ? g.levels[0] : null;
+                let link = '#';
+                if (firstLevel) {
+                    const params = new URLSearchParams();
+                    if (firstLevel.id) params.set('id', firstLevel.id);
+                    if (firstLevel.keys) params.set('keys', JSON.stringify(firstLevel.keys));
+                    if (firstLevel.level) params.set('level', firstLevel.level);
+                    if (firstLevel.num) params.set('num', firstLevel.num);
+                    link = `${firstLevel.url || '#'}?${params.toString()}`;
+                }
+
+                html += `
+                    <div class="game-card" style="background:${colorMap[g.code] || '#FFF8EF'};" onclick="window.location.href='${link}'">
+                        <span class="game-icon">${iconMap[g.code] || '🎮'}</span>
+                        <h3>${nameMap[g.code] || g.name || g.code}</h3>
+                        <p>${g.description || '在游戏中快乐练习打字'}</p>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;">
+                            <span style="font-size:13px;font-weight:600;color:#6B4F3A;">进度 ${progress}%</span>
+                            <div style="flex:1;max-width:100px;background:#E8D5C0;border-radius:20px;height:6px;overflow:hidden;">
+                                <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,#FFB882,#FF6B35);border-radius:20px;"></div>
+                            </div>
+                        </div>
+                        <button class="btn-game" onclick="event.stopPropagation();window.location.href='${link}'">🚀 开始游戏</button>
+                        <div class="game-status">${done}/${total} 关已通关</div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // ---------- 渲染诗词（国学天地） ----------
+        function renderPoetry(groups) {
+            const grid = document.getElementById('poetryGrid');
+            const poetryGroup = groups.find(g => g.code === 'poetry_writing');
+
+            if (!poetryGroup || !poetryGroup.levels || poetryGroup.levels.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#A58874;padding:20px;">📖 暂无诗词数据，即将上线更多经典...</div>`;
+                return;
+            }
+
+            const completed = getCompletedLevels('poetry_writing');
+            const showPoems = poetryGroup.levels.slice(0, 8);
+
+            const poetryColors = [
+                'linear-gradient(135deg, #F5E6D3, #E8D5C0)',
+                'linear-gradient(135deg, #E8D5C0, #D4C4A0)',
+                'linear-gradient(135deg, #F0E3D6, #E0D0C0)',
+                'linear-gradient(135deg, #EDE0D0, #DDD0B8)',
+                'linear-gradient(135deg, #F5EDE0, #E8DDCC)',
+                'linear-gradient(135deg, #EAE0D0, #D8CCB8)',
+                'linear-gradient(135deg, #F0E8D8, #E0D4C0)',
+                'linear-gradient(135deg, #EDE4D4, #DDD0BC)'
+            ];
+
+            let html = '';
+            showPoems.forEach((poem, idx) => {
+                const isDone = completed.includes(poem.id);
+                const title = poem.description || `第${poem.id}首`;
+                const shortTitle = title.length > 16 ? title.slice(0, 14) + '…' : title;
+                const author = poem.author || '佚名';
+                const dynasty = poem.dynasty || '';
+                const bgColor = poetryColors[idx % poetryColors.length];
+                const url = poem.url || 'poetry_writing.html';
+                const params = new URLSearchParams();
+                if (poem.id) params.set('id', poem.id);
+                const link = `${url}?${params.toString()}`;
+
+                let previewText = '';
+                if (poem.poem && poem.poem.length > 0) {
+                    const chars = poem.poem.slice(0, 10).map(c => c.char).join('');
+                    previewText = chars.length > 12 ? chars.slice(0, 12) + '…' : chars;
+                }
+
+                html += `
+                    <div class="content-card" style="background:${bgColor};border-color:#C4B49A;" onclick="window.location.href='${link}'">
+                        <span class="card-badge" style="background:#D4C4A0;color:#5C3D1A;">${isDone ? '✅ 已学完' : '📜 未学习'}</span>
+                        <span class="card-emoji">${isDone ? '🏮' : '📜'}</span>
+                        <div class="card-title" style="font-family:'Noto Serif SC',serif;">${escapeHtml(shortTitle)}</div>
+                        <div class="card-desc" style="color:#6B4F3A;">
+                            ${escapeHtml(author)} ${dynasty ? '· ' + escapeHtml(dynasty) : ''}
+                            ${previewText ? '<br><span style="font-size:12px;color:#8B6F5A;">「' + escapeHtml(previewText) + '」</span>' : ''}
+                        </div>
+                        <div class="card-meta">
+                            <span>🏷️ 拼音练习</span>
+                            <span>${isDone ? '🎉 完成' : '⏳ 待学习'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // ---------- 渲染英文文章（外国文学） ----------
+        function renderEnglish(groups) {
+            const grid = document.getElementById('englishGrid');
+            const englishGroup = groups.find(g => g.code === 'english_typing');
+
+            if (!englishGroup || !englishGroup.levels || englishGroup.levels.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#A58874;padding:20px;">📖 暂无英文文章，即将上线更多经典...</div>`;
+                return;
+            }
+
+            const completed = getCompletedLevels('english_typing');
+            const showArticles = englishGroup.levels.slice(0, 8);
+
+            const englishColors = [
+                'linear-gradient(135deg, #D4E9F7, #B8D8E8)',
+                'linear-gradient(135deg, #D4F0E0, #B8E0CC)',
+                'linear-gradient(135deg, #F0E8D8, #E0D8C8)',
+                'linear-gradient(135deg, #E8D8E8, #D8C8D8)',
+                'linear-gradient(135deg, #D4E8F0, #B8D8E8)',
+                'linear-gradient(135deg, #E8F0D8, #D8E0C8)',
+                'linear-gradient(135deg, #F0D8D8, #E0C8C8)',
+                'linear-gradient(135deg, #D8E8E0, #C8D8D0)'
+            ];
+
+            let html = '';
+            showArticles.forEach((article, idx) => {
+                const isDone = completed.includes(article.id);
+                const title = article.description || `第${article.id}篇`;
+                const shortTitle = title.length > 18 ? title.slice(0, 16) + '…' : title;
+                const author = article.author || 'Unknown';
+                const difficulty = article.difficulty || 'beginner';
+                const difficultyLabel = difficulty === 'beginner' ? '🌱 入门' :
+                                       difficulty === 'intermediate' ? '🌿 进阶' :
+                                       difficulty === 'advanced' ? '🌳 高级' : '📖 阅读';
+                const bgColor = englishColors[idx % englishColors.length];
+                const url = article.url || 'english_typing.html';
+                const params = new URLSearchParams();
+                if (article.id) params.set('id', article.id);
+                const link = `${url}?${params.toString()}`;
+
+                let previewText = '';
+                if (article.text) {
+                    const words = article.text.split(/\s+/).slice(0, 12);
+                    previewText = words.join(' ');
+                    if (previewText.length > 40) previewText = previewText.slice(0, 38) + '…';
+                }
+
+                html += `
+                    <div class="content-card" style="background:${bgColor};border-color:#B0C8D0;" onclick="window.location.href='${link}'">
+                        <span class="card-badge" style="background:#B0C8D0;color:#2C4A5A;">${isDone ? '✅ 已学完' : '📖 未学习'}</span>
+                        <span class="card-emoji">${isDone ? '🌟' : '📚'}</span>
+                        <div class="card-title" style="font-family:'Segoe UI',sans-serif;">${escapeHtml(shortTitle)}</div>
+                        <div class="card-desc" style="color:#3D5A6A;">
+                            ✍️ ${escapeHtml(author)}
+                            <br><span style="font-size:11px;color:#5A7A8A;">${difficultyLabel}</span>
+                            ${previewText ? '<br><span style="font-size:12px;color:#4A6A7A;">「' + escapeHtml(previewText) + '…」</span>' : ''}
+                        </div>
+                        <div class="card-meta">
+                            <span>🔤 英文打字</span>
+                            <span>${isDone ? '🎉 完成' : '⏳ 待学习'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // ---------- 渲染仪表盘 ----------
+        function renderDashboard() {
+            const area = document.getElementById('dashboardPreview');
+            const { loggedIn, userName } = getUserInfo();
+
+            if (!loggedIn) {
+                area.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;width:100%;justify-content:center;padding:6px 0;">
+                        <span style="font-size:18px;">🔒</span>
+                        <span style="color:#6B4F3A;font-size:15px;">登录后查看详细学习报告</span>
+                        <button class="btn-login" style="padding:6px 20px;font-size:14px;" onclick="window.location.href='login.html'">立即登录</button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!configData) {
+                area.innerHTML = `<div style="color:#A58874;">加载数据中...</div>`;
+                return;
+            }
+
+            const totalCompleted = getTotalCompletedCount(configData);
+            const totalScore = getTotalScoreFromHistory(configData);
+            const bestCombo = getBestComboFromHistory(configData);
+
+            area.innerHTML = `
+                <div class="dash-item">
+                    <span class="num">${totalCompleted}</span>
+                    <span class="label">关卡通关</span>
+                </div>
+                <div class="dash-divider"></div>
+                <div class="dash-item">
+                    <span class="num">${totalScore}</span>
+                    <span class="label">总得分</span>
+                </div>
+                <div class="dash-divider"></div>
+                <div class="dash-item">
+                    <span class="num">${bestCombo}</span>
+                    <span class="label">最高连击</span>
+                </div>
+                <div class="dash-divider"></div>
+                <div class="dash-item" style="flex:1;justify-content:flex-end;">
+                    <span style="font-size:14px;color:#7A5F4A;">👋 继续加油，${escapeHtml(userName)}！</span>
                 </div>
             `;
         }
-        
-        fetch(CONFIG_PATH, { cache: 'no-cache', headers: { 'Cache-Control': 'no-cache' } })
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
-            .then(data => {
-                let groups = null;
-                if (data && Array.isArray(data['learn-to-type'])) {
-                    groups = data['learn-to-type'];
-                } else if (data && Array.isArray(data.levels)) {
-                    groups = [{
-                        id: "default",
-                        code: "default",
-                        name: "打字练习关卡",
-                        description: "从基础到进阶，逐步提升打字技能",
-                        levels: data.levels
-                    }];
-                } else {
-                    throw new Error('配置文件格式错误：缺少 "learn-to-type" 数组');
-                }
-                
-                if (!groups.length) {
-                    showError('配置文件中没有分组数据');
-                    return;
-                }
-                
-                container.innerHTML = '';
-                let hasAnyLevel = false;
-                groups.forEach((group, idx) => {
-                    if (group.levels && group.levels.length) {
-                        hasAnyLevel = true;
-                        const section = renderLevelsGroup(group, idx);
-                        if (section) container.appendChild(section);
-                    }
-                });
-                
-                if (!hasAnyLevel) {
-                    showError('所有分组的 levels 都为空');
-                    return;
-                }
-                
-                bindGlobalCardClicks();
-                console.log('✅ 加载成功，分组数:', groups.length);
-                showCuteToast(`✅ 加载成功，共 ${groups.length} 个分组`);
-                
-                if (isDebug) {
-                    showDebugPanel();
-                }
-            })
-            .catch(err => {
-                console.error('读取失败:', err);
-                showError(err.message);
-            });
-    }
 
-    loadAndRender();
-</script>
+        // ================================================================
+        //  重置进度
+        // ================================================================
+        function clearAllProgress() {
+            if (!confirm('⚠️ 确定要清除所有学习进度吗？此操作不可恢复！')) return;
+            const keys = Object.keys(localStorage);
+            let count = 0;
+            keys.forEach(key => {
+                if (key.startsWith('typing_completed_') || key.endsWith('_history')) {
+                    localStorage.removeItem(key);
+                    count++;
+                }
+            });
+            showToast(`🗑️ 已清除 ${count} 条进度记录`);
+            renderDashboard();
+            if (configData) {
+                renderCourses(configData);
+                renderGames(configData);
+                renderPoetry(configData);
+                renderEnglish(configData);
+            }
+        }
+
+        // ================================================================
+        //  初始化
+        // ================================================================
+        async function init() {
+            renderNav();
+
+            const groups = await loadConfig();
+            if (!groups || groups.length === 0) {
+                document.getElementById('courseGrid').innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;color:#A58874;padding:30px;">
+                        ❌ 加载失败，请检查 config.json 文件
+                    </div>
+                `;
+                document.getElementById('gameGrid').innerHTML = '';
+                document.getElementById('poetryGrid').innerHTML = '';
+                document.getElementById('englishGrid').innerHTML = '';
+                return;
+            }
+
+            configData = groups;
+            renderCourses(groups);
+            renderGames(groups);
+            renderPoetry(groups);
+            renderEnglish(groups);
+            renderDashboard();
+
+            document.getElementById('heroStartBtn').addEventListener('click', () => {
+                const basicGroup = groups.find(g => g.code === 'basictype');
+                if (basicGroup && basicGroup.levels && basicGroup.levels.length > 0) {
+                    const first = basicGroup.levels[0];
+                    const params = new URLSearchParams();
+                    if (first.id) params.set('id', first.id);
+                    if (first.keys) params.set('keys', JSON.stringify(first.keys));
+                    if (first.level) params.set('level', first.level);
+                    if (first.num) params.set('num', first.num);
+                    window.location.href = `${first.url || 'basictype.html'}?${params.toString()}`;
+                } else {
+                    showToast('📖 暂时没有课程数据，请检查配置');
+                }
+            });
+
+            document.getElementById('heroExploreBtn').addEventListener('click', () => {
+                const gameSection = document.getElementById('games');
+                gameSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        window.clearAllProgress = clearAllProgress;
+    </script>
 </body>
 </html>

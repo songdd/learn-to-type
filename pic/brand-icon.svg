@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="mainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF8C42;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB347;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.15" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0.05" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#00000030"/>
+    </filter>
+  </defs>
+
+  <!-- 背景圆 -->
+  <circle cx="100" cy="100" r="94" fill="url(#bgGrad)" stroke="url(#mainGrad)" stroke-width="3"/>
+
+  <!-- 键盘按键底座 -->
+  <rect x="50" y="60" width="100" height="100" rx="20" ry="20"
+        fill="url(#mainGrad)" filter="url(#shadow)"/>
+  <rect x="55" y="65" width="90" height="90" rx="16" ry="16"
+        fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+
+  <!-- 键盘字符 "Y"（奕的首字母） -->
+  <text x="100" y="113" font-family="'Segoe UI', 'PingFang SC', sans-serif"
+        font-size="52" font-weight="800" fill="white"
+        text-anchor="middle" dominant-baseline="middle"
+        letter-spacing="-2">Y</text>
+
+  <!-- 游戏手柄十字键（左上角） -->
+  <g transform="translate(38, 38)">
+    <circle cx="0" cy="0" r="22" fill="rgba(255,255,255,0.92)"
+            stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+    <rect x="-4" y="-12" width="8" height="8" rx="2" fill="#FF6B35"/>
+    <rect x="-4" y="4" width="8" height="8" rx="2" fill="#FF6B35"/>
+    <rect x="-12" y="-4" width="8" height="8" rx="2" fill="#FF6B35"/>
+    <rect x="4" y="-4" width="8" height="8" rx="2" fill="#FF6B35"/>
+    <circle cx="0" cy="0" r="3" fill="#FFB347"/>
+  </g>
+
+  <!-- 笑脸弧线（右下角） -->
+  <path d="M 145 80 Q 165 95 145 110"
+        fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"
+        stroke-linecap="round"/>
+  <circle cx="133" cy="85" r="3" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="153" cy="85" r="3" fill="rgba(255,255,255,0.6)"/>
+
+  <!-- 底部品牌文字 -->
+  <text x="100" y="172" font-family="'PingFang SC', 'Segoe UI', sans-serif"
+        font-size="18" font-weight="700" fill="#4A2A00"
+        text-anchor="middle" letter-spacing="6">奕霖打字</text>
+
+  <!-- 底部装饰线 -->
+  <line x1="55" y1="180" x2="145" y2="180"
+        stroke="url(#mainGrad)" stroke-width="2" stroke-linecap="round"
+        opacity="0.4"/>
+</svg>

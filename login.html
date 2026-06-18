@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>登录 - 灵键打字</title>
+    <title>登录 - 奕霖打字</title>
     <style>
         * {
             margin: 0;
@@ -268,7 +268,7 @@
 <body>
 <div class="login-card">
     <div class="logo">✈️🎮</div>
-    <h1>灵键打字</h1>
+    <h1>奕霖打字</h1>
     <div class="subtitle">邀请制 · 专属入口</div>
 
     <div class="input-group">
@@ -368,17 +368,38 @@
         
         setLoading(true);
         
+        // 1. 先验证邀请码
         const result = await verifyCode(code);
         
         if (result.success) {
+            // 2. 记录登录日志
+            try {
+                const logResponse = await fetch('/api/login-log', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_name: result.name,
+                        invite_code: code,
+                        ip_address: null, // 服务端可获取
+                        user_agent: navigator.userAgent
+                    })
+                });
+                
+                if (!logResponse.ok) {
+                    console.warn('登录日志记录失败，但不影响登录');
+                }
+            } catch (logError) {
+                console.warn('登录日志记录异常:', logError);
+            }
+            
             showMessage(`✅ 欢迎 ${result.name}！正在进入游戏...`, false);
             
-            // 保存登录凭证（永久有效）
             localStorage.setItem('logged_in', 'true');
             localStorage.setItem('user_name', result.name);
             localStorage.setItem('login_code', code);
             
-            // 跳转到游戏首页
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 1500);

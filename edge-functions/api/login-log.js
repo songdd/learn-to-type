@@ -1,7 +1,6 @@
-// edge-functions/api/verify.js - 邀请码验证
+// edge-functions/api/login-log.js - 记录登录日志
 
 export async function onRequest(context) {
-    // ✅ 从 context 中解构 request 和 env
     const { request, env } = context;
     
     // 处理 CORS 预检请求
@@ -32,13 +31,13 @@ export async function onRequest(context) {
     }
     
     try {
-        const { code } = await request.json()
+        const { user_name, invite_code, user_agent } = await request.json()
         
-        // 验证邀请码是否为空
-        if (!code || code.trim() === '') {
+        // 验证必要参数
+        if (!user_name || !invite_code) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                message: '请输入邀请码' 
+                message: '缺少必要参数' 
             }), {
                 headers: { 
                     'Content-Type': 'application/json', 
@@ -64,84 +63,61 @@ export async function onRequest(context) {
             })
         }
         
-        const trimmedCode = code.trim()
+        // 获取客户端 IP
+        const ip = request.headers.get('x-forwarded-for') || 
+                   request.headers.get('cf-connecting-ip') || 
+                   request.headers.get('x-real-ip') ||
+                   'unknown'
         
-        // 1. 查询邀请码是否存在且未被使用
-        const queryUrl = `${supabaseUrl}/rest/v1/invites?code=eq.${encodeURIComponent(trimmedCode)}&select=name,used`
-        
-        const queryResponse = await fetch(queryUrl, {
-            headers: {
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${supabaseKey}`
-            }
-        })
-        
-        if (!queryResponse.ok) {
-            console.error('Supabase 查询失败:', queryResponse.status)
-            return new Response(JSON.stringify({ 
-                success: false, 
-                message: '验证服务异常，请稍后重试' 
-            }), {
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Access-Control-Allow-Origin': '*' 
-                }
-            })
+        // 生成 session_id
+        let sessionId
+        try {
+            sessionId = crypto.randomUUID()
+        } catch (e) {
+            // 降级方案
+            sessionId = Date.now().toString(36) + Math.random().toString(36).substring(2, 15)
         }
         
-        const data = await queryResponse.json()
+        // 插入登录日志
+        const insertUrl = `${supabaseUrl}/rest/v1/login_logs`
         
-        // 邀请码不存在
-        if (!data || data.length === 0) {
-            return new Response(JSON.stringify({ 
-                success: false, 
-                message: '邀请码无效' 
-            }), {
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Access-Control-Allow-Origin': '*' 
-                }
-            })
-        }
-        
-        const record = data[0]
-        
-        // 邀请码已被使用
-        if (record.used) {
-            return new Response(JSON.stringify({ 
-                success: false, 
-                message: '此邀请码已被使用' 
-            }), {
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Access-Control-Allow-Origin': '*' 
-                }
-            })
-        }
-        
-        // 2. 标记邀请码为已使用（一次性）
-        const updateUrl = `${supabaseUrl}/rest/v1/invites?code=eq.${encodeURIComponent(trimmedCode)}`
-        
-        const updateResponse = await fetch(updateUrl, {
-            method: 'PATCH',
+        const response = await fetch(insertUrl, {
+            method: 'POST',
             headers: {
                 'apikey': supabaseKey,
                 'Authorization': `Bearer ${supabaseKey}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ used: true, used_at: new Date().toISOString() })
+            body: JSON.stringify({
+                user_name: user_name,
+                invite_code: invite_code,
+                login_time: new Date().toISOString(),
+                ip_address: ip,
+                user_agent: user_agent || null,
+                session_id: sessionId
+            })
         })
         
-        if (!updateResponse.ok) {
-            console.error('Supabase 更新失败:', updateResponse.status)
-            // 即使更新失败，也返回成功（邀请码已验证通过）
+        if (!response.ok) {
+            const errorText = await response.text()
+            console.error('Supabase 插入失败:', response.status, errorText)
+            return new Response(JSON.stringify({ 
+                success: false, 
+                message: '记录登录日志失败' 
+            }), {
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Access-Control-Allow-Origin': '*' 
+                }
+            })
         }
         
-        // 3. 返回验证成功
+        const data = await response.json()
+        
         return new Response(JSON.stringify({ 
             success: true, 
-            name: record.name,
-            message: '验证成功！'
+            message: '登录记录成功',
+            data: data 
         }), {
             headers: { 
                 'Content-Type': 'application/json', 
@@ -150,11 +126,12 @@ export async function onRequest(context) {
         })
         
     } catch (error) {
-        console.error('验证错误:', error)
+        console.error('登录日志记录错误:', error)
         return new Response(JSON.stringify({ 
             success: false, 
             message: '服务器错误，请稍后重试' 
         }), {
+            status: 500,
             headers: { 
                 'Content-Type': 'application/json', 
                 'Access-Control-Allow-Origin': '*' 

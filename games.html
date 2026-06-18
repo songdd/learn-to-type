@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>全部游戏 · 奕霖打字</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #FFF6ED;
+            font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Comic Sans MS', cursive, sans-serif;
+            color: #3D2B1A;
+            min-height: 100vh;
+            padding: 0 16px 40px;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 0 16px;
+            border-bottom: 2px solid rgba(255, 184, 130, 0.3);
+            margin-bottom: 24px;
+        }
+        .back-btn {
+            background: rgba(255, 184, 130, 0.25);
+            border: 2px solid #FFB882;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #6B4F3A;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .back-btn:hover {
+            background: #FFB882;
+            transform: translateY(-2px);
+        }
+        .page-title-area h1 {
+            font-size: 26px;
+            color: #2C1F14;
+        }
+        .page-title-area p {
+            color: #8B6F5A;
+            font-size: 14px;
+        }
+
+        .stats-banner {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 184, 130, 0.2);
+        }
+        .stats-banner .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .stats-banner .stat-item .num {
+            font-size: 22px;
+            font-weight: 800;
+            color: #FF6B35;
+        }
+        .stats-banner .stat-item .label {
+            font-size: 13px;
+            color: #7A5F4A;
+        }
+
+        /* ===== 游戏分组 ===== */
+        .game-group {
+            margin-bottom: 20px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 184, 130, 0.15);
+        }
+        .game-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: 0.25s;
+            border-radius: 24px;
+            user-select: none;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .game-group-header:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .game-group-header .group-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .game-group-header .group-icon {
+            font-size: 28px;
+        }
+        .game-group-header .group-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2C1F14;
+        }
+        .game-group-header .group-badge {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8B6F5A;
+            background: rgba(255, 184, 130, 0.2);
+            padding: 2px 14px;
+            border-radius: 20px;
+        }
+        .game-group-header .group-toggle {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+            color: #A58874;
+            background: rgba(255, 255, 255, 0.5);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .game-group-header .group-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .game-group-body {
+            max-height: 10000px;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s ease,
+                        padding 0.3s ease;
+            opacity: 1;
+            padding: 0 20px 20px 20px;
+        }
+        .game-group-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 20px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .content-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 24px;
+            padding: 16px 14px 14px;
+            border: 1.5px solid rgba(255, 184, 130, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: 0.25s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .content-card:hover {
+            transform: translateY(-4px);
+            border-color: #FFB882;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .content-card .card-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: #FF6B35;
+            background: #FFE0A3;
+            padding: 2px 10px;
+            border-radius: 30px;
+            align-self: flex-start;
+            margin-bottom: 6px;
+        }
+        .content-card .card-emoji {
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+        .content-card .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2C1F14;
+            margin-bottom: 2px;
+        }
+        .content-card .card-desc {
+            font-size: 12px;
+            color: #7A5F4A;
+            flex: 1;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .content-card .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #A58874;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 8px;
+            margin-top: auto;
+        }
+
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 30px 0;
+            color: #A58874;
+            font-size: 14px;
+        }
+
+        .loading-placeholder {
+            text-align: center;
+            padding: 60px 0;
+            color: #A58874;
+            font-size: 15px;
+        }
+        .loading-placeholder .spinner {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #F0E3D6;
+            border-top-color: #FF8C42;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== 全部展开/收起按钮 ===== */
+        .toggle-all-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .toggle-all-btn {
+            background: rgba(255, 184, 130, 0.2);
+            border: 1.5px solid rgba(255, 184, 130, 0.3);
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #6B4F3A;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .toggle-all-btn:hover {
+            background: rgba(255, 184, 130, 0.35);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 600px) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .back-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .stats-banner {
+                gap: 14px;
+                padding: 12px 16px;
+            }
+            .game-group-header {
+                padding: 12px 14px;
+            }
+            .game-group-header .group-title {
+                font-size: 16px;
+            }
+            .game-group-body {
+                padding: 0 12px 14px 12px;
+            }
+            .game-group-body.collapsed {
+                padding: 0 12px;
+            }
+        }
+        @media (max-width: 400px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-header">
+            <button class="back-btn" onclick="window.location.href='index.html'">🏠 返回主页</button>
+            <div class="page-title-area">
+                <h1>🎮 全部游戏</h1>
+                <p>在欢乐的游戏中，不知不觉提升打字速度</p>
+            </div>
+        </div>
+
+        <div class="stats-banner" id="statsBanner">
+            <div class="stat-item"><span class="num" id="totalCount">0</span><span class="label">总关卡</span></div>
+            <div class="stat-item"><span class="num" id="completedCount">0</span><span class="label">已通关</span></div>
+            <div class="stat-item"><span class="num" id="progressPercent">0%</span><span class="label">完成度</span></div>
+        </div>
+
+        <div class="toggle-all-bar">
+            <button class="toggle-all-btn" id="expandAllBtn">📂 全部展开</button>
+            <button class="toggle-all-btn" id="collapseAllBtn">📁 全部收起</button>
+        </div>
+
+        <div id="gameContainer">
+            <div class="loading-placeholder"><span class="spinner"></span>加载游戏中...</div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG_PATH = './config.json';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        }
+
+        function getCompletedLevels(groupCode) {
+            const key = `typing_completed_${groupCode}`;
+            try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                return data['learn-to-type'] || [];
+            } catch (e) {
+                console.error('加载失败:', e);
+                return null;
+            }
+        }
+
+        const gameCodes = ['plane_shooter', 'whackamole', 'catch_thief'];
+        const iconMap = { 'plane_shooter': '✈️', 'whackamole': '🐭', 'catch_thief': '🚓' };
+        const nameMap = { 'plane_shooter': '小飞机射击', 'whackamole': '打地鼠', 'catch_thief': '警察抓小偷' };
+        const colorMap = {
+            'plane_shooter': 'linear-gradient(135deg, #FFE8B5, #FFD4A0)',
+            'whackamole': 'linear-gradient(135deg, #F9D56E, #F8C471)',
+            'catch_thief': 'linear-gradient(135deg, #FFF0D0, #FFE0B5)'
+        };
+        const descMap = {
+            'plane_shooter': '敲对字母发射导弹，击落所有目标',
+            'whackamole': '快速敲对字母，打中冒头的地鼠',
+            'catch_thief': '敲对字母让警察前进，抓住小偷'
+        };
+
+        // 折叠状态存储
+        const COLLAPSE_KEY = 'games_page_collapsed';
+
+        function loadCollapseState() {
+            try {
+                const saved = localStorage.getItem(COLLAPSE_KEY);
+                return saved ? JSON.parse(saved) : {};
+            } catch { return {}; }
+        }
+
+        function saveCollapseState(state) {
+            localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state));
+        }
+
+        async function init() {
+            const groups = await loadData();
+            const container = document.getElementById('gameContainer');
+
+            if (!groups) {
+                container.innerHTML = `<div class="empty-state">❌ 加载失败，请检查配置</div>`;
+                return;
+            }
+
+            const gameGroups = groups.filter(g => gameCodes.includes(g.code));
+
+            if (gameGroups.length === 0) {
+                container.innerHTML = `<div class="empty-state">📭 暂无游戏数据</div>`;
+                return;
+            }
+
+            let totalAll = 0, doneAll = 0;
+            const collapseState = loadCollapseState();
+
+            let html = '';
+            gameGroups.forEach(g => {
+                const completed = getCompletedLevels(g.code);
+                const total = g.levels ? g.levels.length : 0;
+                const done = completed.filter(id => g.levels.some(l => l.id === id)).length;
+                totalAll += total;
+                doneAll += done;
+                const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                const groupKey = g.code;
+                const isCollapsed = collapseState[groupKey] !== undefined ? collapseState[groupKey] : false;
+
+                html += `
+                    <div class="game-group" data-group="${groupKey}">
+                        <div class="game-group-header" data-group="${groupKey}">
+                            <div class="group-left">
+                                <span class="group-icon">${iconMap[g.code] || '🎮'}</span>
+                                <span class="group-title">${nameMap[g.code] || g.name || g.code}</span>
+                                <span class="group-badge">${done}/${total} 关 · ${progress}%</span>
+                            </div>
+                            <span class="group-toggle ${isCollapsed ? 'collapsed' : ''}">▼</span>
+                        </div>
+                        <div class="game-group-body ${isCollapsed ? 'collapsed' : ''}">
+                            <div class="card-grid">
+                `;
+
+                if (g.levels && g.levels.length > 0) {
+                    g.levels.forEach(level => {
+                        const isDone = completed.includes(level.id);
+                        const desc = level.description || `第${level.id}关`;
+                        const shortDesc = desc.length > 18 ? desc.slice(0, 16) + '…' : desc;
+                        const url = level.url || '#';
+                        const params = new URLSearchParams();
+                        if (level.id) params.set('id', level.id);
+                        if (level.keys) params.set('keys', JSON.stringify(level.keys));
+                        if (level.level) params.set('level', level.level);
+                        if (level.num) params.set('num', level.num);
+                        if (level.rate) params.set('rate', level.rate);
+                        if (level.maxDistance) params.set('maxDistance', level.maxDistance);
+                        const link = `${url}?${params.toString()}`;
+
+                        html += `
+                            <div class="content-card" style="background:${colorMap[g.code] || '#FFF8EF'};" onclick="window.location.href='${link}'">
+                                <span class="card-badge">${isDone ? '✅ 已通关' : '🎯 进行中'}</span>
+                                <span class="card-emoji">${isDone ? '🌟' : '🎮'}</span>
+                                <div class="card-title">${escapeHtml(shortDesc)}</div>
+                                <div class="card-desc">${descMap[g.code] || '快乐练习打字'}</div>
+                                <div class="card-meta">
+                                    <span>第 ${level.id} 关</span>
+                                    <span>${isDone ? '🎉 完成' : '⏳ 未开始'}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="empty-state">暂无关卡</div>`;
+                }
+
+                html += `</div></div></div>`;
+            });
+
+            container.innerHTML = html;
+
+            document.getElementById('totalCount').textContent = totalAll;
+            document.getElementById('completedCount').textContent = doneAll;
+            document.getElementById('progressPercent').textContent = totalAll > 0 ? Math.round((doneAll / totalAll) * 100) + '%' : '0%';
+
+            // ===== 绑定折叠事件 =====
+            document.querySelectorAll('.game-group-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const groupKey = this.dataset.group;
+                    const body = this.nextElementSibling;
+                    const toggle = this.querySelector('.group-toggle');
+                    const isCurrentlyCollapsed = body.classList.contains('collapsed');
+
+                    if (isCurrentlyCollapsed) {
+                        body.classList.remove('collapsed');
+                        toggle.classList.remove('collapsed');
+                    } else {
+                        body.classList.add('collapsed');
+                        toggle.classList.add('collapsed');
+                    }
+
+                    // 保存状态
+                    const state = loadCollapseState();
+                    state[groupKey] = !isCurrentlyCollapsed;
+                    saveCollapseState(state);
+                });
+            });
+
+            // ===== 全部展开 =====
+            document.getElementById('expandAllBtn').addEventListener('click', function() {
+                document.querySelectorAll('.game-group-body').forEach(body => {
+                    body.classList.remove('collapsed');
+                });
+                document.querySelectorAll('.group-toggle').forEach(toggle => {
+                    toggle.classList.remove('collapsed');
+                });
+                // 保存全部展开状态
+                const state = {};
+                document.querySelectorAll('.game-group').forEach(group => {
+                    const key = group.dataset.group;
+                    state[key] = false;
+                });
+                saveCollapseState(state);
+            });
+
+            // ===== 全部收起 =====
+            document.getElementById('collapseAllBtn').addEventListener('click', function() {
+                document.querySelectorAll('.game-group-body').forEach(body => {
+                    body.classList.add('collapsed');
+                });
+                document.querySelectorAll('.group-toggle').forEach(toggle => {
+                    toggle.classList.add('collapsed');
+                });
+                // 保存全部收起状态
+                const state = {};
+                document.querySelectorAll('.game-group').forEach(group => {
+                    const key = group.dataset.group;
+                    state[key] = true;
+                });
+                saveCollapseState(state);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

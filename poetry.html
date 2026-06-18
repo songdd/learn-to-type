@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>全部诗词 · 奕霖打字</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #FFF6ED;
+            font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Comic Sans MS', cursive, sans-serif;
+            color: #3D2B1A;
+            min-height: 100vh;
+            padding: 0 16px 40px;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 0 16px;
+            border-bottom: 2px solid rgba(255, 184, 130, 0.3);
+            margin-bottom: 24px;
+        }
+        .back-btn {
+            background: rgba(255, 184, 130, 0.25);
+            border: 2px solid #FFB882;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #6B4F3A;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .back-btn:hover {
+            background: #FFB882;
+            transform: translateY(-2px);
+        }
+        .page-title-area h1 {
+            font-size: 26px;
+            color: #2C1F14;
+        }
+        .page-title-area p {
+            color: #8B6F5A;
+            font-size: 14px;
+        }
+
+        .stats-banner {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 184, 130, 0.2);
+        }
+        .stats-banner .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .stats-banner .stat-item .num {
+            font-size: 22px;
+            font-weight: 800;
+            color: #FF6B35;
+        }
+        .stats-banner .stat-item .label {
+            font-size: 13px;
+            color: #7A5F4A;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 18px;
+        }
+        .content-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(6px);
+            border-radius: 28px;
+            padding: 18px 16px 16px;
+            border: 1.5px solid rgba(255, 184, 130, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: 0.25s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .content-card:hover {
+            transform: translateY(-4px);
+            border-color: #FFB882;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+        }
+        .content-card .card-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: #5C3D1A;
+            background: #D4C4A0;
+            padding: 2px 12px;
+            border-radius: 30px;
+            align-self: flex-start;
+            margin-bottom: 8px;
+        }
+        .content-card .card-emoji {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .content-card .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #2C1F14;
+            margin-bottom: 4px;
+            font-family: 'Noto Serif SC', serif;
+        }
+        .content-card .card-desc {
+            font-size: 13px;
+            color: #6B4F3A;
+            flex: 1;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .content-card .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #A58874;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .loading-placeholder {
+            text-align: center;
+            padding: 60px 0;
+            color: #A58874;
+            font-size: 15px;
+        }
+        .loading-placeholder .spinner {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #F0E3D6;
+            border-top-color: #FF8C42;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 40px 0;
+            color: #A58874;
+            font-size: 16px;
+        }
+
+        .poetry-preview {
+            font-size: 13px;
+            color: #8B6F5A;
+            background: rgba(255, 248, 235, 0.5);
+            padding: 4px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .back-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .stats-banner {
+                gap: 14px;
+                padding: 12px 16px;
+            }
+        }
+        @media (max-width: 400px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-header">
+            <button class="back-btn" onclick="window.location.href='index.html'">🏠 返回主页</button>
+            <div class="page-title-area">
+                <h1>📜 全部诗词</h1>
+                <p>在经典诗词中练习拼音打字，感受传统文化之美</p>
+            </div>
+        </div>
+
+        <div class="stats-banner" id="statsBanner">
+            <div class="stat-item"><span class="num" id="totalCount">0</span><span class="label">总诗词</span></div>
+            <div class="stat-item"><span class="num" id="completedCount">0</span><span class="label">已学完</span></div>
+            <div class="stat-item"><span class="num" id="progressPercent">0%</span><span class="label">完成度</span></div>
+        </div>
+
+        <div class="card-grid" id="poetryGrid">
+            <div class="loading-placeholder"><span class="spinner"></span>加载诗词中...</div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG_PATH = './config.json';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        }
+
+        function getCompletedLevels(groupCode) {
+            const key = `typing_completed_${groupCode}`;
+            try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                return data['learn-to-type'] || [];
+            } catch (e) {
+                console.error('加载失败:', e);
+                return null;
+            }
+        }
+
+        const poetryColors = [
+            'linear-gradient(135deg, #F5E6D3, #E8D5C0)',
+            'linear-gradient(135deg, #E8D5C0, #D4C4A0)',
+            'linear-gradient(135deg, #F0E3D6, #E0D0C0)',
+            'linear-gradient(135deg, #EDE0D0, #DDD0B8)',
+            'linear-gradient(135deg, #F5EDE0, #E8DDCC)',
+            'linear-gradient(135deg, #EAE0D0, #D8CCB8)',
+            'linear-gradient(135deg, #F0E8D8, #E0D4C0)',
+            'linear-gradient(135deg, #EDE4D4, #DDD0BC)'
+        ];
+
+        async function init() {
+            const groups = await loadData();
+            const grid = document.getElementById('poetryGrid');
+            const poetryGroup = groups ? groups.find(g => g.code === 'poetry_writing') : null;
+
+            if (!poetryGroup || !poetryGroup.levels || poetryGroup.levels.length === 0) {
+                grid.innerHTML = `<div class="empty-state">📭 暂无诗词数据</div>`;
+                return;
+            }
+
+            const completed = getCompletedLevels('poetry_writing');
+            const total = poetryGroup.levels.length;
+            const done = completed.filter(id => poetryGroup.levels.some(l => l.id === id)).length;
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('completedCount').textContent = done;
+            document.getElementById('progressPercent').textContent = percent + '%';
+
+            let html = '';
+            poetryGroup.levels.forEach((poem, idx) => {
+                const isDone = completed.includes(poem.id);
+                const title = poem.description || `第${poem.id}首`;
+                const author = poem.author || '佚名';
+                const dynasty = poem.dynasty || '';
+                const bgColor = poetryColors[idx % poetryColors.length];
+                const url = poem.url || 'poetry_writing.html';
+                const params = new URLSearchParams();
+                if (poem.id) params.set('id', poem.id);
+                const link = `${url}?${params.toString()}`;
+
+                let previewText = '';
+                if (poem.poem && poem.poem.length > 0) {
+                    const chars = poem.poem.slice(0, 10).map(c => c.char).join('');
+                    previewText = chars.length > 14 ? chars.slice(0, 14) + '…' : chars;
+                }
+
+                html += `
+                    <div class="content-card" style="background:${bgColor};border-color:#C4B49A;" onclick="window.location.href='${link}'">
+                        <span class="card-badge">${isDone ? '✅ 已学完' : '📜 未学习'}</span>
+                        <span class="card-emoji">${isDone ? '🏮' : '📜'}</span>
+                        <div class="card-title">${escapeHtml(title)}</div>
+                        <div class="card-desc">
+                            ${escapeHtml(author)} ${dynasty ? '· ' + escapeHtml(dynasty) : ''}
+                            ${previewText ? '<div class="poetry-preview">「' + escapeHtml(previewText) + '」</div>' : ''}
+                        </div>
+                        <div class="card-meta">
+                            <span>🏷️ 拼音练习</span>
+                            <span>${isDone ? '🎉 完成' : '⏳ 待学习'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        init();
+    </script>
+</body>
+</html>
