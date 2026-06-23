@@ -541,7 +541,7 @@
 
     <script>
         // ================================================================
-        //  初始化 pinyin-pro（从全局变量中解构）
+        //  初始化 pinyin-pro
         // ================================================================
         if (typeof window.pinyinPro === 'undefined' || typeof window.pinyinPro.pinyin !== 'function') {
             console.warn('⚠️ pinyin-pro 加载失败，请检查网络连接');
@@ -553,8 +553,81 @@
         const { pinyin } = window.pinyinPro || { pinyin: null };
 
         // ================================================================
-        //  工具函数：获取拼音（使用 pinyin-pro）
-        //  关键：将所有 ü 替换为 v，适配键盘输入
+        //  工具函数：清理诗词数据中的空白字符
+        // ================================================================
+
+        /**
+         * 清理诗词数据：移除每行的首尾空格，移除空行，移除制表符等
+         * @param {Array} poemData - 诗词数据数组 [{ char, pinyin }, ...]
+         * @returns {Array} 清理后的数据
+         */
+        function cleanPoemData(poemData) {
+            if (!poemData || poemData.length === 0) return poemData;
+
+            // 1. 将数据按行分组
+            let lines = [];
+            let currentLine = [];
+            
+            for (let i = 0; i < poemData.length; i++) {
+                const item = poemData[i];
+                if (item.char === '\n') {
+                    // 遇到换行符，结束当前行
+                    if (currentLine.length > 0) {
+                        lines.push(currentLine);
+                        currentLine = [];
+                    }
+                } else {
+                    // 只保留非空白字符（去除空格、制表符等）
+                    const trimmed = item.char.trim();
+                    if (trimmed !== '') {
+                        currentLine.push({ char: trimmed, pinyin: item.pinyin || '' });
+                    }
+                }
+            }
+            // 处理最后一行
+            if (currentLine.length > 0) {
+                lines.push(currentLine);
+            }
+
+            // 2. 过滤空行（只有空白字符的行）
+            lines = lines.filter(line => line.length > 0);
+
+            // 3. 重新构建数据，在每行后面添加换行符
+            const result = [];
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                // 添加该行的所有字符
+                for (let j = 0; j < line.length; j++) {
+                    result.push(line[j]);
+                }
+                // 如果不是最后一行，添加换行符
+                if (i < lines.length - 1) {
+                    result.push({ char: '\n', pinyin: '' });
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * 清理原始文本：去除首尾空格、多余空行、制表符等
+         * @param {string} text - 原始文本
+         * @returns {string} 清理后的文本
+         */
+        function cleanRawText(text) {
+            if (!text) return '';
+            
+            // 按行分割，去除每行的首尾空格，过滤空行
+            const lines = text.split('\n')
+                .map(line => line.trim())           // 去除每行首尾空格
+                .filter(line => line !== '');        // 过滤空行
+            
+            // 重新组合
+            return lines.join('\n');
+        }
+
+        // ================================================================
+        //  工具函数：获取拼音
         // ================================================================
         function getCharPinyin(char, context) {
             if (!/[\u4e00-\u9fa5]/.test(char)) return '';
@@ -573,11 +646,10 @@
                 
                 if (!allPinyin || allPinyin.length === 0) return '';
                 if (allPinyin.length === 1) {
-                    // ★★★ 将 ü 替换为 v（键盘适配） ★★★
                     return allPinyin[0].replace(/ü/g, 'v');
                 }
                 
-                // 多音字上下文规则（针对古诗常用多音字）
+                // 多音字上下文规则
                 const contextRules = {
                     '重': { '要': 'zhong', '复': 'chong', '新': 'chong', '量': 'zhong', '大': 'zhong', '点': 'zhong' },
                     '长': { '短': 'chang', '大': 'zhang', '久': 'chang', '远': 'chang', '征': 'chang', '江': 'chang' },
@@ -611,7 +683,6 @@
                     }
                 }
                 
-                // ★★★ 将 ü 替换为 v（键盘适配） ★★★
                 return result.replace(/ü/g, 'v');
             } catch (e) {
                 console.warn('注音失败:', char, e);
@@ -620,11 +691,12 @@
         }
 
         /**
-         * 对整首诗词进行自动注音
-         * 所有拼音中的 ü 都会被替换为 v
+         * 对整首诗词进行自动注音（先清理空白字符）
          */
         function autoPinyinPoem(rawText) {
-            const lines = rawText.split('\n').filter(line => line.trim() !== '');
+            // ✅ 先清理原始文本
+            const cleanedText = cleanRawText(rawText);
+            const lines = cleanedText.split('\n').filter(line => line.trim() !== '');
             const result = [];
             
             const SENTENCE_END = /[。！？；！？\.!?;]/;
@@ -635,6 +707,8 @@
                 
                 for (let charIdx = 0; charIdx < chars.length; charIdx++) {
                     const char = chars[charIdx];
+                    if (char.trim() === '') continue;
+                    
                     if (/[\u4e00-\u9fa5]/.test(char)) {
                         const py = getCharPinyin(char, trimmedLine);
                         result.push({ char: char, pinyin: py || '' });
@@ -642,11 +716,9 @@
                         result.push({ char: char, pinyin: '' });
                     }
                     
-                    // ★★★ 句末标点后面插入换行标记 ★★★
                     if (SENTENCE_END.test(char) && charIdx < chars.length - 1) {
                         const nextChar = chars[charIdx + 1];
                         if (!SENTENCE_END.test(nextChar)) {
-                            // ★★★ 检查下一个字符是否已经是换行标记 ★★★
                             const nextItem = result[result.length - 1];
                             if (nextItem && nextItem.char !== '\n') {
                                 result.push({ char: '\n', pinyin: '' });
@@ -655,7 +727,6 @@
                     }
                 }
                 
-                // ★★★ 行末换行（除了最后一行）★★★
                 if (lineIdx < lines.length - 1) {
                     const lastItem = result.length > 0 ? result[result.length - 1] : null;
                     if (lastItem && lastItem.char !== '\n') {
@@ -666,7 +737,9 @@
             return result;
         }
 
-
+        // ================================================================
+        //  统计函数
+        // ================================================================
         function getPoemStats(poemData) {
             const total = poemData.length;
             const chineseChars = poemData.filter(item => /[\u4e00-\u9fa5]/.test(item.char));
@@ -798,13 +871,11 @@
             let html = '';
             let isNewLine = true;
             const PUNCTUATION = /[，。！？；：、，．！？；：""''（）《》【】—…,.;:!?'"]/;
-            // 包含逗号的版本（不推荐，因为逗号是句内停顿）
             const SENTENCE_END = /[，。！？；！？\.!?;]/;
             
             for (let i = 0; i < poemData.length; i++) {
                 const item = poemData[i];
                 
-                // ★★★ 换行标记 → <br> ★★★
                 if (item.char === '\n') {
                     html += `<br>`;
                     isNewLine = true;
@@ -837,10 +908,8 @@
                 }
                 html += `</span>`;
                 
-                // ★★★ 句末标点后换行（但跳过已存在的换行标记）★★★
                 if (isSentenceEnd && i < poemData.length - 1) {
                     const nextItem = poemData[i + 1];
-                    // 如果下一个不是换行标记，则插入换行
                     if (nextItem && nextItem.char !== '\n') {
                         html += `<br>`;
                         isNewLine = true;
@@ -850,7 +919,6 @@
             
             container.innerHTML = html;
             
-            // 绑定点击事件
             container.querySelectorAll('.char-item').forEach(el => {
                 el.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -887,9 +955,6 @@
             if (editingIndex < 0 || editingIndex >= currentPoem.poem.length) return;
             
             let newPinyin = DOM.pinyinEditInput.value.trim().toLowerCase();
-            // ★★★ 用户输入时，将 v 转换为 ü 存储（但实际存储的是 v，因为键盘适配） ★★★
-            // 但为了保持一致性，我们仍然存储为 v（因为练习时用户按的是 v）
-            // 如果用户手动输入了 ü，也转为 v
             newPinyin = newPinyin.replace(/ü/g, 'v');
             
             currentPoem.poem[editingIndex].pinyin = newPinyin;
@@ -969,16 +1034,6 @@
             }
         });
 
-        document.addEventListener('click', function(e) {
-            if (editingIndex >= 0) {
-                const toolbar = DOM.pinyinEditToolbar;
-                const preview = DOM.poemPreview;
-                if (!toolbar.contains(e.target) && !preview.contains(e.target)) {
-                    // 点击外部不取消编辑，防止意外丢失
-                }
-            }
-        });
-
         document.querySelectorAll('.mode-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
@@ -1044,6 +1099,8 @@
                 poemData.id = generatePoemId();
                 success = saveCustomPoem(poemData);
                 if (success) {
+                    // ✅ 保存成功后清除导入数据
+                    localStorage.removeItem('import_poem_data');
                     showToast(`✅ 《${title}》已保存成功！`);
                     setTimeout(() => {
                         window.location.href = 'poetry.html?tab=custom';
@@ -1059,16 +1116,106 @@
         // ================================================================
         function init() {
             const urlParams = new URLSearchParams(window.location.search);
-            editId = urlParams.get('edit');
-            
-            if (editId) {
+            const editIdParam = urlParams.get('edit');
+            const isImport = urlParams.get('import') === 'true';
+
+            // ============================================================
+            //  处理从诗海拾贝导入的诗词
+            // ============================================================
+            if (isImport) {
+                const importData = localStorage.getItem('import_poem_data');
+                if (importData) {
+                    try {
+                        const data = JSON.parse(importData);
+                        
+                        // 填充表单
+                        DOM.poemTitle.value = data.title || '';
+                        DOM.poemAuthor.value = data.author || '';
+                        DOM.poemDynasty.value = data.dynasty || '现代';
+                        
+                        // ✅ 清理原始文本中的空白字符
+                        let rawText = '';
+                        if (data.rawContent) {
+                            rawText = cleanRawText(data.rawContent);
+                        } else if (data.poem && data.poem.length > 0) {
+                            let text = '';
+                            data.poem.forEach(item => {
+                                if (item.char === '\n') {
+                                    text += '\n';
+                                } else {
+                                    text += item.char;
+                                }
+                            });
+                            rawText = cleanRawText(text);
+                        }
+                        DOM.poemInput.value = rawText;
+                        
+                        // ✅ 清理诗词数据中的空白字符
+                        let cleanedPoem = [];
+                        if (data.poem && data.poem.length > 0) {
+                            cleanedPoem = cleanPoemData(data.poem);
+                        } else if (rawText) {
+                            const chars = rawText.split('');
+                            for (let i = 0; i < chars.length; i++) {
+                                const char = chars[i];
+                                if (char === '\n') {
+                                    cleanedPoem.push({ char: '\n', pinyin: '' });
+                                } else if (char.trim() !== '') {
+                                    cleanedPoem.push({ char: char, pinyin: '' });
+                                }
+                            }
+                        }
+                        
+                        // 设置当前诗词数据
+                        currentPoem.poem = cleanedPoem;
+                        
+                        // 渲染预览
+                        renderPreview(currentPoem.poem);
+                        
+                        // 更新页面标题
+                        DOM.pageMainTitle.textContent = '📝 导入诗词 · 编辑';
+                        DOM.pageSubTitle.textContent = `正在编辑《${data.title}》${data.author ? ' · ' + data.author : ''}`;
+                        DOM.savePoemBtn.textContent = '💾 保存诗词';
+                        
+                        // 标记为导入模式
+                        isEditMode = false;
+                        
+                        showToast(`✅ 已导入《${data.title}》，正在自动注音...`);
+
+                        // ✅ 自动触发注音
+                        setTimeout(() => {
+                            if (DOM.autoPinyinBtn) {
+                                DOM.autoPinyinBtn.click();
+                            }
+                        }, 300);
+
+                        if (editIdParam) {
+                            // 继续执行编辑逻辑
+                        } else {
+                            return;
+                        }
+                    } catch (e) {
+                        console.error('解析导入数据失败:', e);
+                        showToast('⚠️ 导入数据解析失败', true);
+                    }
+                }
+            }
+
+            // ============================================================
+            //  处理编辑已有诗词
+            // ============================================================
+            if (editIdParam) {
+                editId = editIdParam;
                 isEditMode = true;
                 const poem = getCustomPoemById(editId);
                 if (poem) {
                     DOM.poemTitle.value = poem.title || '';
                     DOM.poemAuthor.value = poem.author || '';
                     DOM.poemDynasty.value = poem.dynasty || '';
-                    currentPoem.poem = JSON.parse(JSON.stringify(poem.poem || []));
+                    
+                    // ✅ 清理诗词数据
+                    const cleanedPoem = cleanPoemData(poem.poem || []);
+                    currentPoem.poem = cleanedPoem;
                     renderPreview(currentPoem.poem);
                     
                     const rawText = currentPoem.poem.map(item => item.char).join('');
@@ -1084,6 +1231,9 @@
                 }
             }
             
+            // ============================================================
+            //  检查 pinyin-pro 是否可用
+            // ============================================================
             if (typeof window.pinyinPro === 'undefined') {
                 showToast('⚠️ 注音库加载中，请稍后点击"自动注音"', false);
             } else if (typeof pinyin !== 'function') {
@@ -1092,10 +1242,14 @@
                 console.log('✅ pinyin-pro 已就绪（ü → v 键盘适配已启用）');
             }
             
+            // 聚焦到标题输入框
             DOM.poemTitle.focus();
             console.log('✅ 诗词编辑器已加载');
         }
 
+        // ================================================================
+        //  启动
+        // ================================================================
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {

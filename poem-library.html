@@ -323,16 +323,7 @@
         transform: translateY(-2px) scale(1.02);
     }
     .filter-tab.active::after {
-        content: '';
-        position: absolute;
-        bottom: -4px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        height: 3px;
-        background: #FFD700;
-        border-radius: 4px;
-        box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+        display: none;  /* 隐藏下划线 */
     }
     .filter-tab .count {
         font-size: 10px;
@@ -367,11 +358,25 @@
         background: #FFD700;
         box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
     }
-    .filter-tab.more-tab {
-        border-color: transparent;
-        background: transparent;
-        cursor: default;
-        color: rgba(255, 255, 255, 0.2);
+
+    /* ===== "显示全部" / "收起" 按钮样式 ===== */
+    .filter-tab.more-btn {
+        border-color: rgba(255, 215, 0, 0.2);
+        color: rgba(255, 215, 0, 0.7);
+        cursor: pointer;
+    }
+    .filter-tab.more-btn:hover {
+        background: rgba(255, 215, 0, 0.12);
+        color: #FFD700;
+        border-color: rgba(255, 215, 0, 0.4);
+    }
+    .filter-tab.collapse-btn {
+        border-color: rgba(255, 215, 0, 0.3);
+        color: #FFD700;
+        cursor: pointer;
+    }
+    .filter-tab.collapse-btn:hover {
+        background: rgba(255, 215, 0, 0.15);
     }
 
     /* ===== 骨架屏 ===== */
@@ -784,7 +789,7 @@
                     <!-- 由 JS 动态渲染 -->
                 </div>
             </div>
-            <!-- 作者筛选（无"全部"标签） -->
+            <!-- 作者筛选（无"全部"标签，带"显示全部"功能） -->
             <div class="filter-row" id="authorRow">
                 <span class="filter-label">✍️ 作者</span>
                 <div class="filter-tabs" id="authorTabs">
@@ -876,6 +881,7 @@
         let totalPages = 0;
         let dynastiesData = [];
         let authorsData = [];
+        let showAllAuthors = false;  // ✅ 是否展开全部作者
 
         // DOM 引用
         const waterfall = document.getElementById('poemWaterfall');
@@ -988,6 +994,7 @@
                     
                     currentDynasty = dynasty;
                     currentPage = 1;
+                    showAllAuthors = false;  // ✅ 切换朝代时重置展开状态
                     
                     dynastyTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
@@ -1007,14 +1014,16 @@
             });
         }
 
-        // 渲染作者标签（不包含"全部"）
+        // ✅ 渲染作者标签（带"显示全部"功能）
         function renderAuthorTabs() {
             if (!authorsData || authorsData.length === 0) {
                 authorTabs.innerHTML = `<span style="color:rgba(255,255,255,0.3);font-size:13px;">暂无作者数据</span>`;
                 return;
             }
 
-            const displayAuthors = authorsData.slice(0, 30);
+            // 控制显示数量
+            const displayLimit = showAllAuthors ? authorsData.length : 30;
+            const displayAuthors = authorsData.slice(0, displayLimit);
             
             let html = '';
             displayAuthors.forEach(item => {
@@ -1024,19 +1033,25 @@
                 </button>`;
             });
 
+            // ✅ 如果作者数量 > 30，显示"显示全部"或"收起"按钮
             if (authorsData.length > 30) {
-                html += `<span class="filter-tab author-tab more-tab">
-                    +${(authorsData.length - 30).toLocaleString()} 位更多
-                </span>`;
+                if (showAllAuthors) {
+                    html += `<button class="filter-tab collapse-btn" id="collapseAuthorsBtn">
+                        📌 收起 <span class="count">(${authorsData.length}位)</span>
+                    </button>`;
+                } else {
+                    html += `<button class="filter-tab more-btn" id="showMoreAuthorsBtn">
+                        📖 显示全部 <span class="count">(+${authorsData.length - 30}位)</span>
+                    </button>`;
+                }
             }
 
             authorTabs.innerHTML = html;
 
-            // 绑定事件
+            // 绑定作者点击事件
             authorTabs.querySelectorAll('.filter-tab[data-author]').forEach(tab => {
                 tab.addEventListener('click', async function() {
                     const author = this.dataset.author;
-                    // ✅ 如果点击的是当前选中的作者，不刷新
                     if (author === currentAuthor) return;
                     
                     currentAuthor = author;
@@ -1048,6 +1063,26 @@
                     await loadPoemsAndRender();
                 });
             });
+
+            // ✅ 绑定"显示全部"按钮事件
+            const showMoreBtn = document.getElementById('showMoreAuthorsBtn');
+            if (showMoreBtn) {
+                showMoreBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showAllAuthors = true;
+                    renderAuthorTabs();
+                });
+            }
+
+            // ✅ 绑定"收起"按钮事件
+            const collapseBtn = document.getElementById('collapseAuthorsBtn');
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showAllAuthors = false;
+                    renderAuthorTabs();
+                });
+            }
         }
 
         // 骨架屏
@@ -1151,7 +1186,7 @@
         }
 
         // ================================================================
-        //  导入诗词
+        //  导入诗词（通过 ID 获取完整数据，跳转到编辑器）
         // ================================================================
         async function importPoemById(id) {
             try {
@@ -1167,6 +1202,7 @@
 
                 const poem = result.data;
 
+                // 构建诗词数据（与 poem-editor.html 格式一致）
                 const lines = (poem.content || '').split('\n').filter(line => line.trim() !== '');
                 const poemData = [];
 
@@ -1184,21 +1220,26 @@
                     poemData.pop();
                 }
 
+                // ✅ 构建完整的导入数据
                 const importData = {
                     title: poem.title || '无题',
                     author: poem.author || '佚名',
                     dynasty: poem.dynasty || '未知',
                     poem: poemData,
-                    isImport: true
+                    isImport: true,
+                    // ✅ 新增：原始内容，方便编辑器填充
+                    rawContent: poem.content || ''
                 };
 
+                // ✅ 保存到 localStorage
                 localStorage.setItem('import_poem_data', JSON.stringify(importData));
 
                 showToast(`✅ 已导入《${poem.title}》，即将跳转编辑器`, false);
 
+                // ✅ 跳转到编辑器，携带 import 参数
                 setTimeout(() => {
                     window.location.href = 'poem-editor.html?import=true';
-                }, 800);
+                }, 600);
 
             } catch (error) {
                 console.error('导入失败:', error);
