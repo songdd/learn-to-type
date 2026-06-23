@@ -17,7 +17,7 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 12px;
         }
 
@@ -29,6 +29,7 @@
             box-shadow: 0 10px 30px -8px rgba(0,0,0,0.3);
             padding: 0.6rem;
             border: 2px solid #D4A574;
+            margin-top: 12px;
         }
 
         .page-title {
@@ -140,6 +141,10 @@
             padding: 4px 10px;
             border-radius: 25px;
             transition: all 0.2s;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .nav-message.error {
@@ -202,6 +207,8 @@
             padding: 0.7rem;
             border: 2px solid #D4A574;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.08);
+            overflow-y: visible;
+            max-height: none;
         }
 
         .section-title {
@@ -224,20 +231,28 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            height: auto;
+            overflow: visible;
+            padding-bottom: 4px;
         }
 
         .poem-line {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 8px;
+            /* ★★★ 移除 flex-wrap: wrap，不换行 ★★★ */
+            flex-wrap: nowrap;
+            padding: 4px 0;
+            height: auto;
+            /* ★★★ 允许水平滚动或自适应宽度 ★★★ */
+            overflow-x: visible;
         }
 
         .poem-char-card {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 65px;
+            min-width: 55px;
             padding: 6px 4px;
             border-radius: 16px;
             transition: all 0.15s;
@@ -498,22 +513,79 @@
         .completion-btn-reset { background: #D4A574; color: #4A2A00; }
         .completion-btn-menu { background: #E8D5B0; color: #5C3D1A; }
 
+        .input-hint {
+            font-size: 0.55rem;
+            color: #8B6914;
+            text-align: center;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+        .input-hint kbd {
+            background: #FFF0D4;
+            padding: 0px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #B8860B;
+        }
+
+        /* ★★★ 响应式 ★★★ */
         @media (max-width: 800px) {
-            .poem-char-card { min-width: 55px; }
-            .poem-char-card .char-hanzi { font-size: 1.2rem; }
-            .poem-char-card .char-pinyin { font-size: 0.55rem; }
-            .target-hanzi { font-size: 2rem; }
-            .pinyin-input { font-size: 0.9rem; padding: 8px 12px; }
-            .poem-line { gap: 8px; }
-            .your-input .value, .correct-input .value { min-width: 70px; font-size: 0.8rem; }
+            .poem-char-card {
+                min-width: 45px;
+                padding: 4px 3px;
+            }
+            .poem-char-card .char-hanzi {
+                font-size: 1.1rem;
+            }
+            .poem-char-card .char-pinyin {
+                font-size: 0.5rem;
+            }
+            .target-hanzi {
+                font-size: 2rem;
+            }
+            .pinyin-input {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            .poem-line {
+                gap: 8px;
+            }
+            .your-input .value, .correct-input .value {
+                min-width: 70px;
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 700px) {
-            .main-content { flex-direction: column; }
-            .stats-bar { flex-direction: column; align-items: stretch; }
-            .stat-group { justify-content: center; }
-            .poem-char-card { min-width: 50px; }
-            .poem-char-card .char-hanzi { font-size: 1rem; }
+            .main-content {
+                flex-direction: column;
+            }
+            .stats-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .stat-group {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .poem-char-card {
+                min-width: 36px;
+                padding: 3px 2px;
+            }
+            .poem-char-card .char-hanzi {
+                font-size: 0.9rem;
+            }
+            .poem-char-card .char-pinyin {
+                font-size: 0.45rem;
+            }
+            .poem-line {
+                gap: 6px;
+            }
+            .app-container {
+                padding: 0.4rem;
+            }
         }
     </style>
 </head>
@@ -531,6 +603,7 @@
             <div class="stat"><span>✨ 进度</span> <span id="progressCount">0</span>/<span id="totalChars">0</span></div>
             <div class="stat"><span>🔥 连击</span> <span id="comboValue">0</span></div>
         </div>
+        <div class="stat" style="background:#B8860B;color:#FFF8E7;" id="poemTypeBadge">📜 精选</div>
     </div>
 
     <div class="nav-bar">
@@ -575,6 +648,7 @@
                 <div class="input-section">
                     <div class="input-label">⌨️ 输入拼音 (小写，不要带声调)</div>
                     <input type="text" id="pinyinInput" class="pinyin-input" placeholder="chuang" autocomplete="off">
+                    <div class="input-hint">💡 提示：键盘上的 <kbd>ü</kbd> 请用 <kbd>v</kbd> 键代替</div>
                 </div>
 
                 <div class="compare-hint">
@@ -606,21 +680,65 @@
 const CONFIG_PATH = './config.json';
 
 // ==================== 标点符号判断 ====================
-const PUNCTUATION_SET = new Set(['，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…']);
-
+// 用于 loadPoem 中过滤空格，保留标点
 function isPunctuation(char) {
-    return PUNCTUATION_SET.has(char);
+    const trimmed = char.trim();
+    const punctuationSet = new Set(['，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…']);
+    return punctuationSet.has(trimmed);
 }
 
-// ==================== 检查用户输入是否与正确拼音的前N个字符匹配 ====================
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+}
+
+// ==================== ★★★ 拼音标准化（ü → v 键盘适配）★★★ ====================
+function normalizePinyinForKeyboard(pinyin) {
+    if (!pinyin) return '';
+    return pinyin.replace(/ü/g, 'v');
+}
+
+function isPinyinMatch(userInput, correctPinyin) {
+    if (!userInput || !correctPinyin) return false;
+    const userNorm = userInput.toLowerCase().replace(/ü/g, 'v');
+    const correctNorm = correctPinyin.toLowerCase().replace(/ü/g, 'v');
+    return userNorm === correctNorm;
+}
+
 function isMatchingPrefix(userInput, correctPinyin) {
     if (!userInput || !correctPinyin) return false;
-    if (userInput.length > correctPinyin.length) return false;
-    const prefixOfCorrect = correctPinyin.substring(0, userInput.length);
-    return userInput === prefixOfCorrect;
+    const userNorm = userInput.toLowerCase().replace(/ü/g, 'v');
+    const correctNorm = correctPinyin.toLowerCase().replace(/ü/g, 'v');
+    if (userNorm.length > correctNorm.length) return false;
+    return correctNorm.indexOf(userNorm) === 0;
 }
 
-// ==================== 同步通关进度到主页 ====================
+// ==================== 自定义诗词工具 ====================
+function getCustomPoems() {
+    try {
+        const data = localStorage.getItem('user_custom_poems');
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        console.error('读取自定义诗词失败:', e);
+        return [];
+    }
+}
+
+function getCustomCompleted() {
+    try { return JSON.parse(localStorage.getItem('custom_poetry_completed') || '[]'); } catch { return []; }
+}
+
+function markCustomPoemCompleted(poemId) {
+    if (!poemId) return;
+    const key = 'custom_poetry_completed';
+    let completed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!completed.includes(poemId)) {
+        completed.push(poemId);
+        localStorage.setItem(key, JSON.stringify(completed));
+        console.log(`✅ 自定义诗词完成: ${poemId}`);
+    }
+}
+
 function syncCompletedToMain(poemId) {
     if (!poemId) return;
     const key = `typing_completed_poetry_writing`;
@@ -637,6 +755,7 @@ function syncCompletedToMain(poemId) {
 let poetryDatabase = [];
 let currentPoemIndex = 0;
 let currentPoem = null;
+let currentIsCustom = false;
 
 let practiceChars = [];
 let practicePinyin = [];
@@ -677,11 +796,13 @@ const mainContent = document.getElementById('mainContent');
 const loadingContainer = document.getElementById('loadingContainer');
 const poemAuthorInfo = document.getElementById('poemAuthorInfo');
 const pageTitleH1 = document.querySelector('#pageTitle h1');
+const poemTypeBadge = document.getElementById('poemTypeBadge');
 
 function updateInputPlaceholder(pinyin) {
     if (!pinyinInput) return;
-    if (pinyin && pinyin !== '') {
-        pinyinInput.placeholder = pinyin;
+    const displayPinyin = normalizePinyinForKeyboard(pinyin);
+    if (displayPinyin && displayPinyin !== '') {
+        pinyinInput.placeholder = displayPinyin;
     } else {
         pinyinInput.placeholder = '输入拼音';
     }
@@ -715,11 +836,6 @@ async function loadConfig() {
         console.error('加载配置文件失败:', error);
         return false;
     }
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
 
 function showMessage(text, isError = false, isSuccess = false) {
@@ -835,30 +951,40 @@ function startTimerOnFirstInput() {
     }
 }
 
-// ==================== 加载古诗（过滤标点） ====================
-function loadPoem(index) {
-    if (!poetryDatabase.length || index >= poetryDatabase.length) return;
-    
-    currentPoem = poetryDatabase[index];
-    if (!currentPoem || !currentPoem.poem) return;
+// ==================== ★★★ 加载诗词（保留标点）★★★ ====================
+function loadPoem(poem) {
+    if (!poem || !poem.poem) return;
 
-    const rawPoem = currentPoem.poem;
+    const rawPoem = poem.poem;
     practiceChars = [];
     practicePinyin = [];
     
     for (let i = 0; i < rawPoem.length; i++) {
         const char = rawPoem[i].char;
-        const pinyin = rawPoem[i].pinyin || '';
-        if (!isPunctuation(char)) {
+        let pinyin = rawPoem[i].pinyin || '';
+        pinyin = normalizePinyinForKeyboard(pinyin);
+        
+        // ★★★ 只过滤空字符串或纯空格，保留所有可见字符（包括标点）★★★
+        if (char.trim() !== '') {
             practiceChars.push(char);
             practicePinyin.push(pinyin);
         }
     }
     totalPracticeChars = practiceChars.length;
 
-    const titleText = currentPoem.title || `第${currentPoem.id}首`;
-    poemAuthorInfo.innerHTML = `${titleText} · ${currentPoem.author} (${currentPoem.dynasty})`;
+    const titleText = poem.title || `第${poem.id}首`;
+    const authorText = poem.author || '佚名';
+    const dynastyText = poem.dynasty || '';
+    poemAuthorInfo.innerHTML = `${titleText} · ${authorText}${dynastyText ? ' (' + dynastyText + ')' : ''}`;
     pageTitleH1.innerHTML = `📜 ${titleText} · 拼音练习 🖌️`;
+
+    if (currentIsCustom) {
+        poemTypeBadge.textContent = '✏️ 我的创作';
+        poemTypeBadge.style.background = '#2D6A2D';
+    } else {
+        poemTypeBadge.textContent = '📜 精选诗词';
+        poemTypeBadge.style.background = '#B8860B';
+    }
 
     currentIndex = 0;
     correctCount = 0;
@@ -888,7 +1014,7 @@ function loadPoem(index) {
 
     setTimeout(() => pinyinInput.focus(), 100);
 
-    showMessage(`🎋 开始练习《${titleText}》共${totalPracticeChars}个汉字`, false, true);
+    showMessage(`🎋 开始练习《${titleText}》共${totalPracticeChars}个字符`, false, true);
 }
 
 function renderPoemDisplay() {
@@ -896,13 +1022,23 @@ function renderPoemDisplay() {
     if (!container) return;
     container.innerHTML = '';
     
-    const charsPerLine = 5;
+    // ★★★ 所有标点符号（中英文）★★★
+    const PUNCTUATION_SET = new Set([
+        // 中文标点
+        '，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…', '·',
+        // 英文标点
+        ',', '.', '!', '?', ';', ':', '"', "'", '(', ')', '<', '>', '[', ']', '-', '_', '~', '`', '@', '#', '$', '%', '^', '&', '*', '+', '=', '|', '\\', '/'
+    ]);
+    
     let currentLine = [];
     
     for (let i = 0; i < practiceChars.length; i++) {
         const char = practiceChars[i];
-        const pinyin = practicePinyin[i];
+        const pinyin = normalizePinyinForKeyboard(practicePinyin[i]);
         const status = inputStatus[i];
+        
+        const trimmedChar = char.trim();
+        const isPunctuation = PUNCTUATION_SET.has(trimmedChar);
         
         let cardClass = 'poem-char-card';
         if (i === currentIndex && active) {
@@ -922,7 +1058,8 @@ function renderPoemDisplay() {
         `;
         currentLine.push(charDiv);
         
-        if (currentLine.length % charsPerLine === 0 && currentLine.length > 0 && i !== practiceChars.length - 1) {
+        // ★★★ 遇到任何标点符号就换行（无字数限制）★★★
+        if (isPunctuation && i !== practiceChars.length - 1) {
             const lineDiv = document.createElement('div');
             lineDiv.className = 'poem-line';
             currentLine.forEach(c => lineDiv.appendChild(c));
@@ -931,6 +1068,7 @@ function renderPoemDisplay() {
         }
     }
     
+    // 处理剩余字符
     if (currentLine.length > 0) {
         const lineDiv = document.createElement('div');
         lineDiv.className = 'poem-line';
@@ -939,11 +1077,18 @@ function renderPoemDisplay() {
     }
 }
 
+// ==================== ★★★ 更新当前目标（跳过标点）★★★ ====================
 function updateCurrentTarget() {
+    // ★★★ 跳过标点，找到下一个汉字（或有效字符）★★★
+    while (currentIndex < totalPracticeChars && isPunctuation(practiceChars[currentIndex])) {
+        currentIndex++;
+    }
+    
     if (currentIndex < totalPracticeChars) {
         currentHanziSpan.innerText = practiceChars[currentIndex];
-        currentPinyinHintSpan.innerText = practicePinyin[currentIndex];
-        correctPinyinDisplay.innerText = practicePinyin[currentIndex];
+        const displayPinyin = normalizePinyinForKeyboard(practicePinyin[currentIndex]);
+        currentPinyinHintSpan.innerText = displayPinyin;
+        correctPinyinDisplay.innerText = displayPinyin;
         updateInputPlaceholder(practicePinyin[currentIndex]);
     } else {
         currentHanziSpan.innerText = '🎉';
@@ -957,7 +1102,7 @@ function updateCompareDisplay() {
     if (currentIndex < totalPracticeChars) {
         const currentInput = userInputs[currentIndex] || '';
         yourInputDisplay.innerText = currentInput || '—';
-        correctPinyinDisplay.innerText = practicePinyin[currentIndex];
+        correctPinyinDisplay.innerText = normalizePinyinForKeyboard(practicePinyin[currentIndex]);
     } else {
         yourInputDisplay.innerText = '—';
         correctPinyinDisplay.innerText = '—';
@@ -982,7 +1127,8 @@ function validateInput() {
     } else {
         playError();
         pinyinInput.classList.add('error');
-        showMessage(`⚠️ 输入错误！正确拼音是 "${correctPinyin}"，请修正`, true);
+        const displayCorrect = normalizePinyinForKeyboard(correctPinyin);
+        showMessage(`⚠️ 输入错误！正确拼音是 "${displayCorrect}"，请修正`, true);
         
         setTimeout(() => {
             pinyinInput.classList.remove('error');
@@ -998,7 +1144,8 @@ function submitPinyin() {
     
     const inputValue = pinyinInput.value.trim().toLowerCase();
     if (inputValue === '') {
-        showMessage(`📝 请输入拼音 "${practicePinyin[currentIndex]}"`, false);
+        const displayPinyin = normalizePinyinForKeyboard(practicePinyin[currentIndex]);
+        showMessage(`📝 请输入拼音 "${displayPinyin}"`, false);
         return false;
     }
     
@@ -1006,7 +1153,7 @@ function submitPinyin() {
     
     const correctPinyin = practicePinyin[currentIndex];
     
-    if (inputValue === correctPinyin) {
+    if (isPinyinMatch(inputValue, correctPinyin)) {
         isProcessing = true;
         
         playCorrect();
@@ -1017,6 +1164,7 @@ function submitPinyin() {
         if (combo > maxCombo) maxCombo = combo;
         
         pinyinInput.classList.add('correct');
+        const displayPinyin = normalizePinyinForKeyboard(correctPinyin);
         showMessage(`✅ 正确！拼音 "${inputValue}" 匹配！连击 x${combo}`, false, true);
         
         currentIndex++;
@@ -1037,7 +1185,8 @@ function submitPinyin() {
         return true;
     } else {
         playError();
-        showMessage(`❌ 错误！正确拼音是 "${correctPinyin}"，你输入了 "${inputValue}"`, true);
+        const displayCorrect = normalizePinyinForKeyboard(correctPinyin);
+        showMessage(`❌ 错误！正确拼音是 "${displayCorrect}"，你输入了 "${inputValue}"`, true);
         
         pinyinInput.classList.add('error');
         setTimeout(() => {
@@ -1048,14 +1197,18 @@ function submitPinyin() {
     }
 }
 
+// ==================== 完成 ====================
 function finish() {
     if (currentIndex < totalPracticeChars) return;
     active = false;
     if (timer) clearInterval(timer);
     
-    // 同步通关进度到主页
     if (currentPoem && currentPoem.id) {
-        syncCompletedToMain(currentPoem.id);
+        if (currentIsCustom) {
+            markCustomPoemCompleted(currentPoem.id);
+        } else {
+            syncCompletedToMain(currentPoem.id);
+        }
     }
     
     const totalTyped = correctCount + errorCount;
@@ -1070,7 +1223,15 @@ function finish() {
 function showCompletionDialog() {
     const totalTyped = correctCount + errorCount;
     const accuracy = totalTyped === 0 ? 100 : Math.floor((correctCount / totalTyped) * 100);
-    const hasNext = currentPoemIndex < poetryDatabase.length - 1;
+    
+    let hasNext = false;
+    if (currentIsCustom) {
+        const customPoems = getCustomPoems();
+        const idx = customPoems.findIndex(p => p.id === currentPoem.id);
+        hasNext = idx < customPoems.length - 1 || poetryDatabase.length > 0;
+    } else {
+        hasNext = currentPoemIndex < poetryDatabase.length - 1 || getCustomPoems().length > 0;
+    }
     
     const overlay = document.createElement('div');
     overlay.className = 'completion-overlay';
@@ -1085,7 +1246,7 @@ function showCompletionDialog() {
                 <div class="stat-row"><span class="stat-label">❌ 错误/跳过</span><span class="stat-value">${errorCount}</span></div>
                 <div class="stat-row"><span class="stat-label">🔥 最高连击</span><span class="stat-value">${maxCombo}</span></div>
             </div>
-            ${hasNext ? '<div class="auto-tip" style="font-size:0.65rem; color:#B8860B; margin:6px 0;">⏰ 5秒后自动进入下一首</div>' : '<div class="auto-tip">🎊 恭喜完成所有古诗！ 🎊</div>'}
+            ${hasNext ? '<div class="auto-tip" style="font-size:0.65rem; color:#B8860B; margin:6px 0;">⏰ 5秒后自动进入下一首</div>' : '<div class="auto-tip">🎊 恭喜完成所有诗词！ 🎊</div>'}
             <div class="completion-buttons">
                 ${hasNext ? '<button class="completion-btn completion-btn-next" id="completionNextBtn">📖 下一首</button>' : ''}
                 <button class="completion-btn completion-btn-reset" id="completionResetBtn">🔄 重玩</button>
@@ -1134,7 +1295,7 @@ function showCompletionDialog() {
     if (menuBtn) {
         menuBtn.addEventListener('click', () => {
             if (autoTimer) clearInterval(autoTimer);
-            window.location.href = 'index.html';
+            window.location.href = 'poetry.html';
         });
     }
 }
@@ -1170,25 +1331,70 @@ function resetCurrent() {
     showMessage(`🔄 重新开始《${currentPoem.title}》，加油～`, false);
 }
 
+// ==================== 导航 ====================
 function goPrevPoem() {
-    if (currentPoemIndex > 0) {
-        currentPoemIndex--;
-        loadPoem(currentPoemIndex);
-    } else {
+    if (currentIsCustom) {
+        const customPoems = getCustomPoems();
+        const currentIdx = customPoems.findIndex(p => p.id === currentPoem.id);
+        if (currentIdx > 0) {
+            const prev = customPoems[currentIdx - 1];
+            window.location.href = `poetry_writing.html?customId=${encodeURIComponent(prev.id)}`;
+            return;
+        } else if (poetryDatabase.length > 0) {
+            const last = poetryDatabase[poetryDatabase.length - 1];
+            window.location.href = `poetry_writing.html?id=${last.id}`;
+            return;
+        }
         showMessage("🎋 已经是第一首诗了！", true);
+        return;
+    }
+    
+    if (currentPoemIndex > 0) {
+        const prev = poetryDatabase[currentPoemIndex - 1];
+        window.location.href = `poetry_writing.html?id=${prev.id}`;
+    } else {
+        const customPoems = getCustomPoems();
+        if (customPoems.length > 0) {
+            const last = customPoems[customPoems.length - 1];
+            window.location.href = `poetry_writing.html?customId=${encodeURIComponent(last.id)}`;
+        } else {
+            showMessage("🎋 已经是第一首诗了！", true);
+        }
     }
 }
 
 function goNextPoem() {
+    if (currentIsCustom) {
+        const customPoems = getCustomPoems();
+        const currentIdx = customPoems.findIndex(p => p.id === currentPoem.id);
+        if (currentIdx < customPoems.length - 1) {
+            const next = customPoems[currentIdx + 1];
+            window.location.href = `poetry_writing.html?customId=${encodeURIComponent(next.id)}`;
+            return;
+        } else if (poetryDatabase.length > 0) {
+            const first = poetryDatabase[0];
+            window.location.href = `poetry_writing.html?id=${first.id}`;
+            return;
+        }
+        showMessage("🎉 已经是最后一首诗了！", false, true);
+        return;
+    }
+    
     if (currentPoemIndex < poetryDatabase.length - 1) {
-        currentPoemIndex++;
-        loadPoem(currentPoemIndex);
+        const next = poetryDatabase[currentPoemIndex + 1];
+        window.location.href = `poetry_writing.html?id=${next.id}`;
     } else {
-        showMessage("🎉 恭喜！已经是最后一首诗了！", false, true);
+        const customPoems = getCustomPoems();
+        if (customPoems.length > 0) {
+            const first = customPoems[0];
+            window.location.href = `poetry_writing.html?customId=${encodeURIComponent(first.id)}`;
+        } else {
+            showMessage("🎉 已经是最后一首诗了！", false, true);
+        }
     }
 }
 
-// ==================== 监听输入事件 ====================
+// ==================== 设置输入事件 ====================
 function setupInputEvents() {
     pinyinInput.addEventListener('input', (e) => {
         if (isProcessing) return;
@@ -1198,7 +1404,7 @@ function setupInputEvents() {
         
         if (currentIndex < totalPracticeChars) {
             const correctPinyin = practicePinyin[currentIndex];
-            if (inputValue === correctPinyin) {
+            if (isPinyinMatch(inputValue, correctPinyin)) {
                 submitPinyin();
             }
         }
@@ -1212,15 +1418,9 @@ function setupInputEvents() {
     });
 }
 
-function getPoemIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const poemId = parseInt(urlParams.get('id'));
-    if (poemId && !isNaN(poemId)) {
-        return poemId;
-    }
-    return null;
-}
-
+// ================================================================
+//  初始化
+// ================================================================
 async function init() {
     const loaded = await loadConfig();
     
@@ -1233,17 +1433,54 @@ async function init() {
         return;
     }
     
-    const poemId = getPoemIdFromUrl();
-    if (poemId && poemId >= 1 && poemId <= poetryDatabase.length) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const poemId = parseInt(urlParams.get('id'));
+    const customId = urlParams.get('customId');
+    
+    let targetPoem = null;
+    currentIsCustom = false;
+    currentPoemIndex = 0;
+    
+    if (customId) {
+        const customPoems = getCustomPoems();
+        targetPoem = customPoems.find(p => p.id === customId);
+        if (targetPoem) {
+            currentIsCustom = true;
+            console.log(`✅ 加载自定义诗词: ${targetPoem.title}`);
+        } else {
+            showMessage('⚠️ 未找到该自定义诗词，将加载第一首内置诗词', true);
+            if (poetryDatabase.length > 0) {
+                targetPoem = poetryDatabase[0];
+                currentPoemIndex = 0;
+            }
+        }
+    } else if (poemId && poemId >= 1 && poemId <= poetryDatabase.length) {
+        targetPoem = poetryDatabase[poemId - 1];
         currentPoemIndex = poemId - 1;
+        console.log(`✅ 加载内置诗词: ${targetPoem.title}`);
     } else {
-        currentPoemIndex = 0;
+        if (poetryDatabase.length > 0) {
+            targetPoem = poetryDatabase[0];
+            currentPoemIndex = 0;
+            console.log(`✅ 加载默认诗词: ${targetPoem.title}`);
+        }
+    }
+    
+    if (!targetPoem) {
+        showMessage('❌ 没有可用的诗词', true);
+        loadingContainer.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div class="loading-text">❌ 没有可用的诗词</div>
+        `;
+        return;
     }
     
     loadingContainer.style.display = 'none';
     mainContent.style.display = 'block';
     
-    loadPoem(currentPoemIndex);
+    currentPoem = targetPoem;
+    
+    loadPoem(targetPoem);
     setupInputEvents();
     
     document.getElementById('prevPoemBtn').addEventListener('click', goPrevPoem);
@@ -1252,10 +1489,14 @@ async function init() {
     document.getElementById('backToMenuBtn').addEventListener('click', () => window.location.href = 'poetry.html');
     
     initAudio();
-    console.log(`✅ 初始化完成，共 ${poetryDatabase.length} 首古诗`);
+    console.log(`✅ 初始化完成，当前诗词: ${targetPoem.title}${currentIsCustom ? ' (自定义)' : ' (内置)'}，ü→v 键盘适配已启用`);
 }
 
-init();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 </script>
 </body>
 </html>

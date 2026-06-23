@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>✏️ 创作新诗 · 奕霖打字</title>
+    
+    <!-- ===== 引入 pinyin-pro（通过 unpkg 基础路径） ===== -->
+    <script src="https://unpkg.com/pinyin-pro"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #FFF6ED;
+            font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Comic Sans MS', cursive, sans-serif;
+            color: #3D2B1A;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 2px solid rgba(255, 184, 130, 0.3);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .back-btn {
+            background: rgba(255, 184, 130, 0.25);
+            border: 2px solid #FFB882;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #6B4F3A;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .back-btn:hover {
+            background: #FFB882;
+            transform: translateY(-2px);
+        }
+        .page-title-area h1 {
+            font-size: 24px;
+            color: #2C1F14;
+        }
+        .page-title-area p {
+            color: #8B6F5A;
+            font-size: 13px;
+        }
+
+        /* ===== 编辑器样式 ===== */
+        .editor-section {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 184, 130, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .editor-section .section-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #8B6914;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid #D4A574;
+            padding-left: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 12px;
+            color: #8B6F5A;
+            font-weight: 600;
+        }
+        .form-group input {
+            padding: 10px 14px;
+            border: 2px solid #E8D5B0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.6);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .mode-tab {
+            padding: 6px 18px;
+            border-radius: 25px;
+            border: 2px solid #D4A574;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: #6B4F3A;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .mode-tab:hover {
+            background: #FFF0D4;
+        }
+        .mode-tab.active {
+            background: #D4A574;
+            color: white;
+            border-color: #D4A574;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 14px;
+            border: 2px solid #E8D5B0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Noto Sans CJK SC', 'Segoe UI', sans-serif;
+            resize: vertical;
+            background: rgba(255, 255, 255, 0.6);
+            outline: none;
+            transition: border-color 0.2s;
+            line-height: 1.8;
+        }
+        textarea:focus {
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #B8860B, #D4A574);
+            color: white;
+        }
+        .btn-secondary {
+            background: #E8D5B0;
+            color: #4A2A00;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #2D6A2D, #4A9A4A);
+            color: white;
+        }
+        .btn-danger {
+            background: #FF6B6B;
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #D4A574;
+            color: #6B4F3A;
+        }
+        .btn-outline:hover {
+            background: #FFF0D4;
+        }
+
+        /* ===== 预览区 ===== */
+        .preview-section {
+            background: #FFF8EF;
+            border-radius: 16px;
+            padding: 16px 20px;
+            border: 2px solid #E8D5B0;
+            min-height: 120px;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .preview-header .title {
+            font-weight: 700;
+            color: #8B6914;
+            font-size: 14px;
+        }
+        .stats-badge-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .stats-badge {
+            padding: 4px 14px;
+            background: #FFF0D4;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #8B6914;
+            font-weight: 600;
+        }
+        .stats-badge span {
+            color: #B8860B;
+        }
+
+        .poem-preview {
+            font-size: 22px;
+            line-height: 2.4;
+            font-family: 'Noto Sans CJK SC', 'SimSun', serif;
+            padding: 8px 4px;
+            min-height: 80px;
+        }
+        .poem-preview .char-item {
+            display: inline-block;
+            margin: 0 2px;
+            padding: 2px 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            position: relative;
+            vertical-align: top;
+        }
+        .poem-preview .char-item:hover {
+            background: #FFF0D4;
+            border-bottom-color: #D4A574;
+        }
+        .poem-preview .char-item .pinyin-hint {
+            display: block;
+            font-size: 11px;
+            color: #8B6914;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin-top: -2px;
+            min-height: 16px;
+            font-weight: 400;
+        }
+        .poem-preview .char-item .pinyin-hint.missing {
+            color: #FF6B6B;
+        }
+        .poem-preview .char-item .pinyin-hint.empty {
+            color: #D4C4A0;
+        }
+        .char-item.editing {
+            background: #FFE0A3;
+            border-bottom-color: #B8860B;
+            border-radius: 6px 6px 0 0;
+        }
+
+        /* ===== 拼音编辑工具栏 ===== */
+        .pinyin-edit-toolbar {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: #FFF0D4;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .pinyin-edit-toolbar.active {
+            display: flex;
+        }
+        .pinyin-edit-toolbar .edit-label {
+            font-weight: 600;
+            color: #8B6914;
+            font-size: 13px;
+        }
+        .pinyin-edit-toolbar .char-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #B8860B;
+            min-width: 40px;
+            text-align: center;
+        }
+        .pinyin-edit-toolbar .arrow {
+            color: #D4A574;
+            font-size: 18px;
+        }
+        .pinyin-edit-input {
+            width: 120px;
+            padding: 6px 12px;
+            border: 2px solid #D4A574;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            outline: none;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        .pinyin-edit-input:focus {
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+        }
+        .pinyin-edit-toolbar .hint-text {
+            font-size: 12px;
+            color: #8B6914;
+            margin-left: auto;
+        }
+        .pinyin-edit-toolbar .hint-text kbd {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .pinyin-edit-toolbar .hint-text .key-hint {
+            color: #B8860B;
+            font-weight: 600;
+        }
+
+        /* ===== 底部按钮 ===== */
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px solid rgba(255, 184, 130, 0.2);
+        }
+
+        /* ===== Toast ===== */
+        .toast-global {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3D2B1A;
+            color: #FFF6ED;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            animation: toastPop 2.4s ease forwards;
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+        }
+        .toast-global.error {
+            background: #FF6B6B;
+            color: #fff;
+        }
+        @keyframes toastPop {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 700px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .back-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .poem-preview {
+                font-size: 18px;
+                line-height: 2.2;
+            }
+            .pinyin-edit-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .pinyin-edit-toolbar .hint-text {
+                margin-left: 0;
+            }
+        }
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .poem-preview {
+                font-size: 16px;
+            }
+            .action-bar .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .footer-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        .empty-preview {
+            color: #B8A88A;
+            text-align: center;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+        .empty-preview .icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 顶部导航 ===== -->
+        <div class="back-header">
+            <button class="back-btn" onclick="window.location.href='poetry.html'">🏠 返回诗库</button>
+            <div class="page-title-area">
+                <h1 id="pageMainTitle">✏️ 创作新诗</h1>
+                <p id="pageSubTitle">粘贴诗词原文，系统将自动注音，你也可以手动校正</p>
+            </div>
+        </div>
+
+        <!-- ===== 基本信息 ===== -->
+        <div class="editor-section">
+            <div class="section-label">📖 诗词信息</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>诗词标题 *</label>
+                    <input type="text" id="poemTitle" placeholder="如：静夜思">
+                </div>
+                <div class="form-group">
+                    <label>作者</label>
+                    <input type="text" id="poemAuthor" placeholder="如：李白">
+                </div>
+                <div class="form-group">
+                    <label>朝代</label>
+                    <input type="text" id="poemDynasty" placeholder="如：唐" value="现代">
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 内容输入 ===== -->
+        <div class="editor-section">
+            <div class="section-label">📝 诗词内容</div>
+            
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="auto">🤖 智能注音</button>
+                <button class="mode-tab" data-mode="manual">✏️ 手动编辑</button>
+            </div>
+            
+            <textarea id="poemInput" placeholder="请粘贴诗词原文，每行一句&#10;例如：&#10;床前明月光&#10;疑是地上霜&#10;举头望明月&#10;低头思故乡"></textarea>
+            
+            <div class="action-bar">
+                <button class="btn btn-primary" id="autoPinyinBtn">🔮 自动注音</button>
+                <button class="btn btn-secondary" id="loadExampleBtn">📋 加载示例</button>
+                <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+            </div>
+        </div>
+
+        <!-- ===== 预览与校对 ===== -->
+        <div class="editor-section">
+            <div class="section-label">📝 预览与校对</div>
+            
+            <div class="preview-section">
+                <div class="preview-header">
+                    <span class="title">📖 诗词预览（点击汉字可编辑拼音）</span>
+                    <div class="stats-badge-group">
+                        <span class="stats-badge">📊 字数: <span id="charCount">0</span></span>
+                        <span class="stats-badge">🎯 已注音: <span id="pinyinCount">0/0</span></span>
+                    </div>
+                </div>
+                
+                <div class="poem-preview" id="poemPreview">
+                    <div class="empty-preview">
+                        <span class="icon">📝</span>
+                        点击「自动注音」或输入内容后预览
+                    </div>
+                </div>
+                
+                <!-- 拼音编辑工具栏 -->
+                <div class="pinyin-edit-toolbar" id="pinyinEditToolbar">
+                    <span class="edit-label">✏️ 编辑拼音:</span>
+                    <span class="char-display" id="editingCharDisplay">—</span>
+                    <span class="arrow">→</span>
+                    <input type="text" id="pinyinEditInput" class="pinyin-edit-input" placeholder="输入拼音">
+                    <button class="btn btn-success" id="savePinyinBtn" style="padding:6px 16px; font-size:12px;">💾 确认</button>
+                    <span class="hint-text">
+                        💡 <kbd>Enter</kbd> 确认 · <kbd>Esc</kbd> 取消
+                        <span style="margin-left:8px; color:#B8860B;">ü 请用 <kbd style="background:#B8860B;color:#fff;">v</kbd> 代替</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 底部操作 ===== -->
+        <div class="footer-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='poetry.html'">取消</button>
+            <button class="btn btn-success" id="savePoemBtn">💾 保存诗词</button>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  初始化 pinyin-pro（从全局变量中解构）
+        // ================================================================
+        if (typeof window.pinyinPro === 'undefined' || typeof window.pinyinPro.pinyin !== 'function') {
+            console.warn('⚠️ pinyin-pro 加载失败，请检查网络连接');
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast('⚠️ 注音库加载失败，请刷新页面重试', true);
+            });
+        }
+        
+        const { pinyin } = window.pinyinPro || { pinyin: null };
+
+        // ================================================================
+        //  工具函数：获取拼音（使用 pinyin-pro）
+        //  关键：将所有 ü 替换为 v，适配键盘输入
+        // ================================================================
+        function getCharPinyin(char, context) {
+            if (!/[\u4e00-\u9fa5]/.test(char)) return '';
+            
+            if (typeof pinyin !== 'function') {
+                console.warn('pinyin 函数不可用');
+                return '';
+            }
+            
+            try {
+                const allPinyin = pinyin(char, {
+                    toneType: 'none',
+                    multiple: true,
+                    type: 'array'
+                });
+                
+                if (!allPinyin || allPinyin.length === 0) return '';
+                if (allPinyin.length === 1) {
+                    // ★★★ 将 ü 替换为 v（键盘适配） ★★★
+                    return allPinyin[0].replace(/ü/g, 'v');
+                }
+                
+                // 多音字上下文规则（针对古诗常用多音字）
+                const contextRules = {
+                    '重': { '要': 'zhong', '复': 'chong', '新': 'chong', '量': 'zhong', '大': 'zhong', '点': 'zhong' },
+                    '长': { '短': 'chang', '大': 'zhang', '久': 'chang', '远': 'chang', '征': 'chang', '江': 'chang' },
+                    '行': { '走': 'xing', '业': 'hang', '为': 'xing', '动': 'xing', '列': 'hang', '知': 'xing' },
+                    '乐': { '快': 'le', '音': 'yue', '曲': 'yue', '器': 'yue', '章': 'yue' },
+                    '了': { '解': 'liao', '却': 'le', '结': 'liao', '然': 'liao', '事': 'le' },
+                    '的': { '确': 'di', '话': 'de', '是': 'de', '目': 'di', '士': 'di' },
+                    '觉': { '得': 'jiao', '悟': 'jue', '察': 'jue', '醒': 'jue', '知': 'jue' },
+                    '着': { '火': 'zhao', '急': 'zhao', '陆': 'zhuo', '手': 'zhuo', '落': 'zhao' },
+                    '降': { '低': 'jiang', '落': 'jiang', '服': 'xiang', '临': 'lin' },
+                    '华': { '中': 'hua', '山': 'hua', '夏': 'hua', '实': 'hua', '丽': 'hua' },
+                    '为': { '人': 'wei', '了': 'wei', '国': 'wei', '民': 'wei', '什': 'wei', '何': 'wei' },
+                    '得': { '到': 'de', '过': 'de', '不': 'de', '意': 'de', '失': 'de' },
+                    '还': { '回': 'huan', '有': 'hai', '是': 'hai', '好': 'hai', '钱': 'huan' },
+                    '会': { '面': 'hui', '有': 'hui', '员': 'hui', '见': 'hui', '计': 'kuai' },
+                    '单': { '位': 'dan', '人': 'dan', '词': 'dan', '纯': 'dan', '于': 'chan' },
+                    '空': { '气': 'kong', '中': 'kong', '白': 'kong', '间': 'kong', '缺': 'kong' },
+                    '难': { '过': 'nan', '处': 'nan', '题': 'nan', '民': 'nan', '兄': 'nan' },
+                    '好': { '人': 'hao', '了': 'hao', '处': 'hao', '像': 'hao', '奇': 'hao' },
+                    '和': { '平': 'he', '气': 'he', '好': 'he', '声': 'he', '面': 'he' },
+                    '地': { '方': 'di', '下': 'di', '球': 'di', '理': 'di', '的': 'de' },
+                };
+                
+                let result = allPinyin[0];
+                if (contextRules[char]) {
+                    for (let [key, value] of Object.entries(contextRules[char])) {
+                        if (context.includes(key)) {
+                            result = value;
+                            break;
+                        }
+                    }
+                }
+                
+                // ★★★ 将 ü 替换为 v（键盘适配） ★★★
+                return result.replace(/ü/g, 'v');
+            } catch (e) {
+                console.warn('注音失败:', char, e);
+                return '';
+            }
+        }
+
+        /**
+         * 对整首诗词进行自动注音
+         * 所有拼音中的 ü 都会被替换为 v
+         */
+        function autoPinyinPoem(rawText) {
+            const lines = rawText.split('\n').filter(line => line.trim() !== '');
+            const result = [];
+            
+            const SENTENCE_END = /[。！？；！？\.!?;]/;
+            
+            for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+                const trimmedLine = lines[lineIdx].trim();
+                const chars = trimmedLine.split('');
+                
+                for (let charIdx = 0; charIdx < chars.length; charIdx++) {
+                    const char = chars[charIdx];
+                    if (/[\u4e00-\u9fa5]/.test(char)) {
+                        const py = getCharPinyin(char, trimmedLine);
+                        result.push({ char: char, pinyin: py || '' });
+                    } else {
+                        result.push({ char: char, pinyin: '' });
+                    }
+                    
+                    // ★★★ 句末标点后面插入换行标记 ★★★
+                    if (SENTENCE_END.test(char) && charIdx < chars.length - 1) {
+                        const nextChar = chars[charIdx + 1];
+                        if (!SENTENCE_END.test(nextChar)) {
+                            // ★★★ 检查下一个字符是否已经是换行标记 ★★★
+                            const nextItem = result[result.length - 1];
+                            if (nextItem && nextItem.char !== '\n') {
+                                result.push({ char: '\n', pinyin: '' });
+                            }
+                        }
+                    }
+                }
+                
+                // ★★★ 行末换行（除了最后一行）★★★
+                if (lineIdx < lines.length - 1) {
+                    const lastItem = result.length > 0 ? result[result.length - 1] : null;
+                    if (lastItem && lastItem.char !== '\n') {
+                        result.push({ char: '\n', pinyin: '' });
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        function getPoemStats(poemData) {
+            const total = poemData.length;
+            const chineseChars = poemData.filter(item => /[\u4e00-\u9fa5]/.test(item.char));
+            const hasPinyin = chineseChars.filter(item => item.pinyin && item.pinyin.length > 0);
+            return {
+                total: total,
+                chinese: chineseChars.length,
+                hasPinyin: hasPinyin.length
+            };
+        }
+
+        // ================================================================
+        //  存储工具
+        // ================================================================
+        function getCustomPoems() {
+            try {
+                const data = localStorage.getItem('user_custom_poems');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error('读取自定义诗词失败:', e);
+                return [];
+            }
+        }
+
+        function saveCustomPoem(poem) {
+            try {
+                const poems = getCustomPoems();
+                poems.push(poem);
+                localStorage.setItem('user_custom_poems', JSON.stringify(poems));
+                return true;
+            } catch (e) {
+                console.error('保存自定义诗词失败:', e);
+                return false;
+            }
+        }
+
+        function updateCustomPoem(id, updatedPoem) {
+            try {
+                const poems = getCustomPoems();
+                const index = poems.findIndex(p => p.id === id);
+                if (index === -1) return false;
+                poems[index] = { ...updatedPoem, id: id };
+                localStorage.setItem('user_custom_poems', JSON.stringify(poems));
+                return true;
+            } catch (e) {
+                console.error('更新自定义诗词失败:', e);
+                return false;
+            }
+        }
+
+        function getCustomPoemById(id) {
+            const poems = getCustomPoems();
+            return poems.find(p => p.id === id) || null;
+        }
+
+        function generatePoemId() {
+            return `user_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        }
+
+        // ================================================================
+        //  Toast
+        // ================================================================
+        function showToast(msg, isError) {
+            const old = document.querySelector('.toast-global');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast-global';
+            if (isError) toast.classList.add('error');
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2400);
+        }
+
+        // ================================================================
+        //  状态管理
+        // ================================================================
+        let currentPoem = {
+            title: '',
+            author: '',
+            dynasty: '现代',
+            poem: []
+        };
+        let editingIndex = -1;
+        let isEditMode = false;
+        let editId = null;
+
+        // ================================================================
+        //  DOM引用
+        // ================================================================
+        const DOM = {
+            poemInput: document.getElementById('poemInput'),
+            poemPreview: document.getElementById('poemPreview'),
+            poemTitle: document.getElementById('poemTitle'),
+            poemAuthor: document.getElementById('poemAuthor'),
+            poemDynasty: document.getElementById('poemDynasty'),
+            charCount: document.getElementById('charCount'),
+            pinyinCount: document.getElementById('pinyinCount'),
+            editingCharDisplay: document.getElementById('editingCharDisplay'),
+            pinyinEditInput: document.getElementById('pinyinEditInput'),
+            pinyinEditToolbar: document.getElementById('pinyinEditToolbar'),
+            savePinyinBtn: document.getElementById('savePinyinBtn'),
+            autoPinyinBtn: document.getElementById('autoPinyinBtn'),
+            loadExampleBtn: document.getElementById('loadExampleBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            savePoemBtn: document.getElementById('savePoemBtn'),
+            pageMainTitle: document.getElementById('pageMainTitle'),
+            pageSubTitle: document.getElementById('pageSubTitle'),
+        };
+
+        // ================================================================
+        //  核心功能
+        // ================================================================
+
+        function renderPreview(poemData) {
+            const container = DOM.poemPreview;
+            if (!container) return;
+            
+            if (!poemData || poemData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-preview">
+                        <span class="icon">📝</span>
+                        暂无内容，请粘贴诗词并点击「自动注音」
+                    </div>
+                `;
+                updateStats();
+                return;
+            }
+            
+            let html = '';
+            let isNewLine = true;
+            const PUNCTUATION = /[，。！？；：、，．！？；：""''（）《》【】—…,.;:!?'"]/;
+            // 包含逗号的版本（不推荐，因为逗号是句内停顿）
+            const SENTENCE_END = /[，。！？；！？\.!?;]/;
+            
+            for (let i = 0; i < poemData.length; i++) {
+                const item = poemData[i];
+                
+                // ★★★ 换行标记 → <br> ★★★
+                if (item.char === '\n') {
+                    html += `<br>`;
+                    isNewLine = true;
+                    continue;
+                }
+                
+                const isPunctuation = PUNCTUATION.test(item.char);
+                const isSentenceEnd = SENTENCE_END.test(item.char);
+                isNewLine = false;
+                
+                const isEditing = (i === editingIndex);
+                const charClass = `char-item ${isEditing ? 'editing' : ''}`;
+                const isChinese = /[\u4e00-\u9fa5]/.test(item.char);
+                
+                let pinyinClass = 'pinyin-hint';
+                if (isChinese && (!item.pinyin || item.pinyin === '')) {
+                    pinyinClass += ' missing';
+                } else if (!isChinese && item.char !== '\n') {
+                    pinyinClass += ' empty';
+                }
+                
+                const displayPinyin = isChinese ? (item.pinyin || '?') : '';
+                
+                html += `<span class="${charClass}" data-index="${i}">`;
+                html += item.char;
+                if (isChinese) {
+                    html += `<span class="${pinyinClass}">${displayPinyin}</span>`;
+                } else {
+                    html += `<span class="${pinyinClass}">&nbsp;</span>`;
+                }
+                html += `</span>`;
+                
+                // ★★★ 句末标点后换行（但跳过已存在的换行标记）★★★
+                if (isSentenceEnd && i < poemData.length - 1) {
+                    const nextItem = poemData[i + 1];
+                    // 如果下一个不是换行标记，则插入换行
+                    if (nextItem && nextItem.char !== '\n') {
+                        html += `<br>`;
+                        isNewLine = true;
+                    }
+                }
+            }
+            
+            container.innerHTML = html;
+            
+            // 绑定点击事件
+            container.querySelectorAll('.char-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (!isNaN(idx)) {
+                        startEditPinyin(idx);
+                    }
+                });
+            });
+            
+            updateStats();
+        }
+
+        function updateStats() {
+            const stats = getPoemStats(currentPoem.poem);
+            DOM.charCount.textContent = stats.total;
+            DOM.pinyinCount.textContent = `${stats.hasPinyin}/${stats.chinese}`;
+        }
+
+        function startEditPinyin(index) {
+            const item = currentPoem.poem[index];
+            if (!item || !/[\u4e00-\u9fa5]/.test(item.char)) return;
+            
+            editingIndex = index;
+            DOM.editingCharDisplay.textContent = item.char;
+            DOM.pinyinEditInput.value = item.pinyin || '';
+            DOM.pinyinEditToolbar.classList.add('active');
+            DOM.pinyinEditInput.focus();
+            DOM.pinyinEditInput.select();
+            
+            renderPreview(currentPoem.poem);
+        }
+
+        function savePinyinEdit() {
+            if (editingIndex < 0 || editingIndex >= currentPoem.poem.length) return;
+            
+            let newPinyin = DOM.pinyinEditInput.value.trim().toLowerCase();
+            // ★★★ 用户输入时，将 v 转换为 ü 存储（但实际存储的是 v，因为键盘适配） ★★★
+            // 但为了保持一致性，我们仍然存储为 v（因为练习时用户按的是 v）
+            // 如果用户手动输入了 ü，也转为 v
+            newPinyin = newPinyin.replace(/ü/g, 'v');
+            
+            currentPoem.poem[editingIndex].pinyin = newPinyin;
+            
+            editingIndex = -1;
+            DOM.pinyinEditToolbar.classList.remove('active');
+            DOM.pinyinEditInput.value = '';
+            renderPreview(currentPoem.poem);
+            showToast('✅ 拼音已更新');
+        }
+
+        function cancelPinyinEdit() {
+            editingIndex = -1;
+            DOM.pinyinEditToolbar.classList.remove('active');
+            DOM.pinyinEditInput.value = '';
+            renderPreview(currentPoem.poem);
+        }
+
+        // ================================================================
+        //  事件绑定
+        // ================================================================
+
+        DOM.autoPinyinBtn.addEventListener('click', function() {
+            const rawText = DOM.poemInput.value;
+            if (!rawText.trim()) {
+                showToast('⚠️ 请先输入诗词内容', true);
+                return;
+            }
+            
+            if (typeof pinyin !== 'function') {
+                showToast('❌ 注音库未加载，请刷新页面重试', true);
+                return;
+            }
+            
+            try {
+                currentPoem.poem = autoPinyinPoem(rawText);
+                renderPreview(currentPoem.poem);
+                showToast(`✅ 已为 ${currentPoem.poem.length} 个字符注音（ü → v）`);
+            } catch (e) {
+                showToast('❌ 注音失败: ' + e.message, true);
+                console.error(e);
+            }
+        });
+
+        DOM.loadExampleBtn.addEventListener('click', function() {
+            const example = `静夜思
+床前明月光
+疑是地上霜
+举头望明月
+低头思故乡`;
+            DOM.poemInput.value = example;
+            DOM.autoPinyinBtn.click();
+            DOM.poemTitle.value = '静夜思';
+            DOM.poemAuthor.value = '李白';
+            DOM.poemDynasty.value = '唐';
+        });
+
+        DOM.clearBtn.addEventListener('click', function() {
+            if (currentPoem.poem.length > 0 || DOM.poemInput.value.trim()) {
+                if (!confirm('确定要清空当前输入吗？')) return;
+            }
+            DOM.poemInput.value = '';
+            currentPoem.poem = [];
+            renderPreview(currentPoem.poem);
+            showToast('已清空');
+        });
+
+        DOM.savePinyinBtn.addEventListener('click', savePinyinEdit);
+        DOM.pinyinEditInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                savePinyinEdit();
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelPinyinEdit();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (editingIndex >= 0) {
+                const toolbar = DOM.pinyinEditToolbar;
+                const preview = DOM.poemPreview;
+                if (!toolbar.contains(e.target) && !preview.contains(e.target)) {
+                    // 点击外部不取消编辑，防止意外丢失
+                }
+            }
+        });
+
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const mode = this.dataset.mode;
+                if (mode === 'manual') {
+                    showToast('✏️ 手动模式：请在文本框中按 "汉字 拼音" 格式输入');
+                } else {
+                    showToast('🤖 智能模式：粘贴原文后点击"自动注音"');
+                }
+            });
+        });
+
+        // ================================================================
+        //  保存
+        // ================================================================
+        DOM.savePoemBtn.addEventListener('click', function() {
+            const title = DOM.poemTitle.value.trim();
+            const author = DOM.poemAuthor.value.trim() || '佚名';
+            const dynasty = DOM.poemDynasty.value.trim() || '现代';
+            
+            if (!title) {
+                showToast('⚠️ 请为诗词添加标题', true);
+                DOM.poemTitle.focus();
+                return;
+            }
+            
+            if (currentPoem.poem.length === 0) {
+                showToast('⚠️ 请先输入诗词内容并点击"自动注音"', true);
+                return;
+            }
+            
+            const missingPinyin = currentPoem.poem.filter(
+                item => /[\u4e00-\u9fa5]/.test(item.char) && !item.pinyin
+            );
+            if (missingPinyin.length > 0) {
+                const chars = missingPinyin.map(item => item.char).join('');
+                if (!confirm(`以下汉字缺少拼音：${chars}\n是否继续保存？`)) {
+                    return;
+                }
+            }
+            
+            const poemData = {
+                title: title,
+                author: author,
+                dynasty: dynasty,
+                isCustom: true,
+                poem: JSON.parse(JSON.stringify(currentPoem.poem))
+            };
+            
+            let success;
+            if (isEditMode && editId) {
+                success = updateCustomPoem(editId, poemData);
+                if (success) {
+                    showToast(`✅ 《${title}》已更新成功！`);
+                    setTimeout(() => {
+                        window.location.href = 'poetry.html?tab=custom';
+                    }, 1500);
+                } else {
+                    showToast('❌ 更新失败，请重试', true);
+                }
+            } else {
+                poemData.id = generatePoemId();
+                success = saveCustomPoem(poemData);
+                if (success) {
+                    showToast(`✅ 《${title}》已保存成功！`);
+                    setTimeout(() => {
+                        window.location.href = 'poetry.html?tab=custom';
+                    }, 1500);
+                } else {
+                    showToast('❌ 保存失败，请重试', true);
+                }
+            }
+        });
+
+        // ================================================================
+        //  初始化
+        // ================================================================
+        function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            editId = urlParams.get('edit');
+            
+            if (editId) {
+                isEditMode = true;
+                const poem = getCustomPoemById(editId);
+                if (poem) {
+                    DOM.poemTitle.value = poem.title || '';
+                    DOM.poemAuthor.value = poem.author || '';
+                    DOM.poemDynasty.value = poem.dynasty || '';
+                    currentPoem.poem = JSON.parse(JSON.stringify(poem.poem || []));
+                    renderPreview(currentPoem.poem);
+                    
+                    const rawText = currentPoem.poem.map(item => item.char).join('');
+                    DOM.poemInput.value = rawText;
+                    
+                    DOM.pageMainTitle.textContent = '✏️ 编辑诗词';
+                    DOM.pageSubTitle.textContent = '修改诗词内容和拼音，完成后点击更新';
+                    DOM.savePoemBtn.textContent = '💾 更新诗词';
+                    
+                    showToast(`📝 正在编辑《${poem.title}》`);
+                } else {
+                    showToast('⚠️ 未找到要编辑的诗词', true);
+                }
+            }
+            
+            if (typeof window.pinyinPro === 'undefined') {
+                showToast('⚠️ 注音库加载中，请稍后点击"自动注音"', false);
+            } else if (typeof pinyin !== 'function') {
+                showToast('⚠️ 注音库加载异常，请刷新页面', true);
+            } else {
+                console.log('✅ pinyin-pro 已就绪（ü → v 键盘适配已启用）');
+            }
+            
+            DOM.poemTitle.focus();
+            console.log('✅ 诗词编辑器已加载');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

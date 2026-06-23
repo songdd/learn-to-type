@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>📚 诗海拾贝 · 奕霖打字</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        background: #0a0a1a;
+        font-family: 'Comic Neue', 'Segoe UI', 'PingFang SC', 'Comic Sans MS', cursive, sans-serif;
+        color: #F5E6D3;
+        padding: 0 16px 40px;
+        overflow-x: hidden;
+    }
+
+    /* ===== 流光背景 ===== */
+    .bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    .bg-canvas .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.5;
+        animation: floatOrb 20s ease-in-out infinite alternate;
+    }
+
+    .bg-canvas .orb:nth-child(1) {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #FF6B6B, #FF8C42);
+        top: -10%;
+        left: -10%;
+        animation-duration: 25s;
+    }
+
+    .bg-canvas .orb:nth-child(2) {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, #4ECDC4, #2C8F8F);
+        bottom: -10%;
+        right: -10%;
+        animation-duration: 30s;
+        animation-delay: -5s;
+    }
+
+    .bg-canvas .orb:nth-child(3) {
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, #D4A574, #B8860B);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-duration: 22s;
+        animation-delay: -10s;
+    }
+
+    .bg-canvas .orb:nth-child(4) {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, #A78BFA, #7C3AED);
+        top: 20%;
+        right: 10%;
+        animation-duration: 18s;
+        animation-delay: -3s;
+    }
+
+    .bg-canvas .orb:nth-child(5) {
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, #F472B6, #DB2777);
+        bottom: 20%;
+        left: 15%;
+        animation-duration: 28s;
+        animation-delay: -7s;
+    }
+
+    @keyframes floatOrb {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -40px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(10px, -30px) scale(1.05); }
+    }
+
+    /* ===== 星星闪烁 ===== */
+    .stars {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 3s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+        0% { opacity: 0.2; }
+        100% { opacity: 1; }
+    }
+
+    /* ===== 主容器 ===== */
+    .container {
+        position: relative;
+        z-index: 1;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* ===== 顶部导航 ===== */
+    .back-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 0 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    .back-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 40px;
+        padding: 8px 20px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #F5E6D3;
+        cursor: pointer;
+        transition: 0.3s;
+        font-family: inherit;
+        backdrop-filter: blur(4px);
+        text-decoration: none;
+    }
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .page-title-area h1 {
+        font-size: 26px;
+        background: linear-gradient(135deg, #FFD700, #FF8C42, #FF6B6B);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .page-title-area p {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+    }
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        margin-left: auto;
+        flex-wrap: wrap;
+    }
+    .btn-refresh {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 40px;
+        padding: 8px 18px;
+        font-weight: 600;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: 0.3s;
+        font-family: inherit;
+        backdrop-filter: blur(4px);
+    }
+    .btn-refresh:hover {
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    /* ===== 统计 ===== */
+    .stats-banner {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .stats-banner .stat-item {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+    }
+    .stats-banner .stat-item .num {
+        font-size: 22px;
+        font-weight: 800;
+        color: #FFD700;
+    }
+    .stats-banner .stat-item .label {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ===== 搜索栏 ===== */
+    .search-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .search-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 10px 18px;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #F5E6D3;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: 0.3s;
+        backdrop-filter: blur(4px);
+    }
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+    }
+    .search-input:focus {
+        border-color: rgba(255, 215, 0, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .search-btn {
+        padding: 10px 24px;
+        border-radius: 30px;
+        border: none;
+        background: linear-gradient(135deg, #FF8C42, #FF6B35);
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-family: inherit;
+    }
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+    }
+
+    /* ===== 筛选栏 ===== */
+    .filter-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .filter-label {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+        min-width: 50px;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 6px 18px;
+        border-radius: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        transition: all 0.3s ease;
+        font-family: inherit;
+        backdrop-filter: blur(4px);
+        position: relative;
+    }
+    .filter-tab:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .filter-tab.active {
+        background: linear-gradient(135deg, #FF8C42, #FF6B35);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px) scale(1.02);
+    }
+    .filter-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: #FFD700;
+        border-radius: 4px;
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    }
+    .filter-tab .count {
+        font-size: 10px;
+        opacity: 0.5;
+        margin-left: 4px;
+        transition: all 0.3s;
+    }
+    .filter-tab.active .count {
+        color: rgba(255, 255, 255, 0.9);
+        opacity: 1;
+    }
+
+    /* ===== 作者标签 ===== */
+    .filter-tab.author-tab {
+        padding: 4px 14px;
+        font-size: 12px;
+        border-radius: 20px;
+        border-color: rgba(255, 215, 0, 0.1);
+    }
+    .filter-tab.author-tab:hover {
+        border-color: rgba(255, 215, 0, 0.3);
+        background: rgba(255, 215, 0, 0.08);
+    }
+    .filter-tab.author-tab.active {
+        background: linear-gradient(135deg, #D4A574, #B8860B);
+        border-color: transparent;
+        box-shadow: 0 4px 16px rgba(184, 134, 11, 0.35);
+        color: white;
+        transform: translateY(-2px) scale(1.02);
+    }
+    .filter-tab.author-tab.active::after {
+        background: #FFD700;
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    }
+    .filter-tab.more-tab {
+        border-color: transparent;
+        background: transparent;
+        cursor: default;
+        color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ===== 骨架屏 ===== */
+    .skeleton-card {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 20px 22px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        animation: shimmer 1.5s ease-in-out infinite;
+    }
+    .skeleton-card .skeleton-title {
+        height: 22px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        width: 60%;
+        margin-bottom: 12px;
+    }
+    .skeleton-card .skeleton-line {
+        height: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        margin-bottom: 6px;
+    }
+    .skeleton-card .skeleton-line:last-child {
+        width: 40%;
+    }
+    @keyframes shimmer {
+        0% { opacity: 0.4; }
+        50% { opacity: 0.9; }
+        100% { opacity: 0.4; }
+    }
+
+    /* ===== 诗词瀑布 ===== */
+    .poem-waterfall {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .poem-card {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
+        border-radius: 24px;
+        padding: 20px 22px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.35s;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+    .poem-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.03), rgba(255, 140, 66, 0.05));
+        pointer-events: none;
+        border-radius: 24px;
+    }
+    .poem-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 215, 0, 0.25);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.09);
+    }
+    .poem-card .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+        gap: 8px;
+    }
+    .poem-card .poem-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #FFD700;
+        font-family: 'Noto Serif SC', serif;
+    }
+    .poem-card .poem-author {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    .poem-card .poem-body {
+        font-size: 15px;
+        line-height: 2;
+        color: rgba(255, 255, 255, 0.85);
+        font-family: 'Noto Serif SC', 'Segoe UI', serif;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        padding: 4px 0;
+    }
+    .poem-card .poem-body .line {
+        display: block;
+        padding: 1px 0;
+        letter-spacing: 1px;
+    }
+    .poem-card .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        position: relative;
+        z-index: 1;
+    }
+    .poem-card .card-footer .dynasty-tag {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.06);
+        padding: 2px 12px;
+        border-radius: 20px;
+    }
+    .poem-card .card-footer .action-hint {
+        font-size: 12px;
+        color: rgba(255, 215, 0, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: 0.3s;
+    }
+    .poem-card:hover .card-footer .action-hint {
+        color: #FFD700;
+    }
+
+    /* ===== 加载状态 ===== */
+    .loading-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 60px 0;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .loading-state .spinner {
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #FFD700;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 16px;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 60px 0;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 16px;
+    }
+    .empty-state .icon {
+        font-size: 40px;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    /* ===== Toast ===== */
+    .toast-global {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(12px);
+        color: #FFF6ED;
+        padding: 10px 24px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 9999;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        animation: toastPop 2.4s ease forwards;
+        white-space: nowrap;
+        max-width: 90vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .toast-global.error {
+        background: rgba(255, 107, 107, 0.9);
+    }
+    @keyframes toastPop {
+        0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+
+    /* ===== 分页 ===== */
+    .pagination-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        flex-wrap: wrap;
+    }
+    .pagination-btn {
+        padding: 8px 20px;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .pagination-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+    .pagination-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+    .pagination-info {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 13px;
+    }
+
+    /* ===== 分页跳转 ===== */
+    .pagination-jump {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 13px;
+    }
+    .pagination-jump input[type="number"] {
+        width: 60px;
+        padding: 6px 8px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.06);
+        color: #F5E6D3;
+        font-size: 13px;
+        text-align: center;
+        outline: none;
+        transition: 0.3s;
+        font-family: inherit;
+    }
+    .pagination-jump input[type="number"]:focus {
+        border-color: rgba(255, 215, 0, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .pagination-jump input[type="number"]::-webkit-inner-spin-button,
+    .pagination-jump input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+    .pagination-jump .pagination-btn {
+        padding: 6px 16px;
+        font-size: 12px;
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 700px) {
+        .back-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .header-actions {
+            margin-left: 0;
+            width: 100%;
+        }
+        .header-actions .btn-refresh {
+            flex: 1;
+            text-align: center;
+        }
+        .page-title-area h1 {
+            font-size: 20px;
+        }
+        .poem-waterfall {
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .poem-card .poem-title {
+            font-size: 15px;
+        }
+        .poem-card .poem-body {
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .filter-tab {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        .filter-tab.author-tab {
+            font-size: 11px;
+            padding: 3px 10px;
+        }
+        .stats-banner {
+            gap: 14px;
+            padding: 12px 16px;
+        }
+        .stats-banner .stat-item .num {
+            font-size: 18px;
+        }
+        .search-bar {
+            flex-direction: column;
+        }
+        .search-input {
+            width: 100%;
+        }
+        .search-btn {
+            width: 100%;
+        }
+        .filter-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .filter-label {
+            min-width: auto;
+        }
+        .pagination-bar {
+            gap: 8px;
+        }
+        .pagination-jump {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    @media (max-width: 480px) {
+        .poem-waterfall {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .page-title-area h1 {
+            font-size: 18px;
+        }
+        .filter-tab.active::after {
+            width: 40%;
+        }
+        .pagination-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .pagination-jump input[type="number"] {
+            width: 50px;
+        }
+    }
+</style>    
+</head>
+<body>
+    <!-- ===== 流光背景 ===== -->
+    <div class="bg-canvas">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+    <div class="stars" id="starsContainer"></div>
+
+    <div class="container">
+        <!-- ===== 顶部导航 ===== -->
+        <div class="back-header">
+            <a href="poetry.html" class="back-btn">🏠 返回诗库</a>
+            <div class="page-title-area">
+                <h1>📚 诗海拾贝</h1>
+                <p>从千年诗库中精选，一键导入创作</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="init()">🔄 刷新</button>
+            </div>
+        </div>
+
+        <!-- ===== 统计 ===== -->
+        <div class="stats-banner" id="statsBanner">
+            <div class="stat-item"><span class="num" id="totalCount">0</span><span class="label">总诗词</span></div>
+            <div class="stat-item"><span class="num" id="dynastyCount">0</span><span class="label">朝代</span></div>
+            <div class="stat-item"><span class="num" id="authorCount">0</span><span class="label">当前作者</span></div>
+            <div class="stat-item"><span class="num" id="currentCount">0</span><span class="label">当前显示</span></div>
+        </div>
+
+        <!-- ===== 搜索栏 ===== -->
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索标题、作者、内容..." />
+            <button class="search-btn" onclick="applySearch()">搜索</button>
+        </div>
+
+        <!-- ===== 筛选栏 ===== -->
+        <div class="filter-section">
+            <!-- 朝代筛选（无"全部"标签） -->
+            <div class="filter-row">
+                <span class="filter-label">📜 朝代</span>
+                <div class="filter-tabs" id="dynastyTabs">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+            <!-- 作者筛选（无"全部"标签） -->
+            <div class="filter-row" id="authorRow">
+                <span class="filter-label">✍️ 作者</span>
+                <div class="filter-tabs" id="authorTabs">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 诗词瀑布 ===== -->
+        <div class="poem-waterfall" id="poemWaterfall">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <div>📖 正在加载诗库...</div>
+            </div>
+        </div>
+
+        <!-- ===== 分页（含跳转输入框） ===== -->
+        <div class="pagination-bar" id="paginationBar">
+            <button class="pagination-btn" id="prevPageBtn" disabled>◀ 上一页</button>
+            
+            <span class="pagination-info" id="pageInfo">第 1 / 1 页</span>
+            
+            <!-- ✅ 跳转输入框 -->
+            <div class="pagination-jump">
+                <span>跳至</span>
+                <input type="number" id="jumpPageInput" min="1" value="1" />
+                <span>页</span>
+                <button class="pagination-btn" id="jumpPageBtn">跳转</button>
+            </div>
+            
+            <button class="pagination-btn" id="nextPageBtn" disabled>下一页 ▶</button>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  API 配置
+        // ================================================================
+        const API_BASE = '/api';
+
+        // ================================================================
+        //  工具函数
+        // ================================================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        }
+
+        function showToast(msg, isError = false) {
+            const old = document.querySelector('.toast-global');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast-global';
+            if (isError) toast.classList.add('error');
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2400);
+        }
+
+        // ================================================================
+        //  生成星星
+        // ================================================================
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            if (!container) return;
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = (1 + Math.random() * 2) + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = (Math.random() * 3) + 's';
+                star.style.animationDuration = (2 + Math.random() * 3) + 's';
+                container.appendChild(star);
+            }
+        }
+        createStars();
+
+        // ================================================================
+        //  状态管理
+        // ================================================================
+        let currentDynasty = null;
+        let currentAuthor = null;
+        let currentSearch = '';
+        let currentPage = 1;
+        let pageSize = 12;
+        let totalPoems = 0;
+        let totalPages = 0;
+        let dynastiesData = [];
+        let authorsData = [];
+
+        // DOM 引用
+        const waterfall = document.getElementById('poemWaterfall');
+        const dynastyTabs = document.getElementById('dynastyTabs');
+        const authorTabs = document.getElementById('authorTabs');
+        const searchInput = document.getElementById('searchInput');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const jumpPageInput = document.getElementById('jumpPageInput');
+        const jumpPageBtn = document.getElementById('jumpPageBtn');
+
+        // ================================================================
+        //  API 调用
+        // ================================================================
+        async function fetchDynasties() {
+            try {
+                const response = await fetch(`${API_BASE}/get-dynasties`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                if (result.success) {
+                    dynastiesData = result.data;
+                    return dynastiesData;
+                }
+                throw new Error(result.message || '获取朝代失败');
+            } catch (error) {
+                console.error('获取朝代失败:', error);
+                return [];
+            }
+        }
+
+        async function fetchAuthors(dynasty) {
+            try {
+                const params = new URLSearchParams();
+                if (dynasty && dynasty !== 'all') {
+                    params.append('dynasty', dynasty);
+                }
+                const url = `${API_BASE}/get-authors?${params.toString()}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                if (result.success) {
+                    authorsData = result.data || [];
+                    return authorsData;
+                }
+                throw new Error(result.message || '获取作者失败');
+            } catch (error) {
+                console.error('获取作者失败:', error);
+                return [];
+            }
+        }
+
+        async function fetchPoems(page = 1) {
+            const params = new URLSearchParams();
+            params.append('page', page);
+            params.append('pageSize', pageSize);
+            if (currentDynasty && currentDynasty !== 'all') {
+                params.append('dynasty', currentDynasty);
+            }
+            if (currentAuthor && currentAuthor !== 'all') {
+                params.append('author', currentAuthor);
+            }
+            if (currentSearch && currentSearch.trim()) {
+                params.append('search', currentSearch.trim());
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/get-poems-v2?${params.toString()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                if (result.success) {
+                    totalPoems = result.total || 0;
+                    totalPages = result.totalPages || 0;
+                    return result.data || [];
+                }
+                throw new Error(result.message || '查询诗词失败');
+            } catch (error) {
+                console.error('查询诗词失败:', error);
+                return [];
+            }
+        }
+
+        // ================================================================
+        //  渲染函数
+        // ================================================================
+
+        // 渲染朝代标签（不包含"全部"）
+        function renderDynastyTabs() {
+            if (!dynastiesData || dynastiesData.length === 0) {
+                dynastyTabs.innerHTML = `<span style="color:rgba(255,255,255,0.3);font-size:13px;">暂无朝代数据</span>`;
+                return;
+            }
+
+            let html = '';
+            dynastiesData.forEach(item => {
+                const active = currentDynasty === item.dynasty ? 'active' : '';
+                html += `<button class="filter-tab ${active}" data-dynasty="${escapeHtml(item.dynasty)}">
+                    ${escapeHtml(item.dynasty)} <span class="count">(${item.count.toLocaleString()})</span>
+                </button>`;
+            });
+
+            dynastyTabs.innerHTML = html;
+
+            // 绑定事件
+            dynastyTabs.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', async function() {
+                    const dynasty = this.dataset.dynasty;
+                    // ✅ 如果点击的是当前选中的朝代，不刷新
+                    if (dynasty === currentDynasty) return;
+                    
+                    currentDynasty = dynasty;
+                    currentPage = 1;
+                    
+                    dynastyTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    await loadAuthors(dynasty);
+                    
+                    // ✅ 自动选中该朝代的第一个作者
+                    if (authorsData && authorsData.length > 0) {
+                        currentAuthor = authorsData[0].author;
+                    } else {
+                        currentAuthor = null;
+                    }
+                    renderAuthorTabs();
+                    
+                    await loadPoemsAndRender();
+                });
+            });
+        }
+
+        // 渲染作者标签（不包含"全部"）
+        function renderAuthorTabs() {
+            if (!authorsData || authorsData.length === 0) {
+                authorTabs.innerHTML = `<span style="color:rgba(255,255,255,0.3);font-size:13px;">暂无作者数据</span>`;
+                return;
+            }
+
+            const displayAuthors = authorsData.slice(0, 30);
+            
+            let html = '';
+            displayAuthors.forEach(item => {
+                const active = currentAuthor === item.author ? 'active' : '';
+                html += `<button class="filter-tab author-tab ${active}" data-author="${escapeHtml(item.author)}">
+                    ${escapeHtml(item.author)} <span class="count">(${item.count.toLocaleString()})</span>
+                </button>`;
+            });
+
+            if (authorsData.length > 30) {
+                html += `<span class="filter-tab author-tab more-tab">
+                    +${(authorsData.length - 30).toLocaleString()} 位更多
+                </span>`;
+            }
+
+            authorTabs.innerHTML = html;
+
+            // 绑定事件
+            authorTabs.querySelectorAll('.filter-tab[data-author]').forEach(tab => {
+                tab.addEventListener('click', async function() {
+                    const author = this.dataset.author;
+                    // ✅ 如果点击的是当前选中的作者，不刷新
+                    if (author === currentAuthor) return;
+                    
+                    currentAuthor = author;
+                    currentPage = 1;
+                    
+                    authorTabs.querySelectorAll('.filter-tab[data-author]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    await loadPoemsAndRender();
+                });
+            });
+        }
+
+        // 骨架屏
+        function showSkeleton(count = 8) {
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                html += `
+                    <div class="skeleton-card">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-line" style="width:80%;"></div>
+                        <div class="skeleton-line" style="width:60%;"></div>
+                        <div class="skeleton-line" style="width:40%;"></div>
+                    </div>
+                `;
+            }
+            waterfall.innerHTML = html;
+        }
+
+        // 渲染诗词
+        function renderPoems(poems) {
+            // 更新分页信息
+            const displayTotalPages = totalPages || 1;
+            const displayCurrentPage = Math.min(currentPage, displayTotalPages);
+            
+            pageInfo.textContent = `第 ${displayCurrentPage} / ${displayTotalPages} 页`;
+            prevPageBtn.disabled = displayCurrentPage <= 1;
+            nextPageBtn.disabled = displayCurrentPage >= displayTotalPages || displayTotalPages === 0;
+            
+            // ✅ 更新跳转输入框
+            if (jumpPageInput) {
+                jumpPageInput.max = displayTotalPages;
+                jumpPageInput.value = displayCurrentPage;
+            }
+
+            if (!poems || poems.length === 0) {
+                waterfall.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">📭</span>
+                        <div>暂无诗词</div>
+                        <div style="font-size:13px; margin-top:6px; opacity:0.5;">试试调整筛选条件或搜索关键词</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            poems.forEach((poem, index) => {
+                const lines = (poem.content || '').split('\n').filter(line => line.trim() !== '');
+                const dynastyDisplay = poem.dynasty || '未知';
+
+                html += `
+                    <div class="poem-card" data-id="${poem.id}" style="animation-delay: ${(index % 12) * 0.04}s;">
+                        <div class="card-header">
+                            <span class="poem-title">${escapeHtml(poem.title || '无题')}</span>
+                            <span class="poem-author">${escapeHtml(poem.author || '佚名')}</span>
+                        </div>
+                        <div class="poem-body">
+                            ${lines.map(line => `<span class="line">${escapeHtml(line)}</span>`).join('')}
+                        </div>
+                        <div class="card-footer">
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <span class="dynasty-tag">${escapeHtml(dynastyDisplay)}</span>
+                            </div>
+                            <span class="action-hint">📥 点击导入</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            waterfall.innerHTML = html;
+
+            waterfall.querySelectorAll('.poem-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    importPoemById(id);
+                });
+            });
+        }
+
+        // ================================================================
+        //  数据加载
+        // ================================================================
+        async function loadAuthors(dynasty) {
+            const data = await fetchAuthors(dynasty);
+            authorsData = data;
+            document.getElementById('authorCount').textContent = authorsData.length;
+        }
+
+        async function loadPoemsAndRender() {
+            showSkeleton(8);
+            
+            const poems = await fetchPoems(currentPage);
+            renderPoems(poems);
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = totalPoems.toLocaleString();
+            document.getElementById('dynastyCount').textContent = dynastiesData.length;
+            document.getElementById('currentCount').textContent = totalPoems.toLocaleString();
+        }
+
+        // ================================================================
+        //  导入诗词
+        // ================================================================
+        async function importPoemById(id) {
+            try {
+                showToast('📥 正在获取诗词数据...', false);
+
+                const response = await fetch(`${API_BASE}/get-poem-by-id?id=${id}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+
+                if (!result.success || !result.data) {
+                    throw new Error(result.message || '获取诗词失败');
+                }
+
+                const poem = result.data;
+
+                const lines = (poem.content || '').split('\n').filter(line => line.trim() !== '');
+                const poemData = [];
+
+                lines.forEach(line => {
+                    const chars = line.split('');
+                    chars.forEach(char => {
+                        if (char.trim() !== '') {
+                            poemData.push({ char: char, pinyin: '' });
+                        }
+                    });
+                    poemData.push({ char: '\n', pinyin: '' });
+                });
+
+                if (poemData.length > 0 && poemData[poemData.length - 1].char === '\n') {
+                    poemData.pop();
+                }
+
+                const importData = {
+                    title: poem.title || '无题',
+                    author: poem.author || '佚名',
+                    dynasty: poem.dynasty || '未知',
+                    poem: poemData,
+                    isImport: true
+                };
+
+                localStorage.setItem('import_poem_data', JSON.stringify(importData));
+
+                showToast(`✅ 已导入《${poem.title}》，即将跳转编辑器`, false);
+
+                setTimeout(() => {
+                    window.location.href = 'poem-editor.html?import=true';
+                }, 800);
+
+            } catch (error) {
+                console.error('导入失败:', error);
+                showToast('❌ 导入失败，请重试', true);
+            }
+        }
+
+        // ================================================================
+        //  搜索
+        // ================================================================
+        function applySearch() {
+            const searchValue = searchInput.value.trim();
+            if (searchValue === currentSearch) return;
+            
+            currentSearch = searchValue;
+            currentPage = 1;
+            loadPoemsAndRender();
+        }
+
+        // ================================================================
+        //  ✅ 跳转到指定页
+        // ================================================================
+        function jumpToPage() {
+            let targetPage = parseInt(jumpPageInput.value);
+            
+            if (isNaN(targetPage) || targetPage < 1) {
+                targetPage = 1;
+            }
+            if (targetPage > totalPages) {
+                targetPage = totalPages;
+            }
+            
+            if (targetPage === currentPage) {
+                jumpPageInput.value = targetPage;
+                return;
+            }
+            
+            currentPage = targetPage;
+            jumpPageInput.value = targetPage;
+            loadPoemsAndRender();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================================================================
+        //  初始化
+        // ================================================================
+        async function init() {
+            waterfall.innerHTML = `
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <div>📖 正在加载诗库...</div>
+                </div>
+            `;
+
+            try {
+                const dynasties = await fetchDynasties();
+                dynastiesData = dynasties;
+
+                if (dynastiesData.length === 0) {
+                    waterfall.innerHTML = `
+                        <div class="empty-state">
+                            <span class="icon">📭</span>
+                            <div>暂无诗词数据</div>
+                            <div style="font-size:13px; margin-top:6px; opacity:0.5;">请检查 Supabase 数据库中的 poems 表</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // ✅ 默认选中第一个朝代
+                const firstDynasty = dynastiesData[0].dynasty;
+                currentDynasty = firstDynasty;
+
+                await loadAuthors(firstDynasty);
+
+                // ✅ 默认选中第一个作者
+                if (authorsData && authorsData.length > 0) {
+                    currentAuthor = authorsData[0].author;
+                }
+
+                renderDynastyTabs();
+                renderAuthorTabs();
+
+                await loadPoemsAndRender();
+
+                console.log(`✅ 初始化完成，默认: ${currentDynasty} - ${currentAuthor || '无作者'}`);
+
+            } catch (error) {
+                console.error('初始化失败:', error);
+                waterfall.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">❌</span>
+                        <div>加载失败</div>
+                        <div style="font-size:13px; margin-top:6px; opacity:0.5;">${escapeHtml(error.message || '请检查网络连接')}</div>
+                    </div>
+                `;
+                showToast('❌ 加载诗库失败', true);
+            }
+        }
+
+        // ================================================================
+        //  事件绑定
+        // ================================================================
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                loadPoemsAndRender();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadPoemsAndRender();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        // ✅ 跳转按钮
+        jumpPageBtn.addEventListener('click', jumpToPage);
+
+        // ✅ 回车跳转
+        jumpPageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                jumpToPage();
+            }
+        });
+
+        // ✅ 输入框失焦修正范围
+        jumpPageInput.addEventListener('blur', () => {
+            let val = parseInt(jumpPageInput.value);
+            if (isNaN(val) || val < 1) {
+                jumpPageInput.value = 1;
+            } else if (totalPages > 0 && val > totalPages) {
+                jumpPageInput.value = totalPages;
+            }
+        });
+
+        // 搜索回车
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                applySearch();
+            }
+        });
+
+        // ================================================================
+        //  暴露全局函数
+        // ================================================================
+        window.init = init;
+        window.applySearch = applySearch;
+        window.importPoemById = importPoemById;
+
+        // ================================================================
+        //  启动
+        // ================================================================
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

@@ -33,6 +33,7 @@
             padding: 20px 0 16px;
             border-bottom: 2px solid rgba(255, 184, 130, 0.3);
             margin-bottom: 24px;
+            flex-wrap: wrap;
         }
         .back-btn {
             background: rgba(255, 184, 130, 0.25);
@@ -68,7 +69,7 @@
             align-items: center;
             gap: 30px;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 184, 130, 0.2);
         }
         .stats-banner .stat-item {
@@ -86,6 +87,103 @@
             color: #7A5F4A;
         }
 
+        /* ===== 操作栏 ===== */
+        .poetry-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .poetry-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 6px 18px;
+            border-radius: 25px;
+            border: 2px solid #D4A574;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: #6B4F3A;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .tab-btn:hover {
+            background: #FFF0D4;
+        }
+        .tab-btn.active {
+            background: #D4A574;
+            color: white;
+            border-color: #D4A574;
+        }
+        .btn-library {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #4ECDC4, #2C8F8F);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-library:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(78, 205, 196, 0.4);
+        }        
+        .btn-create {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #B8860B, #D4A574);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3);
+        }
+
+        /* ===== 自定义提示 ===== */
+        .custom-hint {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+            color: #8B6F5A;
+            background: #FFF8EF;
+            border-radius: 16px;
+            border: 2px dashed #D4A574;
+            margin-bottom: 20px;
+        }
+        .custom-hint .icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .custom-hint .sub {
+            font-size: 13px;
+            color: #B8A88A;
+            margin-top: 4px;
+        }
+
+        /* ===== 卡片网格 ===== */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -102,6 +200,7 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         .content-card:hover {
             transform: translateY(-4px);
@@ -146,6 +245,41 @@
             padding-top: 10px;
             margin-top: auto;
         }
+        .card-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .card-actions .btn-sm {
+            padding: 2px 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .card-actions .btn-sm:hover {
+            transform: scale(1.05);
+        }
+        .btn-edit {
+            background: #D4A574;
+            color: white;
+        }
+        .btn-delete {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .poetry-preview {
+            font-size: 13px;
+            color: #8B6F5A;
+            background: rgba(255, 248, 235, 0.5);
+            padding: 4px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 4px;
+        }
 
         .loading-placeholder {
             text-align: center;
@@ -175,16 +309,6 @@
             font-size: 16px;
         }
 
-        .poetry-preview {
-            font-size: 13px;
-            color: #8B6F5A;
-            background: rgba(255, 248, 235, 0.5);
-            padding: 4px 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 4px;
-        }
-
         @media (max-width: 600px) {
             .card-grid {
                 grid-template-columns: 1fr 1fr;
@@ -198,6 +322,16 @@
             .stats-banner {
                 gap: 14px;
                 padding: 12px 16px;
+            }
+            .poetry-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .poetry-tabs {
+                justify-content: center;
+            }
+            .btn-create {
+                justify-content: center;
             }
         }
         @media (max-width: 400px) {
@@ -223,36 +357,45 @@
             <div class="stat-item"><span class="num" id="progressPercent">0%</span><span class="label">完成度</span></div>
         </div>
 
+        <!-- ===== 操作栏 ===== -->
+        <div class="poetry-actions">
+            <div class="poetry-tabs">
+                <button class="tab-btn active" data-tab="all">📖 全部</button>
+                <button class="tab-btn" data-tab="official">📜 精选</button>
+                <button class="tab-btn" data-tab="custom">✏️ 我的</button>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="poem-library.html" class="btn-library">
+                    📚 诗海拾贝
+                </a>
+                <button class="btn-create" onclick="window.location.href='poem-editor.html'">
+                    ➕ 创作新诗
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== 自定义空状态提示 ===== -->
+        <div class="custom-hint" id="customHint">
+            <span class="icon">📝</span>
+            还没有自定义诗词
+            <div class="sub">点击「创作新诗」开始你的第一首作品吧！</div>
+        </div>
+
+        <!-- ===== 诗词卡片网格 ===== -->
         <div class="card-grid" id="poetryGrid">
             <div class="loading-placeholder"><span class="spinner"></span>加载诗词中...</div>
         </div>
     </div>
 
+    <!-- ===== 引入共享工具 ===== -->
+    <script src="js/toast.js"></script>
+    <script src="js/poem-storage.js"></script>
+
     <script>
+        // ================================================================
+        //  配置
+        // ================================================================
         const CONFIG_PATH = './config.json';
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
-        }
-
-        function getCompletedLevels(groupCode) {
-            const key = `typing_completed_${groupCode}`;
-            try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                return data['learn-to-type'] || [];
-            } catch (e) {
-                console.error('加载失败:', e);
-                return null;
-            }
-        }
-
         const poetryColors = [
             'linear-gradient(135deg, #F5E6D3, #E8D5C0)',
             'linear-gradient(135deg, #E8D5C0, #D4C4A0)',
@@ -264,36 +407,110 @@
             'linear-gradient(135deg, #EDE4D4, #DDD0BC)'
         ];
 
-        async function init() {
-            const groups = await loadData();
-            const grid = document.getElementById('poetryGrid');
-            const poetryGroup = groups ? groups.find(g => g.code === 'poetry_writing') : null;
+        // ================================================================
+        //  工具函数
+        // ================================================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        }
 
-            if (!poetryGroup || !poetryGroup.levels || poetryGroup.levels.length === 0) {
-                grid.innerHTML = `<div class="empty-state">📭 暂无诗词数据</div>`;
+        function getCompletedLevels(groupCode) {
+            const key = `typing_completed_${groupCode}`;
+            try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+        }
+
+        function getCustomCompleted() {
+            try { return JSON.parse(localStorage.getItem('custom_poetry_completed') || '[]'); } catch { return []; }
+        }
+
+        // ================================================================
+        //  状态
+        // ================================================================
+        let officialPoems = [];
+        let customPoems = [];
+        let currentTab = 'all';
+
+        // ================================================================
+        //  加载数据
+        // ================================================================
+        async function loadOfficialPoems() {
+            try {
+                const res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const groups = data['learn-to-type'] || [];
+                const poetryGroup = groups.find(g => g.code === 'poetry_writing');
+                if (poetryGroup && poetryGroup.levels) {
+                    officialPoems = poetryGroup.levels;
+                }
+                return true;
+            } catch (e) {
+                console.error('加载配置失败:', e);
+                return false;
+            }
+        }
+
+        function loadCustomPoems() {
+            customPoems = getCustomPoems();
+        }
+
+        function getFilteredPoems() {
+            if (currentTab === 'official') {
+                return officialPoems;
+            } else if (currentTab === 'custom') {
+                return customPoems;
+            } else {
+                return [...officialPoems, ...customPoems];
+            }
+        }
+
+        // ================================================================
+        //  渲染
+        // ================================================================
+        function renderPoems() {
+            const grid = document.getElementById('poetryGrid');
+            const hint = document.getElementById('customHint');
+            const poems = getFilteredPoems();
+
+            // 处理自定义空状态
+            if (currentTab === 'custom' && poems.length === 0) {
+                if (hint) hint.style.display = 'block';
+                grid.innerHTML = '';
+                updateStats();
+                return;
+            }
+            if (hint) hint.style.display = 'none';
+
+            if (poems.length === 0) {
+                grid.innerHTML = `<div class="empty-state">📭 暂无诗词</div>`;
+                updateStats();
                 return;
             }
 
             const completed = getCompletedLevels('poetry_writing');
-            const total = poetryGroup.levels.length;
-            const done = completed.filter(id => poetryGroup.levels.some(l => l.id === id)).length;
-            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('completedCount').textContent = done;
-            document.getElementById('progressPercent').textContent = percent + '%';
+            const customCompleted = getCustomCompleted();
 
             let html = '';
-            poetryGroup.levels.forEach((poem, idx) => {
-                const isDone = completed.includes(poem.id);
-                const title = poem.description || `第${poem.id}首`;
+            poems.forEach((poem, idx) => {
+                const isCustom = poem.isCustom === true;
+                const id = poem.id;
+                const isDone = isCustom ? customCompleted.includes(id) : completed.includes(id);
+                const title = poem.title || `第${id}首`;
+                const shortTitle = title.length > 16 ? title.slice(0, 14) + '…' : title;
                 const author = poem.author || '佚名';
                 const dynasty = poem.dynasty || '';
-                const bgColor = poetryColors[idx % poetryColors.length];
-                const url = poem.url || 'poetry_writing.html';
-                const params = new URLSearchParams();
-                if (poem.id) params.set('id', poem.id);
-                const link = `${url}?${params.toString()}`;
+                const bgColor = isCustom ? 'linear-gradient(135deg, #E8F0E8, #D4E8D4)' : poetryColors[idx % poetryColors.length];
+                const borderColor = isCustom ? '#B8D4B8' : '#C4B49A';
+                const badgeBg = isCustom ? '#B8D4B8' : '#D4C4A0';
+                const badgeColor = isCustom ? '#2D5A2D' : '#5C3D1A';
+
+                let link;
+                if (isCustom) {
+                    link = `poetry_writing.html?customId=${encodeURIComponent(id)}`;
+                } else {
+                    link = `poetry_writing.html?id=${id}`;
+                }
 
                 let previewText = '';
                 if (poem.poem && poem.poem.length > 0) {
@@ -301,11 +518,24 @@
                     previewText = chars.length > 14 ? chars.slice(0, 14) + '…' : chars;
                 }
 
+                let actionsHtml = '';
+                if (isCustom) {
+                    actionsHtml = `
+                        <div class="card-actions">
+                            <button class="btn-sm btn-edit" data-id="${id}">✏️</button>
+                            <button class="btn-sm btn-delete" data-id="${id}">🗑️</button>
+                        </div>
+                    `;
+                }
+
                 html += `
-                    <div class="content-card" style="background:${bgColor};border-color:#C4B49A;" onclick="window.location.href='${link}'">
-                        <span class="card-badge">${isDone ? '✅ 已学完' : '📜 未学习'}</span>
-                        <span class="card-emoji">${isDone ? '🏮' : '📜'}</span>
-                        <div class="card-title">${escapeHtml(title)}</div>
+                    <div class="content-card" style="background:${bgColor};border-color:${borderColor};" data-id="${id}" data-custom="${isCustom}">
+                        <span class="card-badge" style="background:${badgeBg};color:${badgeColor};">
+                            ${isCustom ? '✏️ 我的' : '📜 精选'}
+                            ${isDone ? ' ✅ 已学完' : ''}
+                        </span>
+                        <span class="card-emoji">${isDone ? '🏮' : (isCustom ? '✏️' : '📜')}</span>
+                        <div class="card-title">${escapeHtml(shortTitle)}</div>
                         <div class="card-desc">
                             ${escapeHtml(author)} ${dynasty ? '· ' + escapeHtml(dynasty) : ''}
                             ${previewText ? '<div class="poetry-preview">「' + escapeHtml(previewText) + '」</div>' : ''}
@@ -314,13 +544,140 @@
                             <span>🏷️ 拼音练习</span>
                             <span>${isDone ? '🎉 完成' : '⏳ 待学习'}</span>
                         </div>
+                        ${actionsHtml}
                     </div>
                 `;
             });
+
             grid.innerHTML = html;
+
+            // ===== 绑定事件 =====
+            // 编辑按钮
+            grid.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    window.location.href = `poem-editor.html?edit=${id}`;
+                });
+            });
+
+            // 删除按钮
+            grid.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    const poem = customPoems.find(p => p.id === id);
+                    if (poem && confirm(`确定要删除《${poem.title}》吗？`)) {
+                        if (deleteCustomPoem(id)) {
+                            // 同时清除完成记录
+                            let customCompleted = JSON.parse(localStorage.getItem('custom_poetry_completed') || '[]');
+                            customCompleted = customCompleted.filter(item => item !== id);
+                            localStorage.setItem('custom_poetry_completed', JSON.stringify(customCompleted));
+                            
+                            showToast(`🗑️ 已删除《${poem.title}》`);
+                            loadCustomPoems();
+                            renderPoems();
+                            updateStats();
+                        }
+                    }
+                });
+            });
+
+            // 卡片点击跳转
+            grid.querySelectorAll('.content-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const isCustom = this.dataset.custom === 'true';
+                    if (isCustom) {
+                        window.location.href = `poetry_writing.html?customId=${encodeURIComponent(id)}`;
+                    } else {
+                        window.location.href = `poetry_writing.html?id=${id}`;
+                    }
+                });
+            });
+
+            updateStats();
         }
 
-        init();
+        // ================================================================
+        //  更新统计
+        // ================================================================
+        function updateStats() {
+            const completed = getCompletedLevels('poetry_writing');
+            const customCompleted = getCustomCompleted();
+            
+            const officialDone = completed.filter(id => officialPoems.some(l => l.id === id)).length;
+            const customDone = customCompleted.filter(id => customPoems.some(p => p.id === id)).length;
+            const total = officialPoems.length + customPoems.length;
+            const done = officialDone + customDone;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('completedCount').textContent = done;
+            document.getElementById('progressPercent').textContent = total > 0 ? Math.round((done / total) * 100) + '%' : '0%';
+        }
+
+        // ================================================================
+        //  标签切换
+        // ================================================================
+        function bindTabEvents() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTab = this.dataset.tab;
+                    
+                    // 更新URL参数
+                    const url = new URL(window.location.href);
+                    if (currentTab === 'all') {
+                        url.searchParams.delete('tab');
+                    } else {
+                        url.searchParams.set('tab', currentTab);
+                    }
+                    window.history.replaceState({}, '', url);
+                    
+                    renderPoems();
+                });
+            });
+        }
+
+        // ================================================================
+        //  初始化
+        // ================================================================
+        async function init() {
+            // 1. 加载内置诗词
+            const loaded = await loadOfficialPoems();
+            if (!loaded) {
+                document.getElementById('poetryGrid').innerHTML = 
+                    `<div class="empty-state">❌ 加载配置失败，请检查 config.json</div>`;
+                return;
+            }
+
+            // 2. 加载自定义诗词
+            loadCustomPoems();
+
+            // 3. 读取URL参数中的tab
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab') || 'all';
+            currentTab = tab;
+
+            // 4. 激活对应的标签
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+
+            // 5. 渲染
+            renderPoems();
+            bindTabEvents();
+
+            console.log(`✅ 初始化完成，内置${officialPoems.length}首，自定义${customPoems.length}首`);
+        }
+
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
