@@ -832,6 +832,33 @@
     </div>
 
     <script>
+        // index.html - 在 <script> 最顶部添加
+
+        // ================================================================
+        //  ★★★ 登录验证 ★★★
+        // ================================================================
+        (function checkLogin() {
+            const loggedIn = localStorage.getItem('logged_in') === 'true';
+            const userName = localStorage.getItem('user_name');
+            const urlParams = new URLSearchParams(window.location.search);
+            const isDebug = urlParams.get('debug') === '1';
+            
+            // 调试模式跳过登录验证
+            if (isDebug) {
+                console.log('🔧 调试模式，跳过登录验证');
+                return;
+            }
+            
+            // 未登录 → 跳转到登录页
+            if (!loggedIn || !userName) {
+                console.log('🔒 未登录，跳转到登录页');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            console.log(`✅ 已登录，用户: ${userName}`);
+        })();  
+              
         // ================================================================
         //  配置 & 工具
         // ================================================================

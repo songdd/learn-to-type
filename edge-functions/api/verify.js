@@ -1,7 +1,7 @@
 // edge-functions/api/verify.js - 邀请码验证
+// ★★★ 支持已使用的邀请码重复登录 ★★★
 
 export async function onRequest(context) {
-    // ✅ 从 context 中解构 request 和 env
     const { request, env } = context;
     
     // 处理 CORS 预检请求
@@ -66,7 +66,7 @@ export async function onRequest(context) {
         
         const trimmedCode = code.trim()
         
-        // 1. 查询邀请码是否存在且未被使用
+        // ★★★ 1. 查询邀请码（不限制 used 状态） ★★★
         const queryUrl = `${supabaseUrl}/rest/v1/invites?code=eq.${encodeURIComponent(trimmedCode)}&select=name,used`
         
         const queryResponse = await fetch(queryUrl, {
@@ -95,7 +95,7 @@ export async function onRequest(context) {
         if (!data || data.length === 0) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                message: '邀请码无效' 
+                message: '邀请码无效，请检查输入' 
             }), {
                 headers: { 
                     'Content-Type': 'application/json', 
@@ -106,42 +106,39 @@ export async function onRequest(context) {
         
         const record = data[0]
         
-        // 邀请码已被使用
-        if (record.used) {
-            return new Response(JSON.stringify({ 
-                success: false, 
-                message: '此邀请码已被使用' 
-            }), {
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Access-Control-Allow-Origin': '*' 
-                }
-            })
+        // ★★★ 2. 如果是首次使用（未被标记），则标记为已使用 ★★★
+        if (!record.used) {
+            try {
+                const updateUrl = `${supabaseUrl}/rest/v1/invites?code=eq.${encodeURIComponent(trimmedCode)}`
+                
+                await fetch(updateUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        used: true, 
+                        used_at: new Date().toISOString() 
+                    })
+                })
+                console.log(`✅ 邀请码 ${trimmedCode} 已标记为已使用`)
+            } catch (updateError) {
+                // 更新失败不影响登录，只记录日志
+                console.warn('标记邀请码失败:', updateError)
+            }
+        } else {
+            console.log(`ℹ️ 邀请码 ${trimmedCode} 已被使用，允许重复登录`)
         }
         
-        // 2. 标记邀请码为已使用（一次性）
-        const updateUrl = `${supabaseUrl}/rest/v1/invites?code=eq.${encodeURIComponent(trimmedCode)}`
-        
-        const updateResponse = await fetch(updateUrl, {
-            method: 'PATCH',
-            headers: {
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${supabaseKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ used: true, used_at: new Date().toISOString() })
-        })
-        
-        if (!updateResponse.ok) {
-            console.error('Supabase 更新失败:', updateResponse.status)
-            // 即使更新失败，也返回成功（邀请码已验证通过）
-        }
-        
-        // 3. 返回验证成功
+        // ★★★ 3. 返回成功（无论是否已使用） ★★★
         return new Response(JSON.stringify({ 
             success: true, 
             name: record.name,
-            message: '验证成功！'
+            used: record.used,
+            isReturning: record.used === true,
+            message: record.used ? '欢迎回来！' : '首次登录成功！'
         }), {
             headers: { 
                 'Content-Type': 'application/json', 
