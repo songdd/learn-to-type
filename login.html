@@ -346,11 +346,24 @@
                 body: JSON.stringify({ code: code })
             });
             
+            // ★★★ 先检查响应是否成功 ★★★
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             
-            return await response.json();
+            // ★★★ 获取响应文本，检查是否为空 ★★★
+            const text = await response.text();
+            if (!text || text.trim() === '') {
+                return { success: false, message: '服务器返回空响应' };
+            }
+            
+            // ★★★ 安全解析 JSON ★★★
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('JSON 解析失败:', text);
+                return { success: false, message: '服务器响应格式错误' };
+            }
         } catch (e) {
             console.error('验证请求失败:', e);
             return { success: false, message: '网络错误，请检查网络后重试' };
@@ -368,11 +381,10 @@
         
         setLoading(true);
         
-        // 1. 先验证邀请码
         const result = await verifyCode(code);
         
         if (result.success) {
-            // 2. 记录登录日志
+            // 记录登录日志（不阻塞登录流程）
             try {
                 const logResponse = await fetch('/api/login-log', {
                     method: 'POST',
@@ -382,13 +394,23 @@
                     body: JSON.stringify({
                         user_name: result.name,
                         invite_code: code,
-                        ip_address: null, // 服务端可获取
+                        ip_address: null,
                         user_agent: navigator.userAgent
                     })
                 });
                 
-                if (!logResponse.ok) {
-                    console.warn('登录日志记录失败，但不影响登录');
+                // ★★★ 安全处理日志响应 ★★★
+                if (logResponse.ok) {
+                    const logText = await logResponse.text();
+                    if (logText && logText.trim()) {
+                        try {
+                            JSON.parse(logText);
+                        } catch (e) {
+                            console.warn('登录日志响应不是有效 JSON，但不影响登录');
+                        }
+                    }
+                } else {
+                    console.warn('登录日志记录失败，状态码:', logResponse.status);
                 }
             } catch (logError) {
                 console.warn('登录日志记录异常:', logError);
