@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>📜 古诗拼音练习 · 奕霖打字</title>
     <style>
+        /* ===== 基础样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -199,6 +200,7 @@
             flex-wrap: wrap;
         }
 
+        /* ===== 左侧诗词显示区 ===== */
         .poem-display {
             flex: 1;
             min-width: 260px;
@@ -207,8 +209,26 @@
             padding: 0.7rem;
             border: 2px solid #D4A574;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.08);
-            overflow-y: visible;
-            max-height: none;
+            max-height: 420px;
+            height: 420px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .poem-display::-webkit-scrollbar {
+            width: 6px;
+        }
+        .poem-display::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+        .poem-display::-webkit-scrollbar-thumb {
+            background: #D4A574;
+            border-radius: 10px;
+        }
+        .poem-display::-webkit-scrollbar-thumb:hover {
+            background: #B8860B;
         }
 
         .section-title {
@@ -221,6 +241,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: #FFF8EF;
+            z-index: 5;
+            padding-top: 2px;
         }
 
         .section-title .title-icon {
@@ -231,8 +257,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            height: auto;
-            overflow: visible;
             padding-bottom: 4px;
         }
 
@@ -240,11 +264,8 @@
             display: flex;
             justify-content: center;
             gap: 8px;
-            /* ★★★ 移除 flex-wrap: wrap，不换行 ★★★ */
             flex-wrap: nowrap;
             padding: 4px 0;
-            height: auto;
-            /* ★★★ 允许水平滚动或自适应宽度 ★★★ */
             overflow-x: visible;
         }
 
@@ -554,6 +575,10 @@
                 min-width: 70px;
                 font-size: 0.8rem;
             }
+            .poem-display {
+                max-height: 340px;
+                height: 340px;
+            }
         }
 
         @media (max-width: 700px) {
@@ -566,6 +591,10 @@
             }
             .stat-group {
                 justify-content: center;
+            }
+            .poem-display {
+                max-height: 300px;
+                height: 300px;
             }
         }
 
@@ -585,6 +614,10 @@
             }
             .app-container {
                 padding: 0.4rem;
+            }
+            .poem-display {
+                max-height: 250px;
+                height: 250px;
             }
         }
     </style>
@@ -620,7 +653,7 @@
 
     <div id="mainContent" style="display: none;">
         <div class="main-content">
-            <div class="poem-display">
+            <div class="poem-display" id="poemDisplay">
                 <div class="section-title">
                     <span class="title-icon">📖</span>
                     <span>古诗原文 · 拼音对照</span>
@@ -680,10 +713,9 @@
 const CONFIG_PATH = './config.json';
 
 // ==================== 标点符号判断 ====================
-// 用于 loadPoem 中过滤空格，保留标点
 function isPunctuation(char) {
     const trimmed = char.trim();
-    const punctuationSet = new Set(['，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…']);
+    const punctuationSet = new Set(['，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…', '·']);
     return punctuationSet.has(trimmed);
 }
 
@@ -692,7 +724,7 @@ function escapeHtml(str) {
     return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
 }
 
-// ==================== ★★★ 拼音标准化（ü → v 键盘适配）★★★ ====================
+// ==================== 拼音标准化（ü → v 键盘适配） ====================
 function normalizePinyinForKeyboard(pinyin) {
     if (!pinyin) return '';
     return pinyin.replace(/ü/g, 'v');
@@ -797,6 +829,7 @@ const loadingContainer = document.getElementById('loadingContainer');
 const poemAuthorInfo = document.getElementById('poemAuthorInfo');
 const pageTitleH1 = document.querySelector('#pageTitle h1');
 const poemTypeBadge = document.getElementById('poemTypeBadge');
+const poemDisplay = document.getElementById('poemDisplay');
 
 function updateInputPlaceholder(pinyin) {
     if (!pinyinInput) return;
@@ -805,6 +838,45 @@ function updateInputPlaceholder(pinyin) {
         pinyinInput.placeholder = displayPinyin;
     } else {
         pinyinInput.placeholder = '输入拼音';
+    }
+}
+
+// ==================== ★★★ 滚动到当前字符（智能定位） ★★★ ====================
+function scrollToCurrentChar() {
+    if (!poemDisplay) return;
+    
+    // 找到当前高亮的字符卡片
+    const currentCard = poemDisplay.querySelector('.poem-char-card.current');
+    if (!currentCard) return;
+    
+    // 计算当前卡片相对于滚动容器的位置
+    const containerRect = poemDisplay.getBoundingClientRect();
+    const cardRect = currentCard.getBoundingClientRect();
+    
+    const cardTop = cardRect.top - containerRect.top;
+    const cardBottom = cardRect.bottom - containerRect.top;
+    const containerHeight = containerRect.height;
+    const padding = 30;
+    
+    // 目标位置：让当前字符在可视区域的 35% 位置（约 1/3）
+    const targetRelativePosition = containerHeight * 0.35;
+    
+    // 如果卡片不在可视区域内，滚动到目标位置
+    if (cardTop < padding || cardBottom > containerHeight - padding) {
+        const currentScroll = poemDisplay.scrollTop;
+        // 计算目标滚动位置：让卡片顶部在容器 35% 位置
+        const cardAbsoluteTop = cardRect.top + currentScroll - containerRect.top;
+        let targetScroll = Math.max(0, cardAbsoluteTop - targetRelativePosition);
+        const maxScroll = poemDisplay.scrollHeight - containerHeight;
+        targetScroll = Math.min(maxScroll, targetScroll);
+        
+        // 如果目标滚动位置与当前位置相差较大，才执行滚动（避免微小抖动）
+        if (Math.abs(targetScroll - currentScroll) > 15) {
+            poemDisplay.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+            });
+        }
     }
 }
 
@@ -951,7 +1023,7 @@ function startTimerOnFirstInput() {
     }
 }
 
-// ==================== ★★★ 加载诗词（保留标点）★★★ ====================
+// ==================== 加载诗词（保留标点） ====================
 function loadPoem(poem) {
     if (!poem || !poem.poem) return;
 
@@ -964,7 +1036,6 @@ function loadPoem(poem) {
         let pinyin = rawPoem[i].pinyin || '';
         pinyin = normalizePinyinForKeyboard(pinyin);
         
-        // ★★★ 只过滤空字符串或纯空格，保留所有可见字符（包括标点）★★★
         if (char.trim() !== '') {
             practiceChars.push(char);
             practicePinyin.push(pinyin);
@@ -1017,16 +1088,14 @@ function loadPoem(poem) {
     showMessage(`🎋 开始练习《${titleText}》共${totalPracticeChars}个字符`, false, true);
 }
 
+// ==================== 渲染诗词（含滚动触发） ====================
 function renderPoemDisplay() {
     const container = document.getElementById('poemLines');
     if (!container) return;
     container.innerHTML = '';
     
-    // ★★★ 所有标点符号（中英文）★★★
     const PUNCTUATION_SET = new Set([
-        // 中文标点
         '，', '。', '！', '？', '；', '：', '、', '“', '”', '‘', '’', '（', '）', '《', '》', '【', '】', '—', '…', '·',
-        // 英文标点
         ',', '.', '!', '?', ';', ':', '"', "'", '(', ')', '<', '>', '[', ']', '-', '_', '~', '`', '@', '#', '$', '%', '^', '&', '*', '+', '=', '|', '\\', '/'
     ]);
     
@@ -1052,13 +1121,13 @@ function renderPoemDisplay() {
         
         const charDiv = document.createElement('div');
         charDiv.className = cardClass;
+        charDiv.dataset.index = i;
         charDiv.innerHTML = `
             <div class="char-hanzi">${escapeHtml(char)}</div>
             <div class="char-pinyin">${escapeHtml(pinyin)}</div>
         `;
         currentLine.push(charDiv);
         
-        // ★★★ 遇到任何标点符号就换行（无字数限制）★★★
         if (isPunctuation && i !== practiceChars.length - 1) {
             const lineDiv = document.createElement('div');
             lineDiv.className = 'poem-line';
@@ -1068,20 +1137,22 @@ function renderPoemDisplay() {
         }
     }
     
-    // 处理剩余字符
     if (currentLine.length > 0) {
         const lineDiv = document.createElement('div');
         lineDiv.className = 'poem-line';
         currentLine.forEach(c => lineDiv.appendChild(c));
         container.appendChild(lineDiv);
     }
+    
+    // 渲染完成后滚动到当前字符
+    requestAnimationFrame(() => {
+        scrollToCurrentChar();
+    });
 }
 
-// ==================== ★★★ 更新当前目标（跳过标点）★★★ ====================
+// ==================== 更新当前目标（含滚动触发） ====================
 function updateCurrentTarget() {
-    // 先检查当前位置是否是标点，如果是，标记为已完成并继续前进
     while (currentIndex < totalPracticeChars && isPunctuation(practiceChars[currentIndex])) {
-        // 将标点标记为已完成（绿色背景）
         if (inputStatus[currentIndex] === null) {
             inputStatus[currentIndex] = 'correct';
         }
@@ -1100,6 +1171,11 @@ function updateCurrentTarget() {
         correctPinyinDisplay.innerText = '—';
         updateInputPlaceholder('');
     }
+    
+    // 更新后滚动到当前字符
+    requestAnimationFrame(() => {
+        scrollToCurrentChar();
+    });
 }
 
 function updateCompareDisplay() {
@@ -1140,7 +1216,7 @@ function validateInput() {
     }
 }
 
-// ==================== 提交拼音 ====================
+// ==================== 提交拼音（触发滚动） ====================
 function submitPinyin() {
     if (!active) return false;
     if (currentIndex >= totalPracticeChars) return false;
@@ -1422,9 +1498,7 @@ function setupInputEvents() {
     });
 }
 
-// ================================================================
-//  初始化
-// ================================================================
+// ==================== 初始化 ====================
 async function init() {
     const loaded = await loadConfig();
     

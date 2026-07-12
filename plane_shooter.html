@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>✈️ 小飞机射击 · 奕霖打字</title>
     <style>
+        /* ... 样式保持原样 ... */
         * {
             margin: 0;
             padding: 0;
@@ -402,7 +403,6 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(180deg, #87CEEB 0%, #6BB5D9 100%);
-            /* 初始显示鼠标，通过 JS 动态控制 */
             cursor: default;
         }
 
@@ -777,16 +777,13 @@
     
     let hideCursorTimer = null;
     
-    // 显示鼠标的函数
     function showCursor() {
         if (canvas) {
             canvas.style.cursor = 'default';
         }
-        // 重置定时器
         if (hideCursorTimer) {
             clearTimeout(hideCursorTimer);
         }
-        // 3秒后隐藏鼠标
         hideCursorTimer = setTimeout(() => {
             if (canvas) {
                 canvas.style.cursor = 'none';
@@ -794,11 +791,8 @@
         }, 3000);
     }
     
-    // 监听鼠标移动事件
     canvas.addEventListener('mousemove', showCursor);
-    // 鼠标进入画布时也显示
     canvas.addEventListener('mouseenter', showCursor);
-    // 初始状态：显示鼠标，3秒后隐藏
     showCursor();
 })();
 
@@ -964,8 +958,6 @@ function showHistoryModal() {
     }
     function playHit() {
         if (!audioCtx || !hitSoundBuffer) return;
-        
-        // ★★★ 定义播放函数 ★★★
         const doPlay = () => {
             try {
                 const source = audioCtx.createBufferSource();
@@ -977,17 +969,14 @@ function showHistoryModal() {
                 source.start();
             } catch(e) {}
         };
-        
         if (audioCtx.state !== 'running') {
             audioCtx.resume().then(doPlay).catch(() => {});
             return;
         }
         doPlay();
     }
-
     function playError() {
         if (!audioCtx || !errorSoundBuffer) return;
-        
         const doPlay = () => {
             try {
                 const source = audioCtx.createBufferSource();
@@ -999,7 +988,6 @@ function showHistoryModal() {
                 source.start();
             } catch(e) {}
         };
-        
         if (audioCtx.state !== 'running') {
             audioCtx.resume().then(doPlay).catch(() => {});
             return;
@@ -1012,7 +1000,7 @@ function showHistoryModal() {
     window._missileSound = { hit: playHit, error: playError };
 })();
 
-// ==================== 主游戏逻辑 ====================
+// ==================== ★★★ 主游戏逻辑（修复变量声明顺序）★★★ ====================
 (function(){
     var canvas = document.getElementById('gameCanvas');
     var ctx = canvas.getContext('2d');
@@ -1026,6 +1014,24 @@ function showHistoryModal() {
     var VALID_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_+-=[]{};':\",.<>/?\\|";
     var SKIN_KEY = 'missile_game_skin', currentSkin = localStorage.getItem(SKIN_KEY) || '1', STORAGE_KEY = 'missile_game_progress';
     var currentCharSet = null, currentRate = null, currentNum = 30, msgTimer = null;
+    var lastTime = 0;
+
+    // ★★★ 速度控制函数（放在所有变量定义之后） ★★★
+    function getSpeeds() {
+        // 使用闭包中定义的 currentRate
+        const baseRate = (currentRate && currentRate > 0) ? currentRate : 90;
+        const scale = H / 450;
+        
+        // 敌人下落速度 = rate * scale
+        const enemySpeed = baseRate * scale;
+        
+        // 子弹速度随 rate 提升：基础 400px/s，每增加 10 点 rate 提升 18px/s
+        const bulletBaseSpeed = 400;
+        const bulletBonus = Math.max(0, (baseRate - 90) / 10) * 18;
+        const bulletSpeed = (bulletBaseSpeed + bulletBonus) * scale;
+        
+        return { enemySpeed, bulletSpeed };
+    }
 
     function updateMaxComboDisplay() {
         const span = document.getElementById('maxComboValue');
@@ -1058,7 +1064,6 @@ function showHistoryModal() {
         }
         return "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
     }
-    function getActualSpeed() { return ((currentRate && currentRate > 0) ? currentRate : 90) * (H / 450); }
     function updateGameMessage(mainMsg, subMsg, isError) {
         var msgDiv = document.getElementById('gameMsg');
         if (!msgDiv) return;
@@ -1219,6 +1224,7 @@ function showHistoryModal() {
         document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'index.html'; });
     }
     function restartGame() { if (planeLevels.length > 0) switchToLevel(planeLevels[0].id); else location.reload(); }
+    
     function drawPlane() {
         var px = plane.x, py = plane.y;
         ctx.save(); ctx.translate(px, py); ctx.scale(scale, scale);
@@ -1244,6 +1250,7 @@ function showHistoryModal() {
         }
         ctx.restore();
     }
+    
     function resizeCanvas() {
         var container = canvas.parentElement;
         if (!container) return;
@@ -1254,15 +1261,21 @@ function showHistoryModal() {
         scale = Math.max(0.5, Math.min(1.2, W / 800));
         draw();
     }
-    var lastTime = 0;
+    
+    // ★★★ updateGame 使用动态速度 ★★★
     function updateGame(now) {
         if (!gameRunning || pendingLevelUp) return;
         if (!lastTime) { lastTime = now; return; }
         var dt = Math.min(0.033, (now - lastTime) / 1000);
         lastTime = now;
         if (isPaused) return;
+        
+        // ★★★ 获取当前速度（在函数内部调用 getSpeeds） ★★★
+        var speeds = getSpeeds();
+        
         if (currentFalling) {
-            currentFalling.y += getActualSpeed() * dt;
+            // ★★★ 敌人使用 enemySpeed ★★★
+            currentFalling.y += speeds.enemySpeed * dt;
             if (currentFalling.y + 40 > H) {
                 currentFalling = null;
                 if (combo !== 0) { combo = 0; updateUI(); updateGameMessage(`⚠️ 字母坠落了！`, `连击中断`, true); }
@@ -1270,6 +1283,7 @@ function showHistoryModal() {
                 else if (remainingInLevel <= 0 && !levelCompletedFlag) completeLevel();
             }
         }
+        
         for (var i = missiles.length-1; i >= 0; i--) {
             var m = missiles[i];
             var valid = m.target && m.target.active && m.target.char === m.targetChar;
@@ -1279,7 +1293,12 @@ function showHistoryModal() {
             m.trail.push({x:m.x,y:m.y});
             if (m.trail.length > 5) m.trail.shift();
             var tx = m.target.x, ty = m.target.y - 7, dx = tx - m.x, dy = ty - m.y, len = Math.hypot(dx, dy);
-            if (len > 0.01) { var move = 450 * dt; m.x += (dx/len) * move; m.y += (dy/len) * move; }
+            if (len > 0.01) {
+                // ★★★ 子弹使用 bulletSpeed ★★★
+                var move = speeds.bulletSpeed * dt;
+                m.x += (dx/len) * move;
+                m.y += (dy/len) * move;
+            }
             if (Math.hypot(m.x-tx, m.y-ty) < 25) {
                 if (window._missileSound) window._missileSound.hit();
                 var add = 10;
@@ -1302,6 +1321,7 @@ function showHistoryModal() {
                 missiles.splice(i,1);
             }
         }
+        
         for (var i=explosions.length-1; i>=0; i--) {
             var e = explosions[i];
             e.life -= dt * 1.5;
@@ -1318,6 +1338,7 @@ function showHistoryModal() {
             if (t.life <= 0) floatingTexts.splice(i,1);
         }
     }
+    
     function draw() {
         if (!ctx) return;
         ctx.clearRect(0,0,W,H);
@@ -1365,11 +1386,13 @@ function showHistoryModal() {
         ctx.beginPath(); ctx.arc(plane.x, plane.y-8, 9*scale, 0, Math.PI*2);
         ctx.strokeStyle = "#FFB347"; ctx.lineWidth = 1.5; ctx.setLineDash([4,5]); ctx.stroke(); ctx.setLineDash([]);
     }
+    
     function gameLoop(ts) {
         if (!gameRunning && document.querySelector('.congrats-overlay')) { if (frameRequest) cancelAnimationFrame(frameRequest); return; }
         updateGame(ts); draw();
         frameRequest = requestAnimationFrame(gameLoop);
     }
+    
     function onKeyDown(e) {
         if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); if (gameRunning && !pendingLevelUp) togglePause(); return; }
         if (!gameRunning || pendingLevelUp || isPaused) return;
@@ -1393,6 +1416,7 @@ function showHistoryModal() {
             updateGameMessage(`⚠️ 没有目标`, `等字母出现后再按键`, true);
         }
     }
+    
     async function init() {
         var loaded = await loadPlaneLevels();
         if (!loaded || planeLevels.length === 0) {
@@ -1450,7 +1474,7 @@ function showHistoryModal() {
         canvas.addEventListener('dblclick', () => { if (!document.fullscreenElement) gameContainer.requestFullscreen(); else document.exitFullscreen(); });
         document.addEventListener('keydown', function(e) { if (e.altKey && e.key === 'Enter') { e.preventDefault(); if (!document.fullscreenElement) gameContainer.requestFullscreen(); else document.exitFullscreen(); } });
         gameLoop();
-        console.log("游戏已启动，总关卡数: " + planeLevels.length);
+        console.log("游戏已启动，总关卡数: " + planeLevels.length + "，动态速度系统已启用");
     }
     init();
 })();
