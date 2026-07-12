@@ -1079,8 +1079,12 @@ function renderPoemDisplay() {
 
 // ==================== ★★★ 更新当前目标（跳过标点）★★★ ====================
 function updateCurrentTarget() {
-    // ★★★ 跳过标点，找到下一个汉字（或有效字符）★★★
+    // 先检查当前位置是否是标点，如果是，标记为已完成并继续前进
     while (currentIndex < totalPracticeChars && isPunctuation(practiceChars[currentIndex])) {
+        // 将标点标记为已完成（绿色背景）
+        if (inputStatus[currentIndex] === null) {
+            inputStatus[currentIndex] = 'correct';
+        }
         currentIndex++;
     }
     

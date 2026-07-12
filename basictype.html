@@ -385,8 +385,8 @@
             border-radius: 24px;
             padding: 16px 20px;
             text-align: center;
-            max-width: 300px;
-            width: 80%;
+            max-width: 320px;
+            width: 85%;
             box-shadow: 0 15px 30px rgba(0,0,0,0.25);
             border: 2px solid #FFB347;
             animation: bounceIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
@@ -458,11 +458,13 @@
             font-size: 0.8rem;
         }
 
+        /* ★★★ 弹框按钮同行排列 ★★★ */
         .completion-buttons {
             display: flex;
             gap: 8px;
             justify-content: center;
             margin-top: 12px;
+            flex-wrap: nowrap;
         }
 
         .completion-btn {
@@ -474,6 +476,8 @@
             cursor: pointer;
             transition: 0.2s;
             font-family: inherit;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .completion-btn-next {
@@ -514,6 +518,19 @@
             padding-top: 6px;
             border-top: 1px solid #FFD699;
         }
+
+        @media (max-width: 420px) {
+            .completion-buttons {
+                gap: 4px;
+            }
+            .completion-btn {
+                padding: 5px 10px;
+                font-size: 0.65rem;
+            }
+            .completion-card {
+                padding: 12px 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -531,7 +548,7 @@
             <button id="prevLevelBtn" class="btn">🐣 上一关</button>
             <button id="nextLevelBtn" class="btn btn-primary">下一关 🚀</button>
         </div>
-        <div class="nav-center-message" id="navCenterMsg">🎈 点击输入框或直接按键开始打字～</div>
+        <div class="nav-center-message" id="navCenterMsg">🎈 直接按键开始打字～</div>
         <div class="nav-buttons">
             <button id="resetBtn" class="btn btn-reset">🔄 重来</button>
             <button id="backToMenuBtn" class="btn">🏠 返回</button>
@@ -564,19 +581,21 @@
     
     const isDebug = urlParams.get('debug') === '1';
     
+    // ==================== 音频相关变量 ====================
     let audioCtx = null;
     let isAudioAllowed = false;
     let correctSoundBuffer = null;
     let errorSoundBuffer = null;
     let isGenerating = false;
     let generatePromise = null;
+    let audioEnabled = false;
     
     let timerStarted = false;
     let completionTimer = null;
     let countdownTimer = null;
     let currentOverlay = null;
     
-    // ==================== 辅助函数：解析 keys 参数 ====================
+    // ==================== 辅助函数 ====================
     function parseKeysParam(keysStr) {
         if (!keysStr || keysStr === '') return null;
         try {
@@ -586,17 +605,13 @@
                 return parsed;
             }
         } catch(e) {
-            // JSON 解析失败，尝试旧格式
             console.log('使用旧格式解析 keys 参数');
         }
         return null;
     }
     
-    // ==================== 辅助函数：将 keys 转换为可读的显示文本 ====================
     function getKeysDisplayText(keysStr) {
         if (!keysStr || keysStr === '') return '全键盘';
-        
-        // 尝试解析 JSON 格式
         const parsed = parseKeysParam(keysStr);
         if (parsed && parsed.length > 0) {
             let display = parsed.join(' ');
@@ -605,8 +620,6 @@
             }
             return display;
         }
-        
-        // 兼容旧格式：逗号分隔
         if (keysStr.includes(',')) {
             let display = keysStr;
             if (display.length > 20) {
@@ -614,8 +627,6 @@
             }
             return display;
         }
-        
-        // 单字符或短字符串
         let display = keysStr;
         if (display.length > 20) {
             display = display.substring(0, 18) + '...';
@@ -623,24 +634,20 @@
         return display || '全键盘';
     }
     
-    // ==================== 辅助函数：将 keys 标准化为 JSON 字符串用于比较 ====================
     function normalizeKeysForCompare(keys) {
         if (!keys) return '';
         if (Array.isArray(keys)) {
             return JSON.stringify(keys);
         }
         if (typeof keys === 'string') {
-            // 尝试解析 JSON
             try {
                 const parsed = JSON.parse(keys);
                 if (Array.isArray(parsed)) return JSON.stringify(parsed);
             } catch(e) {}
-            // 逗号分隔
             if (keys.includes(',')) {
                 const arr = keys.split(',').map(s => s.trim()).filter(s => s.length > 0);
                 return JSON.stringify(arr);
             }
-            // 单个字符串拆分为数组
             if (keys.length > 0) {
                 return JSON.stringify(keys.split(''));
             }
@@ -648,7 +655,6 @@
         return '';
     }
     
-    // ==================== 辅助函数：获取当前 URL keys 的标准化 JSON ====================
     function getCurrentKeysJson() {
         let keysArray = [];
         const parsed = parseKeysParam(urlKeys);
@@ -662,7 +668,6 @@
         return JSON.stringify(keysArray);
     }
     
-    // ==================== 获取完整键盘字符集 ====================
     function getFullKeyboardChars() {
         return [
             '1','2','3','4','5','6','7','8','9','0',
@@ -672,7 +677,6 @@
         ];
     }
     
-    // ==================== 生成练习文本 ====================
     function generateText(keysStr, level, targetLen) {
         let baseChars = [];
         
@@ -724,7 +728,7 @@
         }
     }
     
-    // ==================== 音频相关函数 ====================
+    // ==================== ★★★ 音频相关函数（修复版）★★★ ====================
     function initAudio() {
         if (audioCtx) return audioCtx;
         try {
@@ -736,8 +740,16 @@
     function generateSoundBuffers() {
         if (correctSoundBuffer && errorSoundBuffer) return Promise.resolve(true);
         if (isGenerating) return generatePromise;
+        
         const ctx = initAudio();
         if (!ctx) return Promise.resolve(false);
+        
+        // 如果 AudioContext 未运行，等待用户交互
+        if (ctx.state !== 'running') {
+            console.log('⏳ AudioContext 未激活，等待用户交互后生成音效');
+            return Promise.resolve(false);
+        }
+        
         isGenerating = true;
         generatePromise = new Promise((resolve) => {
             try {
@@ -765,16 +777,32 @@
                 }
                 isGenerating = false;
                 resolve(true);
-            } catch(e) { isGenerating = false; resolve(false); }
+            } catch(e) { 
+                isGenerating = false; 
+                resolve(false); 
+            }
         });
         return generatePromise;
     }
-    generateSoundBuffers();
     
     function playSound(buffer, volume = 0.5) {
         if (!audioCtx || !isAudioAllowed || !buffer) return;
-        // ★★★ 添加：如果不在运行状态，不播放（由调用方处理 resume）★★★
-        if (audioCtx.state !== 'running') return;
+        if (audioCtx.state !== 'running') {
+            audioCtx.resume().then(() => {
+                if (!correctSoundBuffer || !errorSoundBuffer) {
+                    generateSoundBuffers().then(() => {
+                        doPlaySound(buffer, volume);
+                    });
+                } else {
+                    doPlaySound(buffer, volume);
+                }
+            }).catch(e => console.log("音频恢复失败"));
+            return;
+        }
+        doPlaySound(buffer, volume);
+    }
+    
+    function doPlaySound(buffer, volume) {
         try {
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
@@ -791,10 +819,21 @@
         const now = Date.now();
         if (now - lastPlayTime < 50) return;
         lastPlayTime = now;
+        
         if (!audioCtx) initAudio();
         if (!isAudioAllowed) return;
         
-        // ★★★ 修改：定义播放函数 ★★★
+        if (!correctSoundBuffer || !errorSoundBuffer) {
+            generateSoundBuffers().then(() => {
+                doPlayKeySound(isError);
+            });
+            return;
+        }
+        
+        doPlayKeySound(isError);
+    }
+    
+    function doPlayKeySound(isError) {
         const doPlay = () => {
             if (isError) playSound(errorSoundBuffer, 0.45);
             else playSound(correctSoundBuffer, 0.55);
@@ -802,29 +841,47 @@
         
         if (audioCtx && audioCtx.state !== 'running') {
             audioCtx.resume().then(() => {
-                doPlay();
+                generateSoundBuffers().then(() => {
+                    doPlay();
+                });
             }).catch(e => console.log("音频启动失败"));
             return;
         }
         doPlay();
     }
     
-    let hasEnabled = false;
     function enableAudio() {
-        if (hasEnabled) return;
-        hasEnabled = true;
-        initAudio();
-        if (audioCtx) {
-            generateSoundBuffers().then(() => {
-                audioCtx.resume().then(() => {
-                    isAudioAllowed = true;
-                    setTimeout(() => { if (correctSoundBuffer) playSound(correctSoundBuffer, 0.3); }, 50);
-                }).catch(e => console.log("音频启动失败"));
-            });
-        } else { isAudioAllowed = true; }
+        if (audioEnabled) return;
+        audioEnabled = true;
+        
+        const ctx = initAudio();
+        if (ctx) {
+            ctx.resume().then(() => {
+                isAudioAllowed = true;
+                generateSoundBuffers().then(() => {
+                    if (correctSoundBuffer) {
+                        try {
+                            const source = ctx.createBufferSource();
+                            source.buffer = correctSoundBuffer;
+                            const gain = ctx.createGain();
+                            gain.gain.value = 0.2;
+                            source.connect(gain);
+                            gain.connect(ctx.destination);
+                            source.start();
+                        } catch(e) {}
+                        console.log('🔊 音频已启用');
+                    }
+                });
+            }).catch(e => console.log("音频启动失败:", e));
+        } else {
+            isAudioAllowed = true;
+        }
+        
         document.removeEventListener('click', enableAudio);
         document.removeEventListener('keydown', enableAudio);
     }
+    
+    // ★★★ 用户交互时启用音频 ★★★
     document.addEventListener('click', enableAudio);
     document.addEventListener('keydown', enableAudio);
     
@@ -990,10 +1047,16 @@
         return inputChar.toLowerCase() === expectedChar.toLowerCase();
     }
     
+    // ==================== 核心输入处理 ====================
+    let isProcessing = false;
+    
     function processCharacterInput(char, index, inputElement) {
         if (!active) return false;
         if (index >= total) return false;
         if (inputCorrect[index]) return false;
+        if (isProcessing) return false;
+        
+        isProcessing = true;
         
         const expectedChar = expected[index];
         
@@ -1016,6 +1079,8 @@
             updateStats();
             updateRefHighlight();
             
+            isProcessing = false;
+            
             if (currentIndex >= total) {
                 finish();
             } else {
@@ -1036,11 +1101,16 @@
             
             const expectedDisplay = expectedChar ? `"${expectedChar}"` : "?";
             showNavMessage(`❌ 第 ${index + 1} 个字符错误！应该输入 ${expectedDisplay}`, true);
+            
+            isProcessing = false;
             return false;
         }
+        
+        isProcessing = false;
         return false;
     }
     
+    // ==================== 创建输入框（完全只读） ====================
     function createInputSlots() {
         inputArea.innerHTML = '';
         inputValues = new Array(total).fill('');
@@ -1054,46 +1124,59 @@
             input.maxLength = 1;
             input.setAttribute('data-index', i);
             input.autocomplete = 'off';
+            input.readOnly = true;
             slot.appendChild(input);
             inputArea.appendChild(slot);
             
-            input.addEventListener('beforeinput', (function(idx) {
-                return function(e) {
-                    if (!active || inputCorrect[idx]) {
-                        e.preventDefault();
+            input.addEventListener('focus', (function(idx) {
+                return function() {
+                    if (inputCorrect[idx]) {
+                        for (let j = 0; j < total; j++) {
+                            if (!inputCorrect[j]) {
+                                const slot2 = inputArea.children[j];
+                                if (slot2) {
+                                    const inp = slot2.querySelector('input');
+                                    if (inp) inp.focus();
+                                }
+                                break;
+                            }
+                        }
                         return;
                     }
-                    e.preventDefault();
-                    const data = e.data;
-                    if (data && data.length > 0) {
-                        const char = data[0];
-                        startTimerOnFirstInput();
-                        processCharacterInput(char, idx, input);
-                    }
+                    updateRefHighlight();
                 };
             })(i));
             
             input.addEventListener('keydown', function(e) {
-                const key = e.key;
-                if (key === 'Enter') {
-                    e.preventDefault();
-                }
-                if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
-                    e.preventDefault();
-                }
-                if (key === 'Backspace') {
-                    e.preventDefault();
-                }
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            
+            input.addEventListener('keyup', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            
+            input.addEventListener('beforeinput', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            
+            input.addEventListener('input', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
             });
         }
         
         updateInputGridLayout();
     }
     
+    // ==================== 全局键盘监听器 ====================
     function setupGlobalKeyboardListener() {
         document.addEventListener('keydown', function(e) {
             if (!active) return;
             if (currentIndex >= total) return;
+            if (isProcessing) return;
             
             let key = e.key;
             
@@ -1106,35 +1189,28 @@
                 return;
             }
             
-            const activeElement = document.activeElement;
-            const isInputFocused = activeElement && activeElement.tagName === 'INPUT' && 
-                                   activeElement.parentElement && activeElement.parentElement.classList.contains('input-slot');
-            
-            if (isInputFocused) {
-                return;
-            }
-            
             e.preventDefault();
+            e.stopPropagation();
             
             const currentSlot = inputArea.children[currentIndex];
             if (!currentSlot) return;
             const currentInput = currentSlot.querySelector('input');
+            if (!currentInput) return;
             
             if (key.length === 1) {
                 startTimerOnFirstInput();
                 processCharacterInput(key, currentIndex, currentInput);
             }
-        });
+        }, true);
     }
     
-    // ==================== 获取下一关信息（使用标准化 JSON 比较） ====================
+    // ==================== 获取下一关信息 ====================
     function getNextLevelInfo() {
         if (basictypeLevels.length === 0) return null;
         
         let currentIdx = -1;
         const currentKeysJson = getCurrentKeysJson();
         
-        // 第一步：完全匹配（keys + level + num）
         for (let i = 0; i < basictypeLevels.length; i++) {
             const level = basictypeLevels[i];
             const levelKeysJson = normalizeKeysForCompare(level.keys);
@@ -1146,7 +1222,6 @@
             }
         }
         
-        // 第二步：如果完全匹配失败，尝试只匹配 keys + level（忽略 num）
         if (currentIdx === -1) {
             for (let i = 0; i < basictypeLevels.length; i++) {
                 const level = basictypeLevels[i];
@@ -1456,7 +1531,6 @@
         
         navCenterMsg.classList.remove('error-msg', 'success-msg');
         let displayMode = levelNames[urlLevel] || urlLevel;
-        // ✅ 使用 getKeysDisplayText 函数显示可读的 keys 文本
         let keysDisplay = getKeysDisplayText(urlKeys);
         showNavMessage(`🎈 ${displayMode} · 练习: ${keysDisplay} · 共${total}字符`, false);
     }
@@ -1517,9 +1591,8 @@
         window.location.href = 'courses.html';
     }
     
-    // ==================== 加载配置并初始化（使用标准化 JSON 比较） ====================
+    // ==================== 加载配置并初始化 ====================
     function loadConfigAndInit() {
-        // 获取 URL 中的 id 参数
         const urlIdParam = urlParams.get('id');
         let targetLevelId = urlIdParam ? parseInt(urlIdParam) : null;
         
@@ -1551,11 +1624,9 @@
                     return;
                 }
                 
-                // ✅ 优先使用 URL 中的 id 参数匹配关卡
                 let foundIndex = -1;
                 
                 if (targetLevelId && !isNaN(targetLevelId)) {
-                    // 根据 id 查找关卡
                     for (let i = 0; i < basictypeLevels.length; i++) {
                         if (basictypeLevels[i].id === targetLevelId) {
                             foundIndex = i;
@@ -1565,7 +1636,6 @@
                     }
                 }
                 
-                // 如果没有通过 id 找到，再使用 keys + level + num 匹配
                 if (foundIndex === -1) {
                     const currentKeysJson = getCurrentKeysJson();
                     for (let i = 0; i < basictypeLevels.length; i++) {
@@ -1580,7 +1650,6 @@
                     }
                 }
                 
-                // 如果还是没有找到，尝试只用 keys + level 匹配（忽略 num）
                 if (foundIndex === -1 && basictypeLevels.length > 0) {
                     const currentKeysJson = getCurrentKeysJson();
                     for (let i = 0; i < basictypeLevels.length; i++) {
@@ -1595,7 +1664,6 @@
                     }
                 }
                 
-                // 最终如果还没找到，使用第一关
                 if (foundIndex !== -1) {
                     currentLevelIndex = foundIndex;
                 } else if (basictypeLevels.length > 0) {
@@ -1621,7 +1689,6 @@
                 initPractice();
                 updatePageTitle();
                 
-                // 显示当前关卡信息
                 if (currentLevelData) {
                     showNavMessage(`🎯 第 ${currentLevelData.id} 关：${currentLevelData.description || '开始练习'}`, false);
                 }
