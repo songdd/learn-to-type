@@ -1,8 +1,17 @@
-// edge-functions/api/get-poems-v2.js
+// edge-functions/api/get-poems-v2.js - 诗词列表（分页+筛选）
+
+import logger from '../utils/logger.js';
+
+const MODULE = 'get-poems-v2';
+
 export async function onRequest(context) {
     const { request, env } = context;
-
+    
+    logger.init(env);
+    logger.request(MODULE, request);
+    
     if (request.method === 'OPTIONS') {
+        logger.debug(MODULE, 'CORS 预检请求');
         return new Response(null, {
             status: 204,
             headers: {
@@ -13,8 +22,9 @@ export async function onRequest(context) {
             }
         });
     }
-
+    
     if (request.method !== 'GET') {
+        logger.warn(MODULE, '❌ 非 GET 请求', { method: request.method });
         return new Response(JSON.stringify({
             success: false,
             message: '请使用 GET 请求'
@@ -26,7 +36,7 @@ export async function onRequest(context) {
             }
         });
     }
-
+    
     try {
         const url = new URL(request.url);
         const dynasty = url.searchParams.get('dynasty') || '';
@@ -35,11 +45,23 @@ export async function onRequest(context) {
         const page = parseInt(url.searchParams.get('page')) || 1;
         const pageSize = parseInt(url.searchParams.get('pageSize')) || 12;
         const offset = (page - 1) * pageSize;
-
+        
+        logger.info(MODULE, `📋 查询诗词`, {
+            dynasty: dynasty || '(全部)',
+            author: author || '(全部)',
+            search: search || '(无)',
+            page,
+            pageSize,
+            offset
+        });
+        
+        logger.env(MODULE, env);
+        
         const supabaseUrl = env.SUPABASE_URL;
         const supabaseKey = env.SUPABASE_SERVICE_KEY;
-
+        
         if (!supabaseUrl || !supabaseKey) {
+            logger.error(MODULE, '❌ 环境变量未配置');
             return new Response(JSON.stringify({
                 success: false,
                 message: '服务器配置错误'
@@ -50,10 +72,7 @@ export async function onRequest(context) {
                 }
             });
         }
-
-        // ============================================================
-        // 构建过滤条件
-        // ============================================================
+        
         let filters = [];
         if (dynasty && dynasty !== 'all') {
             filters.push(`dynasty=eq.${encodeURIComponent(dynasty)}`);
@@ -65,15 +84,12 @@ export async function onRequest(context) {
             const searchTerm = encodeURIComponent(search.trim());
             filters.push(`or=(title.ilike.*${searchTerm}*,author.ilike.*${searchTerm}*,content.ilike.*${searchTerm}*)`);
         }
-
+        
         const filterStr = filters.length > 0 ? '&' + filters.join('&') : '';
-
-        // ============================================================
-        // 1. 获取总数
-        // ============================================================
+        
+        // 获取总数
         let total = 0;
-
-        // 如果有搜索，必须从 poems 表 count
+        
         if (search && search.trim() !== '') {
             try {
                 const countUrl = `${supabaseUrl}/rest/v1/poems?select=id${filterStr}&limit=0`;
@@ -84,7 +100,7 @@ export async function onRequest(context) {
                         'Prefer': 'count=exact'
                     }
                 });
-
+                
                 if (countResponse.ok) {
                     const contentRange = countResponse.headers.get('Content-Range');
                     if (contentRange) {
@@ -98,14 +114,12 @@ export async function onRequest(context) {
                         total = Array.isArray(countData) ? countData.length : 0;
                     }
                 }
-                console.log(`📊 搜索总数: ${total}`);
+                logger.debug(MODULE, `📊 搜索总数: ${total}`);
             } catch (e) {
-                console.warn('搜索计数失败:', e.message);
+                logger.warn(MODULE, '⚠️ 搜索计数失败', e.message);
                 total = 0;
             }
-        } 
-        // ✅ 按作者：从 authors 表获取 poem_count
-        else if (author && author !== 'all') {
+        } else if (author && author !== 'all') {
             try {
                 const queryUrl = `${supabaseUrl}/rest/v1/authors?select=poem_count&name=eq.${encodeURIComponent(author)}`;
                 const response = await fetch(queryUrl, {
@@ -117,17 +131,13 @@ export async function onRequest(context) {
                 if (response.ok) {
                     const data = await response.json();
                     total = data[0]?.poem_count || 0;
-                    console.log(`📊 作者 ${author} 总数: ${total}`);
-                } else {
-                    console.warn(`查询作者失败: ${response.status}`);
+                    logger.debug(MODULE, `📊 作者 ${author} 总数: ${total}`);
                 }
             } catch (e) {
-                console.warn('获取作者总数失败:', e.message);
+                logger.warn(MODULE, '⚠️ 获取作者总数失败', e.message);
                 total = 0;
             }
-        } 
-        // ✅ 按朝代：从 dynasties 表获取 poem_count
-        else if (dynasty && dynasty !== 'all') {
+        } else if (dynasty && dynasty !== 'all') {
             try {
                 const queryUrl = `${supabaseUrl}/rest/v1/dynasties?select=poem_count&name=eq.${encodeURIComponent(dynasty)}`;
                 const response = await fetch(queryUrl, {
@@ -139,17 +149,13 @@ export async function onRequest(context) {
                 if (response.ok) {
                     const data = await response.json();
                     total = data[0]?.poem_count || 0;
-                    console.log(`📊 朝代 ${dynasty} 总数: ${total}`);
-                } else {
-                    console.warn(`查询朝代失败: ${response.status}`);
+                    logger.debug(MODULE, `📊 朝代 ${dynasty} 总数: ${total}`);
                 }
             } catch (e) {
-                console.warn('获取朝代总数失败:', e.message);
+                logger.warn(MODULE, '⚠️ 获取朝代总数失败', e.message);
                 total = 0;
             }
-        } 
-        // ✅ 全部：从 dynasties 表汇总
-        else {
+        } else {
             try {
                 const queryUrl = `${supabaseUrl}/rest/v1/dynasties?select=poem_count`;
                 const response = await fetch(queryUrl, {
@@ -161,44 +167,35 @@ export async function onRequest(context) {
                 if (response.ok) {
                     const data = await response.json();
                     total = data.reduce((sum, item) => sum + (item.poem_count || 0), 0);
-                    console.log(`📊 全部总数: ${total}`);
-                } else {
-                    console.warn(`查询全部朝代失败: ${response.status}`);
+                    logger.debug(MODULE, `📊 全部总数: ${total}`);
                 }
             } catch (e) {
-                console.warn('获取全部总数失败:', e.message);
+                logger.warn(MODULE, '⚠️ 获取全部总数失败', e.message);
                 total = 0;
             }
         }
-
+        
         const totalPages = Math.ceil(total / pageSize);
-
-        // ============================================================
-        // 2. 查询分页数据
-        //    ✅ 第1页: offset=0, 返回第1-12首
-        //    ✅ 第2页: offset=12, 返回第13-24首
-        // ============================================================
+        
         const queryUrl = `${supabaseUrl}/rest/v1/poems?select=id,title,author,category,dynasty,content&order=id.asc&limit=${pageSize}&offset=${offset}${filterStr}`;
-
-        console.log(`📖 查询: page=${page}, offset=${offset}, limit=${pageSize}, total=${total}`);
-
+        logger.supabase(MODULE, '查询分页数据', queryUrl);
+        
         const response = await fetch(queryUrl, {
             headers: {
                 'apikey': supabaseKey,
                 'Authorization': `Bearer ${supabaseKey}`
             }
         });
-
+        
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('查询数据失败:', response.status, errorText);
+            logger.error(MODULE, `❌ 查询失败: ${response.status}`, errorText);
             throw new Error(`查询数据失败: ${response.status}`);
         }
-
+        
         const data = await response.json();
-
-        console.log(`✅ 返回 ${data.length} 条数据 (第${page}页，共${totalPages}页)`);
-
+        logger.info(MODULE, `✅ 返回 ${data.length} 条数据 (第${page}页，共${totalPages}页)`);
+        
         return new Response(JSON.stringify({
             success: true,
             data: data,
@@ -213,9 +210,9 @@ export async function onRequest(context) {
                 'Access-Control-Allow-Origin': '*'
             }
         });
-
+        
     } catch (error) {
-        console.error('查询诗词失败:', error);
+        logger.errorWithStack(MODULE, error);
         return new Response(JSON.stringify({
             success: false,
             message: error.message || '服务器错误',

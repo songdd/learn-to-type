@@ -1,15 +1,22 @@
-// functions/get-invites.js - 支持过滤的后端分页查询
+// edge-functions/api/get-invites.js - 邀请码列表（分页+筛选）
+
+import logger from '../utils/logger.js';
+
+const MODULE = 'get-invites';
 
 export async function onRequest({ request, env }) {
-    // 处理 CORS
+    logger.init(env);
+    logger.request(MODULE, request);
+    
     if (request.method === 'OPTIONS') {
+        logger.debug(MODULE, 'CORS 预检请求');
         return new Response(null, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type'
             }
-        })
+        });
     }
     
     try {
@@ -18,17 +25,37 @@ export async function onRequest({ request, env }) {
         const pageSize = parseInt(url.searchParams.get('pageSize')) || 20;
         const offset = (page - 1) * pageSize;
         
-        // 获取过滤参数
         const filterName = url.searchParams.get('name') || '';
-        const filterUsed = url.searchParams.get('used'); // 'true' 或 'false' 或 null
+        const filterUsed = url.searchParams.get('used');
+        
+        logger.info(MODULE, `📋 查询邀请码`, {
+            page,
+            pageSize,
+            offset,
+            filterName: filterName || '(无)',
+            filterUsed: filterUsed || '(全部)'
+        });
+        
+        logger.env(MODULE, env);
         
         const supabaseUrl = env.SUPABASE_URL;
         const supabaseKey = env.SUPABASE_SERVICE_KEY;
         
-        // 构建过滤条件
+        if (!supabaseUrl || !supabaseKey) {
+            logger.error(MODULE, '❌ 环境变量未配置');
+            return new Response(JSON.stringify({
+                success: false,
+                message: '服务器配置错误',
+                data: [],
+                total: 0,
+                totalPages: 0
+            }), {
+                headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+            });
+        }
+        
         let filters = [];
         if (filterName) {
-            // 使用 ilike 进行模糊匹配（不区分大小写）
             filters.push(`name=ilike.*${encodeURIComponent(filterName)}*`);
         }
         if (filterUsed !== null) {
@@ -37,8 +64,9 @@ export async function onRequest({ request, env }) {
         
         const filterStr = filters.length > 0 ? `&${filters.join('&')}` : '';
         
-        // 1. 查询总数（带过滤条件）
         const countUrl = `${supabaseUrl}/rest/v1/invites?select=id${filterStr}`;
+        logger.supabase(MODULE, '查询总数', countUrl);
+        
         const countResponse = await fetch(countUrl, {
             headers: {
                 'apikey': supabaseKey,
@@ -50,8 +78,10 @@ export async function onRequest({ request, env }) {
         const total = allData.length;
         const totalPages = Math.ceil(total / pageSize);
         
-        // 2. 查询分页数据（带过滤条件和排序）
+        logger.debug(MODULE, `📊 总数: ${total}, 总页数: ${totalPages}`);
+        
         const queryUrl = `${supabaseUrl}/rest/v1/invites?select=*&order=id.desc&limit=${pageSize}&offset=${offset}${filterStr}`;
+        logger.supabase(MODULE, '查询分页数据', queryUrl);
         
         const response = await fetch(queryUrl, {
             headers: {
@@ -61,10 +91,12 @@ export async function onRequest({ request, env }) {
         });
         
         if (!response.ok) {
+            logger.error(MODULE, `❌ 查询失败: ${response.status}`);
             throw new Error('查询失败');
         }
         
         const data = await response.json();
+        logger.info(MODULE, `✅ 返回 ${data.length} 条记录`);
         
         return new Response(JSON.stringify({
             success: true,
@@ -78,10 +110,10 @@ export async function onRequest({ request, env }) {
         });
         
     } catch (error) {
-        console.error('查询错误:', error);
-        return new Response(JSON.stringify({ 
-            success: false, 
-            message: '服务器错误', 
+        logger.errorWithStack(MODULE, error);
+        return new Response(JSON.stringify({
+            success: false,
+            message: '服务器错误',
             data: [],
             total: 0,
             totalPages: 0
