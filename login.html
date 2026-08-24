@@ -181,21 +181,74 @@
             white-space: nowrap;
         }
 
-        .qr-container {
+        /* 平台标签页 */
+        .qr-tabs {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 10px;
+            margin-bottom: 22px;
             flex-wrap: wrap;
+        }
+
+        .qr-tab {
+            flex: 1;
+            min-width: 64px;
+            max-width: 110px;
+            padding: 10px 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .qr-tab:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .qr-tab.active {
+            background: linear-gradient(135deg, #ff0050, #ff6b35);
+            border-color: transparent;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(255, 0, 80, 0.35);
+        }
+
+        .qr-pane {
+            display: none;
+        }
+
+        .qr-pane.active {
+            display: block;
+            animation: fadeInPane 0.3s ease;
+        }
+
+        @keyframes fadeInPane {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .qr-item {
             text-align: center;
-            width: 160px;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
         }
 
         .qr-code {
-            width: 140px;
-            height: 140px;
+            width: 220px;
+            height: 220px;
             background: white;
             border-radius: 20px;
             padding: 10px;
@@ -367,18 +420,20 @@
                 padding: 24px 18px;
             }
             
-            .qr-container {
-                gap: 24px;
+            .qr-tabs {
+                gap: 8px;
             }
-            
-            .qr-item {
-                width: 130px;
+
+            .qr-tab {
+                min-width: 60px;
+                padding: 9px 4px;
+                font-size: 13px;
             }
-            
+
             .qr-code {
-                width: 110px;
-                height: 110px;
-                padding: 8px;
+                width: 200px;
+                height: 200px;
+                padding: 10px;
             }
             
             .qr-label {
@@ -401,22 +456,19 @@
         }
 
         @media (max-width: 380px) {
-            .qr-container {
-                gap: 16px;
+            .qr-tab {
+                min-width: 56px;
+                font-size: 12px;
             }
-            
-            .qr-item {
-                width: 110px;
-            }
-            
+
             .qr-code {
-                width: 90px;
-                height: 90px;
-                padding: 6px;
+                width: 180px;
+                height: 180px;
+                padding: 8px;
             }
             
             .qr-label {
-                font-size: 11px;
+                font-size: 12px;
             }
         }
     </style>
@@ -443,25 +495,59 @@
         <div class="qr-title">
             <span>📱 扫码添加好友 · 获取邀请码</span>
         </div>
-        <div class="qr-container">
-            <div class="qr-item">
-                <div class="qr-code" data-platform="抖音" data-img="pic/douyin.jpg">
-                    <img src="pic/douyin.jpg" alt="抖音二维码" 
-                         onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:#1a1a2e;border-radius:12px;\'>🎵</div>'">
-                    <span class="zoom-hint">🔍 点击放大</span>
-                </div>
-                <div class="qr-label">
-                    <span class="icon">🎵</span> 抖音
+        <div class="qr-tabs">
+            <button class="qr-tab active" data-tab="wechat">💬 微信</button>
+            <button class="qr-tab" data-tab="douyin">🎵 抖音</button>
+            <button class="qr-tab" data-tab="ks">🔥 快手</button>
+            <button class="qr-tab" data-tab="xhs">📕 小红书</button>
+        </div>
+        <div class="qr-tab-content">
+            <div class="qr-pane active" data-pane="wechat">
+                <div class="qr-item">
+                    <div class="qr-code" data-platform="微信" data-img="pic/wechat.jpg">
+                        <img src="pic/wechat.jpg" alt="微信二维码" 
+                             onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:#1a1a2e;border-radius:12px;\'>💬</div>'">
+                        <span class="zoom-hint">🔍 点击放大</span>
+                    </div>
+                    <div class="qr-label">
+                        <span class="icon">💬</span> 微信
+                    </div>
                 </div>
             </div>
-            <div class="qr-item">
-                <div class="qr-code" data-platform="微信" data-img="pic/wechat.jpg">
-                    <img src="pic/wechat.jpg" alt="微信二维码" 
-                         onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:#1a1a2e;border-radius:12px;\'>💬</div>'">
-                    <span class="zoom-hint">🔍 点击放大</span>
+            <div class="qr-pane" data-pane="douyin">
+                <div class="qr-item">
+                    <div class="qr-code" data-platform="抖音" data-img="pic/douyin.jpg">
+                        <img src="pic/douyin.jpg" alt="抖音二维码" 
+                             onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:#1a1a2e;border-radius:12px;\'>🎵</div>'">
+                        <span class="zoom-hint">🔍 点击放大</span>
+                    </div>
+                    <div class="qr-label">
+                        <span class="icon">🎵</span> 抖音
+                    </div>
                 </div>
-                <div class="qr-label">
-                    <span class="icon">💬</span> 微信
+            </div>
+            <div class="qr-pane" data-pane="ks">
+                <div class="qr-item">
+                    <div class="qr-code" data-platform="快手" data-img="pic/ks.jpg">
+                        <img src="pic/ks.jpg" alt="快手二维码" 
+                             onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:#1a1a2e;border-radius:12px;\'>🔥</div>'">
+                        <span class="zoom-hint">🔍 点击放大</span>
+                    </div>
+                    <div class="qr-label">
+                        <span class="icon">🔥</span> 快手
+                    </div>
+                </div>
+            </div>
+            <div class="qr-pane" data-pane="xhs">
+                <div class="qr-item">
+                    <div class="qr-code" data-platform="小红书" data-img="pic/xhs.jpg">
+                        <img src="pic/xhs.jpg" alt="小红书二维码" 
+                             onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:#1a1a2e;border-radius:12px;\'>📕</div>'">
+                        <span class="zoom-hint">🔍 点击放大</span>
+                    </div>
+                    <div class="qr-label">
+                        <span class="icon">📕</span> 小红书
+                    </div>
                 </div>
             </div>
         </div>
@@ -588,6 +674,8 @@
     }
 
     // ===== ★★★ 二维码大图预览功能 ★★★ =====
+    const PLATFORM_ICONS = { '微信': '💬', '抖音': '🎵', '快手': '🔥', '小红书': '📕' };
+
     function showImagePreview(imgSrc, platform) {
         // 移除已有的预览
         const existing = document.querySelector('.image-preview-overlay');
@@ -599,7 +687,7 @@
             <div class="preview-content">
                 <img class="preview-image" src="${imgSrc}" alt="${platform}二维码" 
                      onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-                <div style="display:none;font-size:80px;color:rgba(255,255,255,0.3);">${platform === '抖音' ? '🎵' : '💬'}</div>
+                <div style="display:none;font-size:80px;color:rgba(255,255,255,0.3);">${PLATFORM_ICONS[platform] || '📱'}</div>
                 <div class="preview-label">📱 ${platform} 二维码</div>
                 <div class="preview-close-hint">点击任意位置关闭 · 按 <kbd>ESC</kbd> 关闭</div>
             </div>
@@ -659,23 +747,21 @@
         });
     }
 
-    // ===== 设置二维码提示 =====
-    function setupQrHints() {
-        const douyinQr = document.getElementById('douyinQr');
-        const wechatQr = document.getElementById('wechatQr');
-        
-        // 保留原来的提示功能，但不再与点击冲突
-        if (douyinQr) {
-            douyinQr.addEventListener('mouseenter', () => {
-                // 鼠标悬停时显示提示（由 CSS 的 .zoom-hint 处理）
+    // ===== 二维码标签页切换 =====
+    function setupQrTabs() {
+        const tabs = document.querySelectorAll('.qr-tab');
+        const panes = document.querySelectorAll('.qr-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const target = this.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                panes.forEach(p => {
+                    p.classList.toggle('active', p.dataset.pane === target);
+                });
             });
-        }
-        
-        if (wechatQr) {
-            wechatQr.addEventListener('mouseenter', () => {
-                // 鼠标悬停时显示提示（由 CSS 的 .zoom-hint 处理）
-            });
-        }
+        });
     }
 
     // ===== 绑定事件 =====
@@ -692,7 +778,7 @@
     }
     
     // ===== 初始化 =====
-    setupQrHints();
+    setupQrTabs();
     setupQrClick();
     inviteInput.focus();
 </script>
